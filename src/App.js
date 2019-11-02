@@ -7,17 +7,26 @@ const VALUES = PRICE_DATA.map(({ Price }) => Price);
 
 function App() {
   const [timespan, setTimespan] = useState(2);
-  const values = VALUES.slice(0, Math.round(VALUES.length / timespan));
+  const values = VALUES.slice(
+    VALUES.length - Math.round(VALUES.length / timespan),
+    VALUES.length
+  );
   const averageValue = values.reduce((a, b) => a + b, 0) / values.length;
+  const minValue = Math.min(...values);
+  const maxValue = Math.max(...values);
 
   return (
     <div className="App">
-      <button onClick={() => setTimespan(1)}>24 hours</button>
-      <button onClick={() => setTimespan(2)}>7 days</button>
-      <button onClick={() => setTimespan(3)}>30 days</button>
-      <button onClick={() => setTimespan(4)}>1 year</button>
-      <button onClick={() => setTimespan(5)}>2 years</button>
-      <PeriodAverage values={values} averageValue={averageValue} />
+      <button onClick={() => setTimespan(96)}>24 hours</button>
+      <button onClick={() => setTimespan(24)}>7 days</button>
+      <button onClick={() => setTimespan(2)}>30 days</button>
+      <button onClick={() => setTimespan(1)}>1 year</button>
+      <PeriodAverage
+        values={values}
+        maxValue={maxValue}
+        minValue={minValue}
+        averageValue={averageValue}
+      />
     </div>
   );
 }

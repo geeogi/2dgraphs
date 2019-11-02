@@ -17,7 +17,9 @@ const PeriodAverageBase = props => {
     graphWidth = 920,
     graphDepth = 320,
     values,
-    averageValue
+    averageValue,
+    minValue,
+    maxValue
   } = props;
 
   useEffect(() => {
