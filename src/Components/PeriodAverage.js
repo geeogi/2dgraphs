@@ -1,33 +1,4 @@
 import React, { memo, useEffect, useRef, useState } from "react";
-import { continueStatement } from "@babel/types";
-
-const VALUES = [
-  10,
-  15,
-  30,
-  35,
-  50,
-  56,
-  11,
-  34,
-  65,
-  67,
-  50,
-  43,
-  54,
-  43,
-  23,
-  70,
-  55,
-  30,
-  10,
-  10,
-  45,
-  17,
-  13,
-  10
-];
-const AVERAGE_VALUE = VALUES.reduce((a, b) => a + b, 0) / VALUES.length;
 
 const PeriodAverageBase = props => {
   const [hasSetup, setHasSetup] = useState();
@@ -44,7 +15,9 @@ const PeriodAverageBase = props => {
     canvasSpacingUnit = 8,
     graphMargin = 8 * 5,
     graphWidth = 920,
-    graphDepth = 320
+    graphDepth = 320,
+    values,
+    averageValue
   } = props;
 
   useEffect(() => {
@@ -92,65 +65,104 @@ const PeriodAverageBase = props => {
       context.stroke();
     };
 
-    // Method: Draw frequency areas
-    const drawFrequencyLine = context => {
-      // Set fill gradient
-      const fillGradient = context.createLinearGradient(
-        graphMargin,
-        graphMargin,
-        graphMargin,
-        graphMargin + graphDepth
-      );
-      fillGradient.addColorStop(
-        1 - AVERAGE_VALUE / Math.max(...VALUES),
-        "#09d3ac"
-      );
-      fillGradient.addColorStop(
-        1.01 - AVERAGE_VALUE / Math.max(...VALUES),
-        "rgba(0,0,0,0)"
-      );
-      context.fillStyle = fillGradient;
+    // Method: Draw graph
+    const drawGraph = context => {
+      const maxValue = Math.max(...values);
+      const averageY = (averageValue / maxValue) * graphDepth;
 
-      // Set stroke gradient
-      const strokeGradient = context.createLinearGradient(
+      // Color block: begin path
+      context.beginPath();
+      context.strokeStyle = "rgba(9,211,172,1)";
+
+      // Color block: create gradient
+      var gradient = context.createLinearGradient(
+        0,
         graphMargin,
-        graphMargin,
-        graphMargin,
+        0,
         graphMargin + graphDepth
       );
-      strokeGradient.addColorStop(
-        1 - AVERAGE_VALUE / Math.max(...VALUES),
-        "rgba(0,0,0,0)"
+      gradient.addColorStop(0, "rgba(9,211,172,0.4)");
+      gradient.addColorStop(1 - averageY / graphDepth, "rgba(9,211,172,0)");
+      context.fillStyle = gradient;
+
+      // Color block: draw, stroke and fill path
+      values.forEach((value, index) => {
+        const graphX = index * (graphWidth / (values.length - 1));
+        const graphY = (value / maxValue) * graphDepth;
+        context.lineTo(graphMargin + graphX, graphMargin + graphDepth - graphY);
+        if (index === values.length - 1) {
+          context.lineTo(
+            graphMargin + graphWidth,
+            graphMargin + graphDepth - graphY
+          );
+          context.lineTo(graphMargin + graphWidth, graphMargin + graphDepth);
+        }
+      });
+      context.stroke();
+      context.fill();
+
+      // Color block: clear block underneath the average line
+      context.clearRect(
+        graphMargin,
+        graphMargin + graphDepth - averageY,
+        graphWidth + 1,
+        averageY
       );
-      strokeGradient.addColorStop(
-        1.01 - AVERAGE_VALUE / Math.max(...VALUES),
-        "#09d3ac"
+      context.clearRect(
+        graphMargin + graphWidth - 1,
+        graphMargin,
+        2,
+        graphDepth
       );
-      context.strokeStyle = strokeGradient;
+
+      // Color block: save color block for later
+      const blockImageData = context.getImageData(
+        canvasResolutionScale * graphMargin, // x
+        canvasResolutionScale * graphMargin, // y
+        canvasResolutionScale * graphWidth, // w
+        canvasResolutionScale * (graphDepth - averageY) // h
+      );
+
+      // Clear graph
+      context.clearRect(graphMargin, graphMargin, graphWidth, graphDepth);
 
       // Draw dashed path
       context.setLineDash([5, 5]);
       context.beginPath();
-      VALUES.forEach((value, index) => {
-        const graphX = index * (graphWidth / (VALUES.length - 1));
-        const graphY = (value / Math.max(...VALUES)) * graphDepth;
+      values.forEach((value, index) => {
+        const graphX = index * (graphWidth / (values.length - 1));
+        const graphY = (value / maxValue) * graphDepth;
         context.lineTo(graphMargin + graphX, graphMargin + graphDepth - graphY);
       });
-      context.fill();
       context.stroke();
 
-      // Draw average path
+      // Clear dashed path above the average line
+      context.clearRect(
+        graphMargin,
+        graphMargin,
+        graphWidth,
+        graphDepth - averageY
+      );
+
+      // Draw average line
       context.setLineDash([]);
-      context.strokeStyle = "#09d3ac";
+      context.strokeStyle = "rgba(9,211,172,1)";
       context.lineWidth = 2;
       context.beginPath();
-      const graphY = (AVERAGE_VALUE / Math.max(...VALUES)) * graphDepth;
+      const graphY = averageY;
       context.moveTo(graphMargin, graphMargin + graphDepth - graphY);
       context.lineTo(
         graphMargin + graphWidth,
         graphMargin + graphDepth - graphY
       );
       context.stroke();
+
+      // Re-add the color block
+      context.putImageData(
+        blockImageData,
+        canvasResolutionScale * graphMargin, // x
+        canvasResolutionScale * graphMargin // y
+      );
     };
 
     // Method: Clear the graph
@@ -173,7 +185,7 @@ const PeriodAverageBase = props => {
 
     // Draw graph
     if (!disabled) {
-      drawFrequencyLine(context);
+      drawGraph(context);
     }
     drawGraphAxes(context);
 
@@ -188,7 +200,9 @@ const PeriodAverageBase = props => {
     graphWidth,
     canvasWidth,
     canvasDepth,
-    canvasSpacingUnit
+    canvasSpacingUnit,
+    values,
+    averageValue
   ]);
 
   return (
