@@ -69,8 +69,10 @@ const PeriodAverageBase = props => {
 
     // Method: Draw graph
     const drawGraph = context => {
-      const maxValue = Math.max(...values);
-      const averageY = (averageValue / maxValue) * graphDepth;
+      const normalise = value => value - minValue;
+      const getYFactor = value => normalise(value) / normalise(maxValue);
+      const getY = value => getYFactor(value) * graphDepth;
+      const averageY = getY(averageValue);
 
       // Color block: begin path
       context.beginPath();
@@ -84,13 +86,13 @@ const PeriodAverageBase = props => {
         graphMargin + graphDepth
       );
       gradient.addColorStop(0, "rgba(9,211,172,0.4)");
-      gradient.addColorStop(1 - averageY / graphDepth, "rgba(9,211,172,0)");
+      gradient.addColorStop(1 - getYFactor(averageValue), "rgba(9,211,172,0)");
       context.fillStyle = gradient;
 
       // Color block: draw, stroke and fill path
       values.forEach((value, index) => {
         const graphX = index * (graphWidth / (values.length - 1));
-        const graphY = (value / maxValue) * graphDepth;
+        const graphY = getY(value);
         context.lineTo(graphMargin + graphX, graphMargin + graphDepth - graphY);
         if (index === values.length - 1) {
           context.lineTo(
@@ -133,7 +135,7 @@ const PeriodAverageBase = props => {
       context.beginPath();
       values.forEach((value, index) => {
         const graphX = index * (graphWidth / (values.length - 1));
-        const graphY = (value / maxValue) * graphDepth;
+        const graphY = getY(value);
         context.lineTo(graphMargin + graphX, graphMargin + graphDepth - graphY);
       });
       context.stroke();
