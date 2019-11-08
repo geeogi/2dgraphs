@@ -44,7 +44,7 @@ const PeriodAverageBase = props => {
       context.fillStyle = "#fff";
       context.strokeStyle = "#fff";
       context.lineWidth = 1;
-      context.font = "20px Arial";
+      context.font = "12px Arial";
 
       // Draw x-axis
       context.moveTo(graphMargin, graphDepth + graphMargin);
@@ -55,14 +55,18 @@ const PeriodAverageBase = props => {
       context.lineTo(graphMargin, graphDepth + graphMargin);
 
       // Add x-axis labels
-      context.textAlign = "center";
 
-      // Add graph title
-      context.fillText(
-        "Period average",
-        canvasWidth / 2,
-        graphMargin - canvasSpacingUnit
-      );
+      // Add y-axis labels
+      const numberOfYAxisLabels = 5;
+      [...Array(numberOfYAxisLabels)].forEach((_, index) => {
+        const numberOfYLegendGridRows = numberOfYAxisLabels - 1;
+        const valueRange = maxValue - minValue;
+        const valueStep = valueRange / numberOfYLegendGridRows;
+        const yStep = graphDepth / numberOfYLegendGridRows;
+        const labelValue = minValue + valueStep * index;
+        const labelY = graphMargin + yStep * (numberOfYLegendGridRows - index);
+        context.fillText(Math.round(labelValue), 0, labelY);
+      });
 
       context.stroke();
     };
@@ -179,13 +183,13 @@ const PeriodAverageBase = props => {
     const context = current.getContext("2d");
 
     // Setup graph resolution
-    if (!hasSetup) {
-      scaleCanvasResolution(context, current);
-      setHasSetup(true);
-    } else {
-      descaleCanvasResolution(context, current);
-      scaleCanvasResolution(context, current);
-    }
+    // if (!hasSetup) {
+    //   scaleCanvasResolution(context, current);
+    //   setHasSetup(true);
+    // } else {
+    //   descaleCanvasResolution(context, current);
+    //   scaleCanvasResolution(context, current);
+    // }
 
     // Draw graph
     if (!disabled) {
@@ -206,15 +210,17 @@ const PeriodAverageBase = props => {
     canvasDepth,
     canvasSpacingUnit,
     values,
-    averageValue
+    averageValue,
+    maxValue,
+    minValue
   ]);
 
   return (
     <canvas
       name="frequency"
       ref={canvasElement}
-      width={canvasWidth + "px"}
-      height={canvasDepth + "px"}
+      width={"80%"}
+      height={"80%"}
     />
   );
 };
