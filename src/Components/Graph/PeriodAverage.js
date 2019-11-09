@@ -16,7 +16,9 @@ const PeriodAverageBase = props => {
     values,
     averageValue,
     minValue,
-    maxValue
+    maxValue,
+    activeX,
+    activeY
   } = props;
 
   useEffect(() => {
@@ -71,6 +73,8 @@ const PeriodAverageBase = props => {
         const labelValue = minValue + valueStep * index;
         const labelY = graphMargin + yStep * (numberOfYLegendGridRows - index);
         context.fillText(Math.round(labelValue), 0, labelY);
+        context.moveTo(graphMargin - canvasSpacingUnit, labelY);
+        context.lineTo(graphMargin, labelY);
       });
 
       context.stroke();
@@ -184,6 +188,11 @@ const PeriodAverageBase = props => {
       );
     };
 
+    //Method: Draw active region
+    const drawActiveRegion = context => {
+      context.fillRect(activeX, activeY, 50, 50);
+    };
+
     // Method: Clear the graph
     const clearCanvas = context => {
       context.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -201,6 +210,9 @@ const PeriodAverageBase = props => {
     // Draw graph
     if (!disabled) {
       drawGraph(context);
+      if (activeX && activeY) {
+        drawActiveRegion(context);
+      }
     }
     drawGraphAxes(context);
 
@@ -216,7 +228,9 @@ const PeriodAverageBase = props => {
     values,
     averageValue,
     maxValue,
-    minValue
+    minValue,
+    activeX,
+    activeY
   ]);
 
   return (

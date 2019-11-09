@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import "./App.css";
 import { Button } from "./Components/Button";
-import { Flex } from "./Components/Flex";
-import { ResponsiveGraph } from "./Components/ResponsiveGraph";
+import { Column } from "./Components/Column";
+import { InteractiveGraph } from "./Components/Graph/InteractiveGraph";
+import { PaddedGraph } from "./Components/Graph/PaddedGraph";
+import { PeriodAverage } from "./Components/Graph/PeriodAverage";
+import { ResponsiveGraph } from "./Components/Graph/ResponsiveGraph";
+import { Row } from "./Components/Row";
 import PRICE_DATA from "./Data/price.json";
 
 const VALUES = PRICE_DATA.map(({ Price }) => Price);
@@ -18,9 +21,9 @@ function App() {
   const maxValue = Math.max(...values);
 
   return (
-    <div className="App">
-      <div style={{ width: "80%" }}>
-        <Flex>
+    <main>
+      <Column>
+        <Row>
           <Button onClick={() => setTimespan(1)} active={timespan === 1}>
             1y
           </Button>
@@ -33,15 +36,29 @@ function App() {
           <Button onClick={() => setTimespan(96)} active={timespan === 96}>
             24h
           </Button>
-        </Flex>
-        <ResponsiveGraph
-          values={values}
-          maxValue={maxValue}
-          minValue={minValue}
-          averageValue={averageValue}
-        ></ResponsiveGraph>
-      </div>
-    </div>
+        </Row>
+        <PaddedGraph>
+          <InteractiveGraph>
+            {({ activeX, activeY }) => (
+              <ResponsiveGraph>
+                {({ height, width }) => (
+                  <PeriodAverage
+                    activeX={activeX}
+                    activeY={activeY}
+                    values={values}
+                    maxValue={maxValue}
+                    minValue={minValue}
+                    averageValue={averageValue}
+                    canvasHeight={height - 8}
+                    canvasWidth={width - 8}
+                  />
+                )}
+              </ResponsiveGraph>
+            )}
+          </InteractiveGraph>
+        </PaddedGraph>
+      </Column>
+    </main>
   );
 }
 

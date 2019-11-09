@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { PeriodAverage } from "./PeriodAverage";
 
 const ResponsiveGraphBase = styled.div`
   min-height: 400px;
@@ -12,8 +11,10 @@ export const ResponsiveGraph = props => {
   const [height, setHeight] = useState();
   const [width, setWidth] = useState();
   const container = useRef();
+  const { children } = props;
 
   useEffect(() => {
+    // Grab the dimensions of this element
     const setDimensions = () => {
       if (container.current) {
         setHeight(container.current.offsetHeight);
@@ -29,22 +30,13 @@ export const ResponsiveGraph = props => {
     // Set dimensions on resize
     window.addEventListener("resize", setDimensions);
 
-    // Clean up
+    // Remove event listener on element destroy
     return () => window.removeEventListener("resize", setDimensions);
   }, [height, width]);
 
   return (
     <ResponsiveGraphBase ref={container}>
-      {height && width && (
-        <PeriodAverage
-          values={props.values}
-          maxValue={props.maxValue}
-          minValue={props.minValue}
-          averageValue={props.averageValue}
-          canvasHeight={height - 8}
-          canvasWidth={width - 8}
-        />
-      )}
+      {height && width && children({ height, width })}
     </ResponsiveGraphBase>
   );
 };
