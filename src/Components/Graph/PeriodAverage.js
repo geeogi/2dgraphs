@@ -1,4 +1,9 @@
 import React, { memo, useEffect, useRef, useState } from "react";
+import {
+  PRIMARY_COLOR,
+  BACKGROUND_COLOR,
+  CONTRAST_COLOR
+} from "../../Data/colors";
 
 const PeriodAverageBase = props => {
   const [hasSetup, setHasSetup] = useState();
@@ -87,9 +92,19 @@ const PeriodAverageBase = props => {
       const getY = value => getYFactor(value) * graphHeight;
       const averageY = getY(averageValue);
 
+      // Calculate points
+      const points = values.map((value, index) => {
+        const graphX = index * (graphWidth / (values.length - 1));
+        const graphY = getY(value);
+        const canvasX = graphMargin + graphX;
+        const canvasY = graphMargin + graphHeight - graphY;
+        return { canvasX, canvasY, value };
+      });
+
       // Color block: begin path
       context.beginPath();
       context.strokeStyle = "rgba(9,211,172,1)";
+      context.lineJoin = "round";
 
       // Color block: create gradient
       var gradient = context.createLinearGradient(
@@ -103,18 +118,10 @@ const PeriodAverageBase = props => {
       context.fillStyle = gradient;
 
       // Color block: draw, stroke and fill path
-      values.forEach((value, index) => {
-        const graphX = index * (graphWidth / (values.length - 1));
-        const graphY = getY(value);
-        context.lineTo(
-          graphMargin + graphX,
-          graphMargin + graphHeight - graphY
-        );
-        if (index === values.length - 1) {
-          context.lineTo(
-            graphMargin + graphWidth,
-            graphMargin + graphHeight - graphY
-          );
+      points.forEach(({ canvasX, canvasY }, index) => {
+        context.lineTo(canvasX, canvasY);
+        if (index === points.length - 1) {
+          context.lineTo(canvasX, canvasY);
           context.lineTo(graphMargin + graphWidth, graphMargin + graphHeight);
         }
       });
@@ -149,13 +156,8 @@ const PeriodAverageBase = props => {
       // Draw dashed path
       context.setLineDash([5, 5]);
       context.beginPath();
-      values.forEach((value, index) => {
-        const graphX = index * (graphWidth / (values.length - 1));
-        const graphY = getY(value);
-        context.lineTo(
-          graphMargin + graphX,
-          graphMargin + graphHeight - graphY
-        );
+      points.forEach(({ canvasX, canvasY }) => {
+        context.lineTo(canvasX, canvasY);
       });
       context.stroke();
 
@@ -186,11 +188,50 @@ const PeriodAverageBase = props => {
         canvasResolutionScale * graphMargin, // x
         canvasResolutionScale * graphMargin // y
       );
-    };
 
-    //Method: Draw active region
-    const drawActiveRegion = context => {
-      context.fillRect(activeX, activeY, 50, 50);
+      // Draw active region
+      if (activeX && activeY) {
+        context.fillStyle = PRIMARY_COLOR;
+        const sortedPoints = points.sort((a, b) => {
+          return Math.abs(a.canvasX - activeX) - Math.abs(b.canvasX - activeX);
+        });
+        const [{ canvasX, canvasY, value }] = sortedPoints;
+
+        // Draw active legend
+        context.strokeStyle = PRIMARY_COLOR;
+        context.fillStyle = BACKGROUND_COLOR;
+        context.beginPath();
+        context.moveTo(canvasX, canvasY);
+        context.lineTo(
+          canvasX - 2 * canvasSpacingUnit,
+          canvasY - 2 * canvasSpacingUnit
+        );
+        context.lineTo(canvasX - graphMargin, canvasY - 2 * canvasSpacingUnit);
+        context.lineTo(canvasX - graphMargin, canvasY + 2 * canvasSpacingUnit);
+        context.lineTo(
+          canvasX - 2 * canvasSpacingUnit,
+          canvasY + 2 * canvasSpacingUnit
+        );
+        context.lineTo(canvasX, canvasY);
+        context.stroke();
+        context.fill();
+
+        // Draw active handle
+        context.fillStyle = PRIMARY_COLOR;
+        context.strokeStyle = BACKGROUND_COLOR;
+        context.beginPath();
+        context.arc(canvasX, canvasY, 5, 0, 2 * Math.PI);
+        context.fill();
+        context.stroke();
+
+        // Write text
+        context.fillStyle = CONTRAST_COLOR;
+        context.fillText(
+          Math.round(value),
+          canvasX - (graphMargin - canvasSpacingUnit / 2),
+          canvasY + canvasSpacingUnit / 2
+        );
+      }
     };
 
     // Method: Clear the graph
@@ -208,13 +249,10 @@ const PeriodAverageBase = props => {
     }
 
     // Draw graph
+    drawGraphAxes(context);
     if (!disabled) {
       drawGraph(context);
-      if (activeX && activeY) {
-        drawActiveRegion(context);
-      }
     }
-    drawGraphAxes(context);
 
     // Clean up
     return () => clearCanvas(context);
