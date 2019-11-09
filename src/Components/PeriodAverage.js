@@ -24,7 +24,7 @@ const PeriodAverageBase = props => {
     const { current } = canvasElement;
     const context = current.getContext("2d");
 
-    const graphMargin = 8;
+    const graphMargin = 5 * canvasSpacingUnit;
     const graphHeight = canvasHeight - 2 * graphMargin;
     const graphWidth = canvasWidth - 2 * graphMargin;
 
