@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import "./App.css";
-import { PeriodAverage } from "./Components/PeriodAverage";
-import PRICE_DATA from "./Data/price.json";
-import { Flex } from "./Components/Flex";
 import { Button } from "./Components/Button";
+import { Flex } from "./Components/Flex";
+import { ResponsiveGraph } from "./Components/ResponsiveGraph";
+import PRICE_DATA from "./Data/price.json";
 
 const VALUES = PRICE_DATA.map(({ Price }) => Price);
 
@@ -19,7 +19,7 @@ function App() {
 
   return (
     <div className="App">
-      <div>
+      <div style={{ width: "80%" }}>
         <Flex>
           <Button onClick={() => setTimespan(1)} active={timespan === 1}>
             1y
@@ -34,12 +34,12 @@ function App() {
             24h
           </Button>
         </Flex>
-        <PeriodAverage
+        <ResponsiveGraph
           values={values}
           maxValue={maxValue}
           minValue={minValue}
           averageValue={averageValue}
-        />
+        ></ResponsiveGraph>
       </div>
     </div>
   );
