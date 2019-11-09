@@ -5,6 +5,7 @@ import { InteractiveGraph } from "./Components/Graph/InteractiveGraph";
 import { PaddedGraph } from "./Components/Graph/PaddedGraph";
 import { PeriodAverage } from "./Components/Graph/PeriodAverage";
 import { ResponsiveGraph } from "./Components/Graph/ResponsiveGraph";
+import { H3 } from "./Components/H";
 import { Row } from "./Components/Row";
 import PRICE_DATA from "./Data/price.json";
 
@@ -23,6 +24,7 @@ function App() {
   return (
     <main>
       <Column>
+        <H3>Period average</H3>
         <Row>
           <Button onClick={() => setTimespan(1)} active={timespan === 1}>
             1y
@@ -39,12 +41,13 @@ function App() {
         </Row>
         <PaddedGraph>
           <InteractiveGraph>
-            {({ activeX, activeY }) => (
+            {({ activeX, activeY, isClicked }) => (
               <ResponsiveGraph>
                 {({ height, width }) => (
                   <PeriodAverage
                     activeX={activeX}
                     activeY={activeY}
+                    isClicked={isClicked}
                     values={values}
                     maxValue={maxValue}
                     minValue={minValue}

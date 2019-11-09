@@ -1,11 +1,14 @@
 import React, { useRef, useState } from "react";
 import styled from "styled-components";
 
-const InteractiveGraphBase = styled.div``;
+const InteractiveGraphBase = styled.div`
+  cursor: pointer;
+`;
 
 export const InteractiveGraph = props => {
   const [activeX, setActiveX] = useState();
   const [activeY, setActiveY] = useState();
+  const [isClicked, setIsClicked] = useState();
   const container = useRef();
   const { children } = props;
 
@@ -17,9 +20,26 @@ export const InteractiveGraph = props => {
     setActiveY(y);
   };
 
+  const handleMouseLeave = () => {
+    setActiveX();
+    setActiveY();
+  };
+
+  const handleMouseDown = () => {
+    setIsClicked(true);
+    document.addEventListener("mouseup", () => {
+      setIsClicked(false);
+    });
+  };
+
   return (
-    <InteractiveGraphBase ref={container} onMouseMove={handleMouseMove}>
-      {children({ activeX, activeY })}
+    <InteractiveGraphBase
+      ref={container}
+      onMouseMove={handleMouseMove}
+      onMouseDown={handleMouseDown}
+      onMouseLeave={handleMouseLeave}
+    >
+      {children({ activeX, activeY, isClicked })}
     </InteractiveGraphBase>
   );
 };
