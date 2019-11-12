@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Button } from "./Components/Button";
 import { Column } from "./Components/Column";
-import { InteractiveGraph } from "./Components/Graph/InteractiveGraph";
-import { PaddedGraph } from "./Components/Graph/PaddedGraph";
+import { InteractiveGraph } from "./Components/Graph/Containers/InteractiveGraph";
+import { PaddedGraph } from "./Components/Graph/Containers/PaddedGraph";
 import { PeriodAverage } from "./Components/Graph/PeriodAverage";
-import { ResponsiveGraph } from "./Components/Graph/ResponsiveGraph";
+import { ResponsiveGraph } from "./Components/Graph/Containers/ResponsiveGraph";
 import { H3 } from "./Components/H";
 import { Row } from "./Components/Row";
 import PRICE_DATA from "./Data/price.json";

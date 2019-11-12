@@ -92,7 +92,7 @@ const PeriodAverageBase = props => {
       });
 
       // Add y-axis labels
-      context.textAlign = "start";
+      context.textAlign = "end";
       const numberOfYAxisLabels = 5;
       const numberOfYLegendGridRows = numberOfYAxisLabels - 1;
       const valueRange = maxValue - minValue;
@@ -101,7 +101,11 @@ const PeriodAverageBase = props => {
       [...Array(numberOfYAxisLabels)].forEach((_, index) => {
         const labelValue = minValue + valueStep * index;
         const labelY = graphMargin + yStep * (numberOfYLegendGridRows - index);
-        context.fillText(`$${Math.round(labelValue)}`, 0, labelY);
+        context.fillText(
+          `$${Math.round(labelValue)}`,
+          graphMargin - 1.5 * canvasSpacingUnit,
+          labelY + 2
+        );
         context.moveTo(graphMargin - canvasSpacingUnit, labelY);
         context.lineTo(graphMargin, labelY);
       });
@@ -212,7 +216,9 @@ const PeriodAverageBase = props => {
       );
 
       // Draw average legend body
-      context.fillStyle = PRIMARY_COLOR;
+      context.fillStyle = BACKGROUND_COLOR;
+      context.strokeStyle = PRIMARY_COLOR;
+      context.lineWidth = 1;
       context.beginPath();
       context.moveTo(graphMargin * 2, averageYCanvasY);
       context.lineTo(
@@ -233,10 +239,12 @@ const PeriodAverageBase = props => {
       );
       context.lineTo(graphMargin * 2, averageYCanvasY);
       context.fill();
+      context.stroke();
 
       // Draw average legend text
       context.textAlign = "center";
-      context.fillStyle = BACKGROUND_COLOR;
+      context.font = "12px Arial";
+      context.fillStyle = CONTRAST_COLOR;
       context.fillText(
         `$${Math.round(averageValue)}`,
         graphMargin * 2 + IN_GRAPH_LEGEND.WIDTH / 2,
@@ -266,7 +274,7 @@ const PeriodAverageBase = props => {
             context.stroke();
           }
 
-          // Draw legend body
+          // Draw active legend body
           context.strokeStyle = PRIMARY_COLOR;
           context.fillStyle = BACKGROUND_COLOR;
           context.beginPath();
@@ -291,7 +299,7 @@ const PeriodAverageBase = props => {
           context.stroke();
           context.fill();
 
-          // Draw legend handle
+          // Draw active legend handle
           context.fillStyle = PRIMARY_COLOR;
           context.strokeStyle = BACKGROUND_COLOR;
           context.beginPath();
@@ -299,12 +307,12 @@ const PeriodAverageBase = props => {
           context.fill();
           context.stroke();
 
-          // Write legend text
+          // Write active legend text
           context.fillStyle = CONTRAST_COLOR;
-          context.textAlign = "center";
+          context.textAlign = "end";
           context.fillText(
             `$${Math.round(value)}`,
-            canvasX - (IN_GRAPH_LEGEND.WIDTH + 2 * canvasSpacingUnit) / 2,
+            canvasX - (IN_GRAPH_LEGEND.WIDTH + 2 * canvasSpacingUnit) / 4,
             canvasY + canvasSpacingUnit / 2
           );
         }
