@@ -8,6 +8,7 @@ import {
 
 export const Button = styled.button`
   display: inline-block;
+  margin: 4px;
   border-radius: 3px;
   background: ${props => (props.active ? PRIMARY_COLOR : BACKGROUND_COLOR)};
   color: ${props => (props.active ? BORDER_COLOR : CONTRAST_COLOR)};

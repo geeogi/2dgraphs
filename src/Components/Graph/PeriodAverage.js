@@ -5,9 +5,10 @@ import {
   PRIMARY_COLOR,
   PRIMARY_BASE
 } from "../../Data/colors";
+import { valueLabels } from "./Utils/labels";
 
 const IN_GRAPH_LEGEND = {
-  WIDTH: 56,
+  WIDTH: 72,
   HEIGHT: 24
 };
 
@@ -38,9 +39,12 @@ const PeriodAverageBase = props => {
     const { current } = canvasElement;
     const context = current.getContext("2d");
 
-    const graphMargin = 6 * canvasSpacingUnit;
+    const graphMargin = 8 * canvasSpacingUnit;
     const graphHeight = canvasHeight - 2 * graphMargin;
     const graphWidth = canvasWidth - 2 * graphMargin;
+    const labels = valueLabels(minValue, maxValue, 4);
+    const yAxisMin = labels[0];
+    const yAxisMax = labels[labels.length - 1];
 
     // Method: Scale canvas resolution for retina displays
     const scaleCanvasResolution = context => {
@@ -76,7 +80,7 @@ const PeriodAverageBase = props => {
 
       // Add x-axis labels
       context.textAlign = "center";
-      const xLabels = ["Aug '18", "Sep '18", "Oct '18", "Nov '18", "Dec '18"];
+      const xLabels = ["Sep '18", "Oct '18", "Nov '18", "Dec '18"];
       const numberOfXLegendGridColumns = xLabels.length - 1;
       xLabels.forEach((label, index) => {
         const xStep = graphWidth / numberOfXLegendGridColumns;
@@ -93,13 +97,9 @@ const PeriodAverageBase = props => {
 
       // Add y-axis labels
       context.textAlign = "end";
-      const numberOfYAxisLabels = 5;
-      const numberOfYLegendGridRows = numberOfYAxisLabels - 1;
-      const valueRange = maxValue - minValue;
-      const valueStep = valueRange / numberOfYLegendGridRows;
+      const numberOfYLegendGridRows = labels.length - 1;
       const yStep = graphHeight / numberOfYLegendGridRows;
-      [...Array(numberOfYAxisLabels)].forEach((_, index) => {
-        const labelValue = minValue + valueStep * index;
+      labels.forEach((labelValue, index) => {
         const labelY = graphMargin + yStep * (numberOfYLegendGridRows - index);
         context.fillText(
           `$${Math.round(labelValue)}`,
@@ -115,8 +115,8 @@ const PeriodAverageBase = props => {
 
     // Method: Draw graph
     const drawGraph = context => {
-      const normalise = value => value - minValue;
-      const getYFactor = value => normalise(value) / normalise(maxValue);
+      const normalise = value => value - yAxisMin;
+      const getYFactor = value => normalise(value) / normalise(yAxisMax);
       const getY = value => getYFactor(value) * graphHeight;
       const averageY = getY(averageValue);
 
