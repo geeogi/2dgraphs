@@ -5,12 +5,14 @@ import {
   PRIMARY_COLOR,
   PRIMARY_BASE
 } from "../../Data/colors";
-import { valueLabels } from "./Utils/labels";
+import { priceLabels as priceLabels } from "./Utils/labels";
 
 const IN_GRAPH_LEGEND = {
   WIDTH: 72,
   HEIGHT: 24
 };
+
+const toUnix = dateString => new Date(dateString).getTime();
 
 const PeriodAverageBase = props => {
   const [hasSetup, setHasSetup] = useState();
@@ -26,9 +28,11 @@ const PeriodAverageBase = props => {
     canvasResolutionScale = 4,
     canvasSpacingUnit = 8,
     values,
-    averageValue,
-    minValue,
-    maxValue,
+    minPrice,
+    maxPrice,
+    averagePrice,
+    earliestDate,
+    latestDate,
     activeX,
     activeY,
     isClicked
@@ -42,9 +46,14 @@ const PeriodAverageBase = props => {
     const graphMargin = 8 * canvasSpacingUnit;
     const graphHeight = canvasHeight - 2 * graphMargin;
     const graphWidth = canvasWidth - 2 * graphMargin;
-    const labels = valueLabels(minValue, maxValue, 4);
-    const yAxisMin = labels[0];
-    const yAxisMax = labels[labels.length - 1];
+
+    const yLabels = priceLabels(minPrice, maxPrice, 4);
+    const yAxisMin = yLabels[0];
+    const yAxisMax = yLabels[yLabels.length - 1];
+
+    const xLabels = [earliestDate, latestDate];
+    const xAxisMin = toUnix(earliestDate);
+    const xAxisMax = toUnix(latestDate);
 
     // Method: Scale canvas resolution for retina displays
     const scaleCanvasResolution = context => {
@@ -80,7 +89,6 @@ const PeriodAverageBase = props => {
 
       // Add x-axis labels
       context.textAlign = "center";
-      const xLabels = ["Sep '18", "Oct '18", "Nov '18", "Dec '18"];
       const numberOfXLegendGridColumns = xLabels.length - 1;
       xLabels.forEach((label, index) => {
         const xStep = graphWidth / numberOfXLegendGridColumns;
@@ -97,9 +105,9 @@ const PeriodAverageBase = props => {
 
       // Add y-axis labels
       context.textAlign = "end";
-      const numberOfYLegendGridRows = labels.length - 1;
+      const numberOfYLegendGridRows = yLabels.length - 1;
       const yStep = graphHeight / numberOfYLegendGridRows;
-      labels.forEach((labelValue, index) => {
+      yLabels.forEach((labelValue, index) => {
         const labelY = graphMargin + yStep * (numberOfYLegendGridRows - index);
         context.fillText(
           `$${Math.round(labelValue)}`,
@@ -115,15 +123,21 @@ const PeriodAverageBase = props => {
 
     // Method: Draw graph
     const drawGraph = context => {
-      const normalise = value => value - yAxisMin;
-      const getYFactor = value => normalise(value) / normalise(yAxisMax);
-      const getY = value => getYFactor(value) * graphHeight;
-      const averageY = getY(averageValue);
+      // Help methods for y-axis values
+      const normaliseY = price => price - yAxisMin;
+      const getYFactor = price => normaliseY(price) / normaliseY(yAxisMax);
+      const getY = price => Math.round(getYFactor(price) * graphHeight);
+      const averageY = getY(averagePrice);
+
+      // Help methods for x-axis values
+      const normaliseX = unix => unix - xAxisMin;
+      const getXFactor = unix => normaliseX(unix) / normaliseX(xAxisMax);
+      const getX = date => Math.round(getXFactor(toUnix(date)) * graphWidth);
 
       // Calculate points
-      const points = values.map((value, index) => {
-        const graphX = index * (graphWidth / (values.length - 1));
-        const graphY = getY(value);
+      const points = values.map(value => {
+        const graphX = getX(value.dateTime);
+        const graphY = getY(value.price);
         const canvasX = graphMargin + graphX;
         const canvasY = graphMargin + graphHeight - graphY;
         return { canvasX, canvasY, value };
@@ -246,7 +260,7 @@ const PeriodAverageBase = props => {
       context.font = "12px Arial";
       context.fillStyle = CONTRAST_COLOR;
       context.fillText(
-        `$${Math.round(averageValue)}`,
+        `$${Math.round(averagePrice)}`,
         graphMargin * 2 + IN_GRAPH_LEGEND.WIDTH / 2,
         averageYCanvasY + canvasSpacingUnit / 2
       );
@@ -311,7 +325,7 @@ const PeriodAverageBase = props => {
           context.fillStyle = CONTRAST_COLOR;
           context.textAlign = "end";
           context.fillText(
-            `$${Math.round(value)}`,
+            `$${Math.round(value.price)}`,
             canvasX - (IN_GRAPH_LEGEND.WIDTH + 2 * canvasSpacingUnit) / 4,
             canvasY + canvasSpacingUnit / 2
           );
@@ -348,12 +362,14 @@ const PeriodAverageBase = props => {
     disabled,
     canvasSpacingUnit,
     values,
-    averageValue,
-    maxValue,
-    minValue,
+    averagePrice,
+    maxPrice,
+    minPrice,
     activeX,
     activeY,
-    isClicked
+    isClicked,
+    earliestDate,
+    latestDate
   ]);
 
   return (
