@@ -1,18 +1,22 @@
+import moment from "moment";
 import React, { memo, useEffect, useRef, useState } from "react";
 import {
   BACKGROUND_COLOR,
   CONTRAST_COLOR,
-  PRIMARY_COLOR,
-  PRIMARY_BASE
+  PRIMARY_BASE,
+  PRIMARY_COLOR
 } from "../../Data/colors";
-import { priceLabels as priceLabels } from "./Utils/labels";
+import {
+  dateLabels,
+  dateToUnix,
+  DATE_FORMAT,
+  priceLabels
+} from "./Utils/labels";
 
 const IN_GRAPH_LEGEND = {
   WIDTH: 72,
   HEIGHT: 24
 };
-
-const toUnix = dateString => new Date(dateString).getTime();
 
 const PeriodAverageBase = props => {
   const [hasSetup, setHasSetup] = useState();
@@ -51,9 +55,23 @@ const PeriodAverageBase = props => {
     const yAxisMin = yLabels[0];
     const yAxisMax = yLabels[yLabels.length - 1];
 
-    const xLabels = [earliestDate, latestDate];
-    const xAxisMin = toUnix(earliestDate);
-    const xAxisMax = toUnix(latestDate);
+    const xLabels = dateLabels(earliestDate, latestDate);
+    const xAxisMin = dateToUnix(earliestDate);
+    const xAxisMax = dateToUnix(latestDate);
+
+    // Help methods for y-axis values
+    const normaliseGraphY = price => price - yAxisMin;
+    const getGraphYFactor = price =>
+      normaliseGraphY(price) / normaliseGraphY(yAxisMax);
+    const getGraphY = price => Math.round(getGraphYFactor(price) * graphHeight);
+    const averageY = getGraphY(averagePrice);
+
+    // Help methods for x-axis values
+    const normaliseGraphX = unix => unix - xAxisMin;
+    const getGraphXFactor = unix =>
+      normaliseGraphX(unix) / normaliseGraphX(xAxisMax);
+    const getGraphX = date =>
+      Math.round(getGraphXFactor(dateToUnix(date)) * graphWidth);
 
     // Method: Scale canvas resolution for retina displays
     const scaleCanvasResolution = context => {
@@ -89,31 +107,21 @@ const PeriodAverageBase = props => {
 
       // Add x-axis labels
       context.textAlign = "center";
-      const numberOfXLegendGridColumns = xLabels.length - 1;
-      xLabels.forEach((label, index) => {
-        const xStep = graphWidth / numberOfXLegendGridColumns;
-        const labelX =
-          graphMargin + xStep * (numberOfXLegendGridColumns - index);
-        context.fillText(
-          label,
-          labelX,
-          graphMargin + graphHeight + canvasSpacingUnit * 3
-        );
+      xLabels.forEach(unix => {
+        const labelX = getGraphX(unix);
+        console.log(moment(unix * 1000).format());
+        const labelY = graphMargin + graphHeight + canvasSpacingUnit * 3;
+        context.fillText(moment(unix).format(DATE_FORMAT), labelX, labelY);
         context.moveTo(labelX, graphMargin + graphHeight);
         context.lineTo(labelX, graphMargin + graphHeight + canvasSpacingUnit);
       });
 
       // Add y-axis labels
       context.textAlign = "end";
-      const numberOfYLegendGridRows = yLabels.length - 1;
-      const yStep = graphHeight / numberOfYLegendGridRows;
-      yLabels.forEach((labelValue, index) => {
-        const labelY = graphMargin + yStep * (numberOfYLegendGridRows - index);
-        context.fillText(
-          `$${Math.round(labelValue)}`,
-          graphMargin - 1.5 * canvasSpacingUnit,
-          labelY + 2
-        );
+      yLabels.forEach(price => {
+        const labelX = graphMargin - 1.5 * canvasSpacingUnit;
+        const labelY = getGraphY(price) + graphMargin;
+        context.fillText(`$${Math.round(price)}`, labelX, labelY + 2);
         context.moveTo(graphMargin - canvasSpacingUnit, labelY);
         context.lineTo(graphMargin, labelY);
       });
@@ -123,21 +131,10 @@ const PeriodAverageBase = props => {
 
     // Method: Draw graph
     const drawGraph = context => {
-      // Help methods for y-axis values
-      const normaliseY = price => price - yAxisMin;
-      const getYFactor = price => normaliseY(price) / normaliseY(yAxisMax);
-      const getY = price => Math.round(getYFactor(price) * graphHeight);
-      const averageY = getY(averagePrice);
-
-      // Help methods for x-axis values
-      const normaliseX = unix => unix - xAxisMin;
-      const getXFactor = unix => normaliseX(unix) / normaliseX(xAxisMax);
-      const getX = date => Math.round(getXFactor(toUnix(date)) * graphWidth);
-
       // Calculate points
       const points = values.map(value => {
-        const graphX = getX(value.dateTime);
-        const graphY = getY(value.price);
+        const graphX = getGraphX(value.dateTime);
+        const graphY = getGraphY(value.price);
         const canvasX = graphMargin + graphX;
         const canvasY = graphMargin + graphHeight - graphY;
         return { canvasX, canvasY, value };

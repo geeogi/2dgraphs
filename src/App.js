@@ -42,7 +42,8 @@ function App() {
     .map(({ quote }) => ({
       dateTime: quote.USD.timestamp,
       price: quote.USD.open
-    }));
+    }))
+    .sort((a, b) => moment(a.dateTime).unix() - moment(b.dateTime).unix());
 
   // Calculate min, max and average price
   const averagePrice =
