@@ -34,6 +34,9 @@ export const priceLabels = (minPrice, maxPrice, numberOfLabels = 5) => {
 
 export const dateLabels = (earliestDate, latestDate) => {
   return [
+    moment(earliestDate)
+      .endOf("month")
+      .unix() * 1000,
     moment(latestDate)
       .startOf("month")
       .unix() * 1000

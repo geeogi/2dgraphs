@@ -13,7 +13,12 @@ import {
   priceLabels
 } from "./Utils/labels";
 
-const IN_GRAPH_LEGEND = {
+const ACTIVE_LEGEND = {
+  WIDTH: 96,
+  HEIGHT: 48
+};
+
+const AVERAGE_LEGEND = {
   WIDTH: 72,
   HEIGHT: 24
 };
@@ -108,8 +113,7 @@ const PeriodAverageBase = props => {
       // Add x-axis labels
       context.textAlign = "center";
       xLabels.forEach(unix => {
-        const labelX = getGraphX(unix);
-        console.log(moment(unix * 1000).format());
+        const labelX = graphMargin + getGraphX(unix);
         const labelY = graphMargin + graphHeight + canvasSpacingUnit * 3;
         context.fillText(moment(unix).format(DATE_FORMAT), labelX, labelY);
         context.moveTo(labelX, graphMargin + graphHeight);
@@ -120,7 +124,8 @@ const PeriodAverageBase = props => {
       context.textAlign = "end";
       yLabels.forEach(price => {
         const labelX = graphMargin - 1.5 * canvasSpacingUnit;
-        const labelY = getGraphY(price) + graphMargin;
+        const labelY = graphMargin + graphHeight - getGraphY(price);
+        console.log(`${price}: ${labelY}`);
         context.fillText(`$${Math.round(price)}`, labelX, labelY + 2);
         context.moveTo(graphMargin - canvasSpacingUnit, labelY);
         context.lineTo(graphMargin, labelY);
@@ -234,19 +239,19 @@ const PeriodAverageBase = props => {
       context.moveTo(graphMargin * 2, averageYCanvasY);
       context.lineTo(
         graphMargin * 2,
-        averageYCanvasY - IN_GRAPH_LEGEND.HEIGHT / 2
+        averageYCanvasY - AVERAGE_LEGEND.HEIGHT / 2
       );
       context.lineTo(
-        graphMargin * 2 + IN_GRAPH_LEGEND.WIDTH,
-        averageYCanvasY - IN_GRAPH_LEGEND.HEIGHT / 2
+        graphMargin * 2 + AVERAGE_LEGEND.WIDTH,
+        averageYCanvasY - AVERAGE_LEGEND.HEIGHT / 2
       );
       context.lineTo(
-        graphMargin * 2 + IN_GRAPH_LEGEND.WIDTH,
-        averageYCanvasY + IN_GRAPH_LEGEND.HEIGHT / 2
+        graphMargin * 2 + AVERAGE_LEGEND.WIDTH,
+        averageYCanvasY + AVERAGE_LEGEND.HEIGHT / 2
       );
       context.lineTo(
         graphMargin * 2,
-        averageYCanvasY + IN_GRAPH_LEGEND.HEIGHT / 2
+        averageYCanvasY + AVERAGE_LEGEND.HEIGHT / 2
       );
       context.lineTo(graphMargin * 2, averageYCanvasY);
       context.fill();
@@ -258,7 +263,7 @@ const PeriodAverageBase = props => {
       context.fillStyle = CONTRAST_COLOR;
       context.fillText(
         `$${Math.round(averagePrice)}`,
-        graphMargin * 2 + IN_GRAPH_LEGEND.WIDTH / 2,
+        graphMargin * 2 + AVERAGE_LEGEND.WIDTH / 2,
         averageYCanvasY + canvasSpacingUnit / 2
       );
 
@@ -272,7 +277,7 @@ const PeriodAverageBase = props => {
           return Math.abs(a.canvasX - activeX) - Math.abs(b.canvasX - activeX);
         });
         const [{ canvasX, canvasY, value }] = sortedPoints;
-        if (canvasX > IN_GRAPH_LEGEND.WIDTH + canvasSpacingUnit) {
+        if (canvasX > ACTIVE_LEGEND.WIDTH + canvasSpacingUnit) {
           // Draw active axes
           if (isClicked) {
             context.lineWidth = 1;
@@ -292,19 +297,19 @@ const PeriodAverageBase = props => {
           context.moveTo(canvasX, canvasY);
           context.lineTo(
             canvasX - 2 * canvasSpacingUnit,
-            canvasY - IN_GRAPH_LEGEND.HEIGHT / 2
+            canvasY - ACTIVE_LEGEND.HEIGHT / 2
           );
           context.lineTo(
-            canvasX - IN_GRAPH_LEGEND.WIDTH,
-            canvasY - IN_GRAPH_LEGEND.HEIGHT / 2
+            canvasX - ACTIVE_LEGEND.WIDTH,
+            canvasY - ACTIVE_LEGEND.HEIGHT / 2
           );
           context.lineTo(
-            canvasX - IN_GRAPH_LEGEND.WIDTH,
-            canvasY + IN_GRAPH_LEGEND.HEIGHT / 2
+            canvasX - ACTIVE_LEGEND.WIDTH,
+            canvasY + ACTIVE_LEGEND.HEIGHT / 2
           );
           context.lineTo(
             canvasX - 2 * canvasSpacingUnit,
-            canvasY + IN_GRAPH_LEGEND.HEIGHT / 2
+            canvasY + ACTIVE_LEGEND.HEIGHT / 2
           );
           context.lineTo(canvasX, canvasY);
           context.stroke();
@@ -323,8 +328,13 @@ const PeriodAverageBase = props => {
           context.textAlign = "end";
           context.fillText(
             `$${Math.round(value.price)}`,
-            canvasX - (IN_GRAPH_LEGEND.WIDTH + 2 * canvasSpacingUnit) / 4,
+            canvasX - (ACTIVE_LEGEND.WIDTH + 2 * canvasSpacingUnit) / 4,
             canvasY + canvasSpacingUnit / 2
+          );
+          context.fillText(
+            moment(value.dateTime).format("YYYY-MM-DD"),
+            canvasX - (ACTIVE_LEGEND.WIDTH + 2 * canvasSpacingUnit) / 4,
+            canvasY + 2 * canvasSpacingUnit
           );
         }
       }
