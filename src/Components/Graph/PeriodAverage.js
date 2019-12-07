@@ -4,7 +4,8 @@ import {
   BACKGROUND_COLOR,
   CONTRAST_COLOR,
   PRIMARY_BASE,
-  PRIMARY_COLOR
+  PRIMARY_COLOR,
+  BORDER_COLOR
 } from "../../Data/colors";
 import {
   getClearCanvasMethod,
@@ -20,8 +21,7 @@ import {
 } from "./Utils/labelUtils";
 
 const ACTIVE_LEGEND = {
-  WIDTH: 96,
-  HEIGHT: 48
+  WIDTH: 120
 };
 
 const AVERAGE_LEGEND = {
@@ -111,7 +111,6 @@ const PeriodAverageBase = props => {
       context.textAlign = "center";
       xLabels.forEach(unix => {
         const labelX = graphMargin + scaleDateX(unix);
-        console.log(labelX);
         const labelY = graphMargin + graphHeight + canvasSpacingUnit * 3;
         context.fillText(moment(unix).format(DATE_FORMAT), labelX, labelY);
         context.moveTo(labelX, graphMargin + graphHeight);
@@ -159,13 +158,11 @@ const PeriodAverageBase = props => {
       context.fillStyle = gradient;
 
       // Color block: draw, stroke and fill path
-      points.forEach(({ canvasX, canvasY }, index) => {
+      context.lineTo(graphMargin, graphMargin + graphHeight);
+      points.forEach(({ canvasX, canvasY }) => {
         context.lineTo(canvasX, canvasY);
-        if (index === points.length - 1) {
-          context.lineTo(canvasX, canvasY);
-          context.lineTo(graphMargin + graphWidth, graphMargin + graphHeight);
-        }
       });
+      context.lineTo(graphMargin + graphWidth, graphMargin + graphHeight);
       context.stroke();
       context.fill();
 
@@ -173,14 +170,8 @@ const PeriodAverageBase = props => {
       context.clearRect(
         graphMargin,
         graphMargin + graphHeight - averageY,
-        graphWidth + 1,
+        graphWidth,
         averageY
-      );
-      context.clearRect(
-        graphMargin + graphWidth - 1,
-        graphMargin,
-        2,
-        graphHeight
       );
 
       // Color block: save color block for later
@@ -273,67 +264,68 @@ const PeriodAverageBase = props => {
         const sortedPoints = points.sort((a, b) => {
           return Math.abs(a.canvasX - activeX) - Math.abs(b.canvasX - activeX);
         });
-        const [{ canvasX, canvasY, value }] = sortedPoints;
-        if (canvasX > ACTIVE_LEGEND.WIDTH + canvasSpacingUnit) {
-          // Draw active axes
-          if (isClicked) {
-            context.lineWidth = 1;
-            context.strokeStyle = PRIMARY_BASE(0.3);
-            context.beginPath();
-            context.moveTo(graphMargin, canvasY);
-            context.lineTo(graphMargin + graphWidth, canvasY);
-            context.moveTo(canvasX, graphMargin);
-            context.lineTo(canvasX, graphHeight + graphMargin);
-            context.stroke();
-          }
+        const { canvasX, canvasY, value } = sortedPoints[0];
 
-          // Draw active legend body
-          context.strokeStyle = PRIMARY_COLOR;
-          context.fillStyle = BACKGROUND_COLOR;
-          context.beginPath();
-          context.moveTo(canvasX, canvasY);
-          context.lineTo(
-            canvasX - 2 * canvasSpacingUnit,
-            canvasY - ACTIVE_LEGEND.HEIGHT / 2
-          );
-          context.lineTo(
-            canvasX - ACTIVE_LEGEND.WIDTH,
-            canvasY - ACTIVE_LEGEND.HEIGHT / 2
-          );
-          context.lineTo(
-            canvasX - ACTIVE_LEGEND.WIDTH,
-            canvasY + ACTIVE_LEGEND.HEIGHT / 2
-          );
-          context.lineTo(
-            canvasX - 2 * canvasSpacingUnit,
-            canvasY + ACTIVE_LEGEND.HEIGHT / 2
-          );
-          context.lineTo(canvasX, canvasY);
-          context.stroke();
-          context.fill();
+        // Draw active axes
+        context.strokeStyle = BORDER_COLOR;
+        context.setLineDash([5, 5]);
+        context.lineWidth = 1;
+        context.beginPath();
+        context.moveTo(canvasX, graphMargin);
+        context.lineTo(canvasX, graphHeight + graphMargin);
+        context.stroke();
 
-          // Draw active legend handle
-          context.fillStyle = PRIMARY_COLOR;
-          context.strokeStyle = BACKGROUND_COLOR;
-          context.beginPath();
-          context.arc(canvasX, canvasY, 5, 0, 2 * Math.PI);
-          context.fill();
-          context.stroke();
+        // Draw active legend body
+        context.setLineDash([]);
+        context.strokeStyle = PRIMARY_COLOR;
+        context.fillStyle = BACKGROUND_COLOR;
+        context.beginPath();
+        const anchorY = canvasY;
+        context.moveTo(
+          canvasX - ACTIVE_LEGEND.WIDTH / 2,
+          anchorY + 2 * canvasSpacingUnit
+        );
+        context.lineTo(
+          canvasX - ACTIVE_LEGEND.WIDTH / 2,
+          anchorY + 2 * canvasSpacingUnit
+        );
+        context.lineTo(
+          canvasX - ACTIVE_LEGEND.WIDTH / 2,
+          anchorY + 5 * canvasSpacingUnit
+        );
+        context.lineTo(
+          canvasX + ACTIVE_LEGEND.WIDTH / 2,
+          anchorY + 5 * canvasSpacingUnit
+        );
+        context.lineTo(
+          canvasX + ACTIVE_LEGEND.WIDTH / 2,
+          anchorY + 2 * canvasSpacingUnit
+        );
+        context.lineTo(
+          canvasX - ACTIVE_LEGEND.WIDTH / 2,
+          anchorY + 2 * canvasSpacingUnit
+        );
+        context.stroke();
+        context.fill();
 
-          // Write active legend text
-          context.fillStyle = CONTRAST_COLOR;
-          context.textAlign = "end";
-          context.fillText(
-            `$${Math.round(value.price)}`,
-            canvasX - (ACTIVE_LEGEND.WIDTH + 2 * canvasSpacingUnit) / 4,
-            canvasY + canvasSpacingUnit / 2
-          );
-          context.fillText(
-            moment(value.dateTime).format("YYYY-MM-DD"),
-            canvasX - (ACTIVE_LEGEND.WIDTH + 2 * canvasSpacingUnit) / 4,
-            canvasY + 2 * canvasSpacingUnit
-          );
-        }
+        // Draw active legend handle
+        context.fillStyle = PRIMARY_COLOR;
+        context.strokeStyle = BACKGROUND_COLOR;
+        context.beginPath();
+        context.arc(canvasX, canvasY, 5, 0, 2 * Math.PI);
+        context.fill();
+        context.stroke();
+
+        // Write active legend text
+        context.fillStyle = CONTRAST_COLOR;
+        context.textAlign = "center";
+        const priceLabel = Math.round(value.price);
+        const dateLabel = moment(value.dateTime).format("DD MMM YY");
+        context.fillText(
+          `$${priceLabel}    ${dateLabel}`,
+          canvasX,
+          anchorY + 4 * canvasSpacingUnit
+        );
       }
     };
 
