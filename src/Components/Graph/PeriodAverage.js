@@ -7,11 +7,17 @@ import {
   PRIMARY_COLOR
 } from "../../Data/colors";
 import {
+  getClearCanvasMethod,
+  getScaleMethod,
+  getScaleCanvasResolutionMethod,
+  getDescaleCanvasResolutionMethod
+} from "./Utils/canvasUtils";
+import {
   dateLabels,
   dateToUnix,
   DATE_FORMAT,
   priceLabels
-} from "./Utils/labels";
+} from "./Utils/labelUtils";
 
 const ACTIVE_LEGEND = {
   WIDTH: 96,
@@ -64,33 +70,24 @@ const PeriodAverageBase = props => {
     const xAxisMin = dateToUnix(earliestDate);
     const xAxisMax = dateToUnix(latestDate);
 
-    // Help methods for y-axis values
-    const normaliseGraphY = price => price - yAxisMin;
-    const getGraphYFactor = price =>
-      normaliseGraphY(price) / normaliseGraphY(yAxisMax);
-    const getGraphY = price => Math.round(getGraphYFactor(price) * graphHeight);
-    const averageY = getGraphY(averagePrice);
+    const scaleUnixX = getScaleMethod(xAxisMin, xAxisMax, graphWidth);
+    const scaleDateX = date => scaleUnixX(dateToUnix(date));
+    const scalePriceY = getScaleMethod(yAxisMin, yAxisMax, graphHeight);
 
-    // Help methods for x-axis values
-    const normaliseGraphX = unix => unix - xAxisMin;
-    const getGraphXFactor = unix =>
-      normaliseGraphX(unix) / normaliseGraphX(xAxisMax);
-    const getGraphX = date =>
-      Math.round(getGraphXFactor(dateToUnix(date)) * graphWidth);
+    const averageY = scalePriceY(averagePrice);
 
-    // Method: Scale canvas resolution for retina displays
-    const scaleCanvasResolution = context => {
-      current.style.width = canvasWidth + "px";
-      current.style.height = canvasHeight + "px";
-      current.width = canvasWidth * 4;
-      current.height = canvasHeight * 4;
-      context.scale(canvasResolutionScale, canvasResolutionScale);
-    };
+    const scaleCanvasResolution = getScaleCanvasResolutionMethod(
+      context,
+      current,
+      canvasWidth,
+      canvasHeight,
+      canvasResolutionScale
+    );
 
-    // Method: descale canvas
-    const descaleCanvasResolution = context => {
-      context.scale(1 / canvasResolutionScale, 1 / canvasResolutionScale);
-    };
+    const descaleCanvasResolution = getDescaleCanvasResolutionMethod(
+      context,
+      canvasResolutionScale
+    );
 
     // Method: Draw x,y axes and add labels
     const drawGraphAxes = context => {
@@ -113,7 +110,8 @@ const PeriodAverageBase = props => {
       // Add x-axis labels
       context.textAlign = "center";
       xLabels.forEach(unix => {
-        const labelX = graphMargin + getGraphX(unix);
+        const labelX = graphMargin + scaleDateX(unix);
+        console.log(labelX);
         const labelY = graphMargin + graphHeight + canvasSpacingUnit * 3;
         context.fillText(moment(unix).format(DATE_FORMAT), labelX, labelY);
         context.moveTo(labelX, graphMargin + graphHeight);
@@ -124,8 +122,7 @@ const PeriodAverageBase = props => {
       context.textAlign = "end";
       yLabels.forEach(price => {
         const labelX = graphMargin - 1.5 * canvasSpacingUnit;
-        const labelY = graphMargin + graphHeight - getGraphY(price);
-        console.log(`${price}: ${labelY}`);
+        const labelY = graphMargin + graphHeight - scalePriceY(price);
         context.fillText(`$${Math.round(price)}`, labelX, labelY + 2);
         context.moveTo(graphMargin - canvasSpacingUnit, labelY);
         context.lineTo(graphMargin, labelY);
@@ -138,8 +135,8 @@ const PeriodAverageBase = props => {
     const drawGraph = context => {
       // Calculate points
       const points = values.map(value => {
-        const graphX = getGraphX(value.dateTime);
-        const graphY = getGraphY(value.price);
+        const graphX = scaleDateX(value.dateTime);
+        const graphY = scalePriceY(value.price);
         const canvasX = graphMargin + graphX;
         const canvasY = graphMargin + graphHeight - graphY;
         return { canvasX, canvasY, value };
@@ -341,9 +338,11 @@ const PeriodAverageBase = props => {
     };
 
     // Method: Clear the graph
-    const clearCanvas = context => {
-      context.clearRect(0, 0, canvasWidth, canvasHeight);
-    };
+    const clearCanvas = getClearCanvasMethod(
+      context,
+      canvasWidth,
+      canvasHeight
+    );
 
     // Setup graph resolution
     if (!hasSetup) {
