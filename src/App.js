@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { Button } from "./Components/Button";
 import { Column } from "./Components/Column";
 import { InteractiveGraph } from "./Components/Graph/Containers/InteractiveGraph";
-import { PaddedGraph } from "./Components/Graph/Containers/PaddedGraph";
 import { ResponsiveGraph } from "./Components/Graph/Containers/ResponsiveGraph";
 import { PeriodAverage } from "./Components/Graph/PeriodAverage";
 import { H3 } from "./Components/H";
@@ -96,29 +95,28 @@ function App() {
             7d
           </Button>
         </Row>
-        <PaddedGraph>
-          <InteractiveGraph>
-            {({ activeX, activeY, isClicked }) => (
-              <ResponsiveGraph>
-                {({ height, width }) => (
-                  <PeriodAverage
-                    activeX={activeX}
-                    activeY={activeY}
-                    isClicked={isClicked}
-                    values={values}
-                    minPrice={minPrice}
-                    maxPrice={maxPrice}
-                    averagePrice={averagePrice}
-                    earliestDate={earliestDate}
-                    latestDate={latestDate}
-                    canvasHeight={height - 8}
-                    canvasWidth={width - 8}
-                  />
-                )}
-              </ResponsiveGraph>
-            )}
-          </InteractiveGraph>
-        </PaddedGraph>
+
+        <InteractiveGraph>
+          {({ activeX, activeY, isClicked }) => (
+            <ResponsiveGraph>
+              {({ height, width }) => (
+                <PeriodAverage
+                  activeX={activeX}
+                  activeY={activeY}
+                  isClicked={isClicked}
+                  values={values}
+                  minPrice={minPrice}
+                  maxPrice={maxPrice}
+                  averagePrice={averagePrice}
+                  earliestDate={earliestDate}
+                  latestDate={latestDate}
+                  canvasHeight={height - 8}
+                  canvasWidth={width - 8}
+                />
+              )}
+            </ResponsiveGraph>
+          )}
+        </InteractiveGraph>
       </Column>
     </main>
   );

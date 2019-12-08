@@ -45,38 +45,44 @@ const PeriodAverageBase = props => {
     const { current } = canvasElement;
     const context = current.getContext("2d");
 
+    // Calculate graph dimensions
     const graphMargin = 8 * canvasSpacingUnit;
     const graphHeight = canvasHeight - 2 * graphMargin;
     const graphWidth = canvasWidth - 2 * graphMargin;
 
+    // Calculate graph legend dimensions
     const ACTIVE_LEGEND = {
       WIDTH: graphMargin * 2 - canvasSpacingUnit
     };
-
     const AVERAGE_LEGEND = {
       WIDTH: 72,
       HEIGHT: 24
     };
 
+    // Get y-axis labels
     const yLabels = priceLabels(minPrice, maxPrice, 4);
     const yAxisMin = yLabels[0];
     const yAxisMax = yLabels[yLabels.length - 1];
 
-    const minNumberOfLabels = canvasWidth < 600 ? 2 : 4;
+    // Get x-axis labels
+    const minNumberOfXLabels = canvasWidth < 600 ? 2 : 4;
     const { dateLabels: xLabels, displayFormat } = dateLabels(
       earliestDate,
       latestDate,
-      minNumberOfLabels
+      minNumberOfXLabels
     );
     const xAxisMin = dateToUnix(earliestDate);
     const xAxisMax = dateToUnix(latestDate);
 
+    // Get axis scale helpers
     const scaleUnixX = getScaleMethod(xAxisMin, xAxisMax, graphWidth);
     const scaleDateX = date => scaleUnixX(dateToUnix(date));
     const scalePriceY = getScaleMethod(yAxisMin, yAxisMax, graphHeight);
 
-    const averageY = scalePriceY(averagePrice);
+    // Calculate average price y-coordinate
+    const averagePriceY = scalePriceY(averagePrice);
 
+    // Get canvas util methods
     const scaleCanvasResolution = getScaleCanvasResolutionMethod(
       context,
       current,
@@ -84,12 +90,10 @@ const PeriodAverageBase = props => {
       canvasHeight,
       canvasResolutionScale
     );
-
     const descaleCanvasResolution = getDescaleCanvasResolutionMethod(
       context,
       canvasResolutionScale
     );
-
     const clearCanvas = getClearCanvasMethod(
       context,
       canvasWidth,
@@ -149,7 +153,7 @@ const PeriodAverageBase = props => {
       });
 
       // Calculate average line y-coordinates
-      const averageYCanvasY = graphMargin + graphHeight - averageY;
+      const averagePriceYCanvasY = graphMargin + graphHeight - averagePriceY;
 
       // Primary-block: begin path
       context.beginPath();
@@ -180,7 +184,7 @@ const PeriodAverageBase = props => {
         canvasResolutionScale * graphMargin, // x
         canvasResolutionScale * graphMargin, // y
         canvasResolutionScale * graphWidth, // w
-        canvasResolutionScale * (graphHeight - averageY) // h
+        canvasResolutionScale * (graphHeight - averagePriceY) // h
       );
 
       // Clear graph
@@ -199,8 +203,8 @@ const PeriodAverageBase = props => {
 
       // Secondary-block: draw block
       context.beginPath();
-      context.moveTo(graphMargin, averageYCanvasY);
-      context.lineTo(graphMargin + graphWidth, averageYCanvasY);
+      context.moveTo(graphMargin, averagePriceYCanvasY);
+      context.lineTo(graphMargin + graphWidth, averagePriceYCanvasY);
       context.lineTo(graphMargin + graphWidth, graphMargin + graphHeight);
       context.lineTo(graphMargin, graphMargin + graphHeight);
       context.fill();
@@ -232,34 +236,33 @@ const PeriodAverageBase = props => {
       context.stroke();
 
       // Draw average-line
-      context.strokeStyle = PRIMARY_COLOR;
+      context.strokeStyle = PRIMARY_BASE(0.5);
       context.beginPath();
-      context.moveTo(graphMargin, averageYCanvasY);
-      context.lineTo(graphMargin + graphWidth, averageYCanvasY);
+      context.moveTo(graphMargin, averagePriceYCanvasY);
+      context.lineTo(graphMargin + graphWidth, averagePriceYCanvasY);
       context.stroke();
 
       // Draw average legend body
       context.fillStyle = BACKGROUND_COLOR;
-      context.strokeStyle = PRIMARY_COLOR;
       context.beginPath();
-      context.moveTo(graphMargin * 2, averageYCanvasY);
+      context.moveTo(graphMargin + canvasSpacingUnit, averagePriceYCanvasY);
       context.lineTo(
-        graphMargin * 2,
-        averageYCanvasY - AVERAGE_LEGEND.HEIGHT / 2
+        graphMargin + canvasSpacingUnit,
+        averagePriceYCanvasY - AVERAGE_LEGEND.HEIGHT / 2
       );
       context.lineTo(
-        graphMargin * 2 + AVERAGE_LEGEND.WIDTH,
-        averageYCanvasY - AVERAGE_LEGEND.HEIGHT / 2
+        graphMargin + canvasSpacingUnit + AVERAGE_LEGEND.WIDTH,
+        averagePriceYCanvasY - AVERAGE_LEGEND.HEIGHT / 2
       );
       context.lineTo(
-        graphMargin * 2 + AVERAGE_LEGEND.WIDTH,
-        averageYCanvasY + AVERAGE_LEGEND.HEIGHT / 2
+        graphMargin + canvasSpacingUnit + AVERAGE_LEGEND.WIDTH,
+        averagePriceYCanvasY + AVERAGE_LEGEND.HEIGHT / 2
       );
       context.lineTo(
-        graphMargin * 2,
-        averageYCanvasY + AVERAGE_LEGEND.HEIGHT / 2
+        graphMargin + canvasSpacingUnit,
+        averagePriceYCanvasY + AVERAGE_LEGEND.HEIGHT / 2
       );
-      context.lineTo(graphMargin * 2, averageYCanvasY);
+      context.lineTo(graphMargin + canvasSpacingUnit, averagePriceYCanvasY);
       context.fill();
       context.stroke();
 
@@ -269,8 +272,8 @@ const PeriodAverageBase = props => {
       context.fillStyle = CONTRAST_COLOR;
       context.fillText(
         `$${Math.round(averagePrice)}`,
-        graphMargin * 2 + AVERAGE_LEGEND.WIDTH / 2,
-        averageYCanvasY + canvasSpacingUnit / 2
+        graphMargin + canvasSpacingUnit + AVERAGE_LEGEND.WIDTH / 2,
+        averagePriceYCanvasY + canvasSpacingUnit / 2
       );
 
       // Draw graph axes
