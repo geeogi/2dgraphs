@@ -1,9 +1,7 @@
 import React, { useRef, useState } from "react";
 import styled from "styled-components";
 
-const InteractiveGraphBase = styled.div`
-  cursor: pointer;
-`;
+const InteractiveGraphBase = styled.div``;
 
 export const InteractiveGraph = props => {
   const [activeX, setActiveX] = useState();

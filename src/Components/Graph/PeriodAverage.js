@@ -79,8 +79,17 @@ const PeriodAverageBase = props => {
     const scaleDateX = date => scaleUnixX(dateToUnix(date));
     const scalePriceY = getScaleMethod(yAxisMin, yAxisMax, graphHeight);
 
-    // Calculate average price y-coordinate
+    // Calculate baseLine price y-coordinate
+    const activeYHeight = graphMargin + graphHeight - activeY;
+    const activeYCanvasY = activeY;
+
     const averagePriceY = scalePriceY(averagePrice);
+    const averagePriceCanvasY = graphMargin + graphHeight - averagePriceY;
+
+    const baseLineY = isClicked ? activeYHeight : averagePriceY;
+    const baseLineYCanvasY = isClicked ? activeYCanvasY : averagePriceCanvasY;
+
+    const baseLineAmount = isClicked ? undefined : averagePrice;
 
     // Get canvas util methods
     const scaleCanvasResolution = getScaleCanvasResolutionMethod(
@@ -152,9 +161,6 @@ const PeriodAverageBase = props => {
         return { canvasX, canvasY, value };
       });
 
-      // Calculate average line y-coordinates
-      const averagePriceYCanvasY = graphMargin + graphHeight - averagePriceY;
-
       // Primary-block: begin path
       context.beginPath();
       context.strokeStyle = "rgba(9,211,172,1)";
@@ -184,7 +190,7 @@ const PeriodAverageBase = props => {
         canvasResolutionScale * graphMargin, // x
         canvasResolutionScale * graphMargin, // y
         canvasResolutionScale * graphWidth, // w
-        canvasResolutionScale * (graphHeight - averagePriceY) // h
+        canvasResolutionScale * (graphHeight - baseLineY) // h
       );
 
       // Clear graph
@@ -203,8 +209,8 @@ const PeriodAverageBase = props => {
 
       // Secondary-block: draw block
       context.beginPath();
-      context.moveTo(graphMargin, averagePriceYCanvasY);
-      context.lineTo(graphMargin + graphWidth, averagePriceYCanvasY);
+      context.moveTo(graphMargin, baseLineYCanvasY);
+      context.lineTo(graphMargin + graphWidth, baseLineYCanvasY);
       context.lineTo(graphMargin + graphWidth, graphMargin + graphHeight);
       context.lineTo(graphMargin, graphMargin + graphHeight);
       context.fill();
@@ -238,43 +244,45 @@ const PeriodAverageBase = props => {
       // Draw average-line
       context.strokeStyle = PRIMARY_BASE(0.5);
       context.beginPath();
-      context.moveTo(graphMargin, averagePriceYCanvasY);
-      context.lineTo(graphMargin + graphWidth, averagePriceYCanvasY);
+      context.moveTo(graphMargin, baseLineYCanvasY);
+      context.lineTo(graphMargin + graphWidth, baseLineYCanvasY);
       context.stroke();
 
       // Draw average legend body
-      context.fillStyle = BACKGROUND_COLOR;
-      context.beginPath();
-      context.moveTo(graphMargin + canvasSpacingUnit, averagePriceYCanvasY);
-      context.lineTo(
-        graphMargin + canvasSpacingUnit,
-        averagePriceYCanvasY - AVERAGE_LEGEND.HEIGHT / 2
-      );
-      context.lineTo(
-        graphMargin + canvasSpacingUnit + AVERAGE_LEGEND.WIDTH,
-        averagePriceYCanvasY - AVERAGE_LEGEND.HEIGHT / 2
-      );
-      context.lineTo(
-        graphMargin + canvasSpacingUnit + AVERAGE_LEGEND.WIDTH,
-        averagePriceYCanvasY + AVERAGE_LEGEND.HEIGHT / 2
-      );
-      context.lineTo(
-        graphMargin + canvasSpacingUnit,
-        averagePriceYCanvasY + AVERAGE_LEGEND.HEIGHT / 2
-      );
-      context.lineTo(graphMargin + canvasSpacingUnit, averagePriceYCanvasY);
-      context.fill();
-      context.stroke();
+      if (baseLineAmount) {
+        context.fillStyle = BACKGROUND_COLOR;
+        context.beginPath();
+        context.moveTo(graphMargin + canvasSpacingUnit, baseLineYCanvasY);
+        context.lineTo(
+          graphMargin + canvasSpacingUnit,
+          baseLineYCanvasY - AVERAGE_LEGEND.HEIGHT / 2
+        );
+        context.lineTo(
+          graphMargin + canvasSpacingUnit + AVERAGE_LEGEND.WIDTH,
+          baseLineYCanvasY - AVERAGE_LEGEND.HEIGHT / 2
+        );
+        context.lineTo(
+          graphMargin + canvasSpacingUnit + AVERAGE_LEGEND.WIDTH,
+          baseLineYCanvasY + AVERAGE_LEGEND.HEIGHT / 2
+        );
+        context.lineTo(
+          graphMargin + canvasSpacingUnit,
+          baseLineYCanvasY + AVERAGE_LEGEND.HEIGHT / 2
+        );
+        context.lineTo(graphMargin + canvasSpacingUnit, baseLineYCanvasY);
+        context.fill();
+        context.stroke();
 
-      // Draw average legend text
-      context.textAlign = "center";
-      context.font = "12px Arial";
-      context.fillStyle = CONTRAST_COLOR;
-      context.fillText(
-        `$${Math.round(averagePrice)}`,
-        graphMargin + canvasSpacingUnit + AVERAGE_LEGEND.WIDTH / 2,
-        averagePriceYCanvasY + canvasSpacingUnit / 2
-      );
+        // Draw average legend text
+        context.textAlign = "center";
+        context.font = "12px Arial";
+        context.fillStyle = CONTRAST_COLOR;
+        context.fillText(
+          `$${Math.round(baseLineAmount)}`,
+          graphMargin + canvasSpacingUnit + AVERAGE_LEGEND.WIDTH / 2,
+          baseLineYCanvasY + canvasSpacingUnit / 2
+        );
+      }
 
       // Draw graph axes
       drawGraphAxes(context);

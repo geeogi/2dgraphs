@@ -5,7 +5,7 @@ import { Column } from "./Components/Column";
 import { InteractiveGraph } from "./Components/Graph/Containers/InteractiveGraph";
 import { ResponsiveGraph } from "./Components/Graph/Containers/ResponsiveGraph";
 import { PeriodAverage } from "./Components/Graph/PeriodAverage";
-import { H3 } from "./Components/H";
+import { H1, H4 } from "./Components/H";
 import { Row } from "./Components/Row";
 import BITCOIN_PRICE_DATA from "./Data/bitcoin-price.json";
 
@@ -32,7 +32,7 @@ const timeScales = {
 
 function App() {
   const [desiredEarliestDate, setDesiredEarliestDate] = useState(
-    timeScales["30days"].startDate
+    timeScales["6months"].startDate
   );
 
   // Filter and extract values by date
@@ -60,7 +60,8 @@ function App() {
   return (
     <main>
       <Column>
-        <H3>Period average</H3>
+        <H1>CoinTales</H1>
+        <H4>Period average</H4>
         <Row>
           <Button
             onClick={() =>
