@@ -89,6 +89,12 @@ const PeriodAverageBase = props => {
       canvasResolutionScale
     );
 
+    const clearCanvas = getClearCanvasMethod(
+      context,
+      canvasWidth,
+      canvasHeight
+    );
+
     // Method: Draw x,y axes and add labels
     const drawGraphAxes = context => {
       context.beginPath();
@@ -280,30 +286,26 @@ const PeriodAverageBase = props => {
         context.strokeStyle = PRIMARY_COLOR;
         context.fillStyle = BACKGROUND_COLOR;
         context.beginPath();
-        const anchorY = canvasY;
-        context.moveTo(
-          canvasX - ACTIVE_LEGEND.WIDTH / 2,
-          anchorY + 2 * canvasSpacingUnit
-        );
+        const legendBottomY = graphMargin + 5 * canvasSpacingUnit;
+        const legendTopY = legendBottomY - 3 * canvasSpacingUnit;
+        const anchorY = canvasY < legendBottomY ? canvasY - graphMargin : 0;
+        context.moveTo(canvasX - ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
+        context.lineTo(canvasX - ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
         context.lineTo(
           canvasX - ACTIVE_LEGEND.WIDTH / 2,
-          anchorY + 2 * canvasSpacingUnit
-        );
-        context.lineTo(
-          canvasX - ACTIVE_LEGEND.WIDTH / 2,
-          anchorY + 5 * canvasSpacingUnit
+          anchorY + legendBottomY
         );
         context.lineTo(
           canvasX + ACTIVE_LEGEND.WIDTH / 2,
-          anchorY + 5 * canvasSpacingUnit
+          anchorY + legendBottomY
         );
         context.lineTo(
           canvasX + ACTIVE_LEGEND.WIDTH / 2,
-          anchorY + 2 * canvasSpacingUnit
+          anchorY + legendBottomY - 3 * canvasSpacingUnit
         );
         context.lineTo(
           canvasX - ACTIVE_LEGEND.WIDTH / 2,
-          anchorY + 2 * canvasSpacingUnit
+          anchorY + legendBottomY - 3 * canvasSpacingUnit
         );
         context.stroke();
         context.fill();
@@ -324,25 +326,18 @@ const PeriodAverageBase = props => {
         context.fillText(
           `$${priceLabel}    ${dateLabel}`,
           canvasX,
-          anchorY + 4 * canvasSpacingUnit
+          anchorY + legendBottomY - canvasSpacingUnit
         );
       }
     };
 
-    // Method: Clear the graph
-    const clearCanvas = getClearCanvasMethod(
-      context,
-      canvasWidth,
-      canvasHeight
-    );
-
     // Setup graph resolution
     if (!hasSetup) {
-      scaleCanvasResolution(context, current);
+      scaleCanvasResolution();
       setHasSetup(true);
     } else {
-      descaleCanvasResolution(context, current);
-      scaleCanvasResolution(context, current);
+      descaleCanvasResolution();
+      scaleCanvasResolution();
     }
 
     // Draw graph
@@ -351,7 +346,7 @@ const PeriodAverageBase = props => {
     }
 
     // Clean up
-    return () => clearCanvas(context);
+    return () => clearCanvas();
   }, [
     canvasHeight,
     canvasWidth,
