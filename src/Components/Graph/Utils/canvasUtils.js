@@ -11,15 +11,31 @@ export const getClearCanvasMethod = (
 ) => () => canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
 
 /**
- * Returns a method which will scale a given value range
+ * Returns a method which will scale and descale linearly between two value ranges
  * @param {*} minValue
  * @param {*} maxValue
  * @param {*} maxScaled
  */
-export const getScaleMethod = (minValue, maxValue, maxScaled) => {
-  const normalise = value => value - minValue;
-  const getFactor = value => normalise(value) / normalise(maxValue);
-  return value => Math.round(getFactor(value) * maxScaled);
+export const getScaleMethods = (
+  minPrimaryValue,
+  maxPrimaryValue,
+  minSecondaryValue,
+  maxSecondaryValue
+) => {
+  const primaryValueRange = maxPrimaryValue - minPrimaryValue;
+  const secondaryValueRange = maxSecondaryValue - minSecondaryValue;
+  return {
+    scale: primaryValue => {
+      const normalPrimaryValue = primaryValue - minPrimaryValue;
+      const primaryPercentage = normalPrimaryValue / primaryValueRange;
+      return minSecondaryValue + primaryPercentage * secondaryValueRange;
+    },
+    descale: secondaryValue => {
+      const normalSecondaryValue = secondaryValue - minSecondaryValue;
+      const secondaryPercentage = normalSecondaryValue / secondaryValueRange;
+      return minPrimaryValue + secondaryPercentage * primaryValueRange;
+    }
+  };
 };
 
 // Method: Scale canvas resolution for retina displays

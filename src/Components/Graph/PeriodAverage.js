@@ -12,7 +12,7 @@ import {
   getClearCanvasMethod,
   getDescaleCanvasResolutionMethod,
   getScaleCanvasResolutionMethod,
-  getScaleMethod
+  getScaleMethods
 } from "./Utils/canvasUtils";
 import { dateLabels, dateToUnix, priceLabels } from "./Utils/labelUtils";
 
@@ -75,21 +75,38 @@ const PeriodAverageBase = props => {
     const xAxisMax = dateToUnix(latestDate);
 
     // Get axis scale helpers
-    const scaleUnixX = getScaleMethod(xAxisMin, xAxisMax, graphWidth);
+    const { scale: scaleUnixX } = getScaleMethods(
+      xAxisMin,
+      xAxisMax,
+      0,
+      graphWidth
+    );
     const scaleDateX = date => scaleUnixX(dateToUnix(date));
-    const scalePriceY = getScaleMethod(yAxisMin, yAxisMax, graphHeight);
+    const { scale: scalePriceY, descale: descalePriceY } = getScaleMethods(
+      yAxisMin,
+      yAxisMax,
+      0,
+      graphHeight
+    );
 
     // Calculate baseLine price y-coordinate
-    const activeYHeight = graphMargin + graphHeight - activeY;
+    const activeYGraphY = graphMargin + graphHeight - activeY;
     const activeYCanvasY = activeY;
 
-    const averagePriceY = scalePriceY(averagePrice);
-    const averagePriceCanvasY = graphMargin + graphHeight - averagePriceY;
+    const averagePriceGraphY = scalePriceY(averagePrice);
+    const averagePriceCanvasY = graphMargin + graphHeight - averagePriceGraphY;
 
-    const baseLineY = isClicked ? activeYHeight : averagePriceY;
-    const baseLineYCanvasY = isClicked ? activeYCanvasY : averagePriceCanvasY;
+    const showAverage =
+      !isClicked ||
+      activeYGraphY < 2 * canvasSpacingUnit ||
+      activeYGraphY > graphHeight - 2 * canvasSpacingUnit;
 
-    const baseLineAmount = isClicked ? undefined : averagePrice;
+    const baseLineGraphY = showAverage ? averagePriceGraphY : activeYGraphY;
+    const baseLineYCanvasY = showAverage ? averagePriceCanvasY : activeYCanvasY;
+
+    const baseLineAmount = showAverage
+      ? averagePrice
+      : descalePriceY(activeYGraphY);
 
     // Get canvas util methods
     const scaleCanvasResolution = getScaleCanvasResolutionMethod(
@@ -190,7 +207,7 @@ const PeriodAverageBase = props => {
         canvasResolutionScale * graphMargin, // x
         canvasResolutionScale * graphMargin, // y
         canvasResolutionScale * graphWidth, // w
-        canvasResolutionScale * (graphHeight - baseLineY) // h
+        canvasResolutionScale * (graphHeight - baseLineGraphY) // h
       );
 
       // Clear graph
