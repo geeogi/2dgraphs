@@ -36,28 +36,76 @@ export const priceLabels = (
   });
 };
 
-export const dateLabels = (earliestDate: string, latestDate: string) => {
-  const numberOfLabels = 5;
-
+export const dateLabels = (
+  earliestDate: string,
+  latestDate: string,
+  minNumberOfLabels: number
+) => {
   let dateLabels = [];
+  let displayFormat = "MMM YY";
 
-  const firstMoment = moment(earliestDate);
-  const lastMoment = moment(latestDate);
+  let momentToAdd = moment(earliestDate)
+    .startOf("month")
+    .add(1, "month");
 
-  let momentToAdd = firstMoment.startOf("month").add(1, "month");
-
-  while (momentToAdd.isBefore(lastMoment)) {
-    dateLabels.push(momentToAdd.unix() * 1000);
-    momentToAdd = momentToAdd.add(1, "month");
-  }
-
-  if (dateLabels.length < numberOfLabels) {
-    momentToAdd = firstMoment.startOf("week").add(1, "week");
-    while (momentToAdd.isBefore(lastMoment)) {
-      dateLabels.push(momentToAdd.unix() * 1000);
-      momentToAdd = momentToAdd.add(1, "week");
+  const tryLabels = (period: any, amount: number) => {
+    const labelArray: any[] = [];
+    let momentToAdd = moment(earliestDate)
+      .startOf(period)
+      .add(1, period);
+    while (momentToAdd.isBefore(moment(latestDate))) {
+      labelArray.push(momentToAdd.unix() * 1000);
+      momentToAdd = momentToAdd.add(amount, period);
     }
+    return labelArray;
+  };
+
+  // 6 month intervals
+  if (dateLabels.length < minNumberOfLabels) {
+    dateLabels = tryLabels("month", 6);
   }
 
-  return dateLabels;
+  // 3 month intervals
+  if (dateLabels.length < minNumberOfLabels) {
+    dateLabels = tryLabels("month", 3);
+  }
+
+  // 2 month intervals
+  if (dateLabels.length < minNumberOfLabels) {
+    dateLabels = tryLabels("month", 2);
+  }
+
+  // 1 month intervals
+  if (dateLabels.length < minNumberOfLabels) {
+    dateLabels = tryLabels("month", 1);
+  }
+
+  // 2 week intervals
+  if (dateLabels.length < minNumberOfLabels) {
+    displayFormat = "Do MMM";
+    dateLabels = tryLabels("week", 2);
+  }
+
+  // 1 week intervals
+  if (dateLabels.length < minNumberOfLabels) {
+    displayFormat = "Do MMM";
+    dateLabels = tryLabels("week", 1);
+  }
+
+  // 4 day intervals
+  if (dateLabels.length < minNumberOfLabels) {
+    dateLabels = tryLabels("day", 4);
+  }
+
+  // 2 day intervals
+  if (dateLabels.length < minNumberOfLabels) {
+    dateLabels = tryLabels("day", 2);
+  }
+
+  // 1 day intervals
+  if (dateLabels.length < minNumberOfLabels) {
+    dateLabels = tryLabels("day", 1);
+  }
+
+  return { dateLabels, displayFormat };
 };

@@ -40,7 +40,10 @@ function App() {
   const values = BITCOIN_PRICE_DATA.data.quotes
     .filter(({ time_open }) => moment(time_open).isAfter(desiredEarliestDate))
     .map(({ quote }) => ({
-      dateTime: quote.USD.timestamp,
+      dateTime: moment(quote.USD.timestamp)
+        .utc()
+        .startOf("day")
+        .format(),
       price: quote.USD.open
     }))
     .sort((a, b) => moment(a.dateTime).unix() - moment(b.dateTime).unix());
