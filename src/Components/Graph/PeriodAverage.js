@@ -12,7 +12,10 @@ import {
   getClearCanvasMethod,
   getDescaleCanvasResolutionMethod,
   getScaleCanvasResolutionMethod,
-  getScaleMethods
+  getScaleMethods,
+  clipPath,
+  lineThroughPoints,
+  clamp
 } from "./Utils/canvasUtils";
 import { dateLabels, dateToUnix, priceLabels } from "./Utils/labelUtils";
 
@@ -46,13 +49,15 @@ const PeriodAverageBase = props => {
     const context = current.getContext("2d");
 
     // Calculate graph dimensions
-    const graphMargin = 8 * canvasSpacingUnit;
-    const graphHeight = canvasHeight - 2 * graphMargin;
-    const graphWidth = canvasWidth - 2 * graphMargin;
+    const graphMarginY = 8 * canvasSpacingUnit;
+    const graphMarginX = 0;
+    const labelMarginX = graphMarginY;
+    const graphDepth = canvasHeight - 2 * graphMarginY;
+    const graphWidth = canvasWidth - 2 * graphMarginX;
 
     // Calculate graph legend dimensions
     const ACTIVE_LEGEND = {
-      WIDTH: graphMargin * 2 - canvasSpacingUnit
+      WIDTH: 120
     };
     const AVERAGE_LEGEND = {
       WIDTH: 72,
@@ -86,27 +91,20 @@ const PeriodAverageBase = props => {
       yAxisMin,
       yAxisMax,
       0,
-      graphHeight
+      graphDepth
     );
 
     // Calculate baseLine price y-coordinate
-    const activeYGraphY = graphMargin + graphHeight - activeY;
-    const activeYCanvasY = activeY;
-
+    const minActiveCanvasY = graphMarginY + 2 * canvasSpacingUnit;
+    const maxActiveCanvasY = graphMarginY + graphDepth - 2 * canvasSpacingUnit;
+    const activeYCanvasY = clamp(activeY, minActiveCanvasY, maxActiveCanvasY);
     const averagePriceGraphY = scalePriceY(averagePrice);
-    const averagePriceCanvasY = graphMargin + graphHeight - averagePriceGraphY;
-
-    const showAverage =
-      !isClicked ||
-      activeYGraphY < 2 * canvasSpacingUnit ||
-      activeYGraphY > graphHeight - 2 * canvasSpacingUnit;
-
-    const baseLineGraphY = showAverage ? averagePriceGraphY : activeYGraphY;
+    const averagePriceCanvasY = graphMarginY + graphDepth - averagePriceGraphY;
+    const showAverage = !isClicked || !activeY;
     const baseLineYCanvasY = showAverage ? averagePriceCanvasY : activeYCanvasY;
-
     const baseLineAmount = showAverage
       ? averagePrice
-      : descalePriceY(activeYGraphY);
+      : descalePriceY(graphMarginY + graphDepth - activeYCanvasY);
 
     // Get canvas util methods
     const scaleCanvasResolution = getScaleCanvasResolutionMethod(
@@ -116,15 +114,29 @@ const PeriodAverageBase = props => {
       canvasHeight,
       canvasResolutionScale
     );
+
     const descaleCanvasResolution = getDescaleCanvasResolutionMethod(
       context,
       canvasResolutionScale
     );
+
     const clearCanvas = getClearCanvasMethod(
       context,
       canvasWidth,
       canvasHeight
     );
+
+    const createVerticalColorFade = (primaryColor, secondaryColor) => {
+      const gradient = context.createLinearGradient(
+        0,
+        graphMarginY,
+        0,
+        graphMarginY + graphDepth
+      );
+      gradient.addColorStop(0, primaryColor);
+      gradient.addColorStop(1, secondaryColor);
+      return gradient;
+    };
 
     // Method: Draw x,y axes and add labels
     const drawGraphAxes = context => {
@@ -136,32 +148,25 @@ const PeriodAverageBase = props => {
       context.font = "12px Arial";
       context.textAlign = "start";
 
-      // Draw x-axis
-      context.moveTo(graphMargin, graphHeight + graphMargin);
-      context.lineTo(graphWidth + graphMargin, graphHeight + graphMargin);
-
-      // Draw y-axis
-      context.moveTo(graphMargin, graphMargin);
-      context.lineTo(graphMargin, graphHeight + graphMargin);
-
       // Add x-axis labels
       context.textAlign = "center";
       xLabels.forEach(unix => {
-        const labelX = graphMargin + scaleDateX(unix);
-        const labelY = graphMargin + graphHeight + canvasSpacingUnit * 3;
+        const labelX = scaleDateX(unix);
+        const labelY = graphMarginY + graphDepth + canvasSpacingUnit * 3;
         context.fillText(moment(unix).format(displayFormat), labelX, labelY);
-        context.moveTo(labelX, graphMargin + graphHeight);
-        context.lineTo(labelX, graphMargin + graphHeight + canvasSpacingUnit);
+        context.moveTo(labelX, graphMarginY + graphDepth);
+        context.lineTo(labelX, graphMarginY + graphDepth + canvasSpacingUnit);
       });
 
       // Add y-axis labels
       context.textAlign = "end";
+      context.strokeStyle = BORDER_COLOR;
       yLabels.forEach(price => {
-        const labelX = graphMargin - 1.5 * canvasSpacingUnit;
-        const labelY = graphMargin + graphHeight - scalePriceY(price);
+        const labelX = labelMarginX - 1.5 * canvasSpacingUnit;
+        const labelY = graphMarginY + graphDepth - scalePriceY(price);
         context.fillText(`$${Math.round(price)}`, labelX, labelY + 2);
-        context.moveTo(graphMargin - canvasSpacingUnit, labelY);
-        context.lineTo(graphMargin, labelY);
+        context.moveTo(labelMarginX + canvasSpacingUnit, labelY);
+        context.lineTo(graphWidth, labelY);
       });
 
       context.stroke();
@@ -173,136 +178,104 @@ const PeriodAverageBase = props => {
       const points = values.map(value => {
         const graphX = scaleDateX(value.dateTime);
         const graphY = scalePriceY(value.price);
-        const canvasX = graphMargin + graphX;
-        const canvasY = graphMargin + graphHeight - graphY;
+        const canvasX = graphMarginX + graphX;
+        const canvasY = graphMarginY + graphDepth - graphY;
         return { canvasX, canvasY, value };
       });
 
       // Primary-block: begin path
       context.beginPath();
-      context.strokeStyle = "rgba(9,211,172,1)";
-      context.lineJoin = "round";
 
       // Primary-block: create gradient
-      const primaryGradient = context.createLinearGradient(
-        0,
-        graphMargin,
-        0,
-        graphMargin + graphHeight
+      context.fillStyle = createVerticalColorFade(
+        PRIMARY_BASE(0.4),
+        PRIMARY_BASE(0)
       );
-      primaryGradient.addColorStop(0, PRIMARY_BASE(0.4));
-      primaryGradient.addColorStop(1, PRIMARY_BASE(0));
-      context.fillStyle = primaryGradient;
+
+      // Primary-block: configure clip
+      context.save();
+      clipPath(context, points, canvasWidth, baseLineYCanvasY);
 
       // Primary-block: draw and fill path
-      context.lineTo(graphMargin, graphMargin + graphHeight);
-      points.forEach(({ canvasX, canvasY }) => {
-        context.lineTo(canvasX, canvasY);
-      });
-      context.lineTo(graphMargin + graphWidth, graphMargin + graphHeight);
+      context.beginPath();
+      context.moveTo(graphMarginX, graphMarginY + graphDepth);
+      lineThroughPoints(context, points);
+      context.lineTo(graphMarginX + graphWidth, graphMarginY + graphDepth);
       context.fill();
 
-      // Primary-block: save primary-block for later
-      const blockImageData = context.getImageData(
-        canvasResolutionScale * graphMargin, // x
-        canvasResolutionScale * graphMargin, // y
-        canvasResolutionScale * graphWidth, // w
-        canvasResolutionScale * (graphHeight - baseLineGraphY) // h
-      );
-
-      // Clear graph
-      context.clearRect(graphMargin, graphMargin, graphWidth, graphHeight);
+      // Restore clip
+      context.restore();
 
       // Secondary-block: create gradient
-      const secondaryGradient = context.createLinearGradient(
-        0,
-        graphMargin,
-        0,
-        graphMargin + graphHeight
+      context.fillStyle = createVerticalColorFade(
+        SECONDARY_BASE(0.4),
+        SECONDARY_BASE(0)
       );
-      secondaryGradient.addColorStop(0, SECONDARY_BASE(0.4));
-      secondaryGradient.addColorStop(1, SECONDARY_BASE(0));
-      context.fillStyle = secondaryGradient;
+
+      // Secondary-block: configure clip
+      context.save();
+      clipPath(context, points, canvasWidth, 0);
 
       // Secondary-block: draw block
       context.beginPath();
-      context.moveTo(graphMargin, baseLineYCanvasY);
-      context.lineTo(graphMargin + graphWidth, baseLineYCanvasY);
-      context.lineTo(graphMargin + graphWidth, graphMargin + graphHeight);
-      context.lineTo(graphMargin, graphMargin + graphHeight);
+      context.moveTo(graphMarginX, baseLineYCanvasY);
+      context.lineTo(graphMarginX + graphWidth, baseLineYCanvasY);
+      context.lineTo(graphMarginX + graphWidth, graphMarginY + graphDepth);
+      context.lineTo(graphMarginX, graphMarginY + graphDepth);
       context.fill();
 
-      // Draw ternary-block
-      context.beginPath();
-      context.fillStyle = BACKGROUND_COLOR;
-      context.lineTo(graphMargin, graphMargin + graphHeight);
-      points.forEach(({ canvasX, canvasY }) => {
-        context.lineTo(canvasX, canvasY);
-      });
-      context.lineTo(graphMargin + graphWidth, graphMargin + graphHeight);
-      context.fill();
-
-      // Re-add the primary-block
-      context.putImageData(
-        blockImageData,
-        canvasResolutionScale * graphMargin, // x
-        canvasResolutionScale * graphMargin // y
-      );
+      // Restore clip
+      context.restore();
 
       // Draw primary-line
       context.beginPath();
-      context.fillStyle = BACKGROUND_COLOR;
+      context.strokeStyle = PRIMARY_COLOR;
       context.moveTo(points[0].canvasX, points[0].canvasY);
-      points.forEach(({ canvasX, canvasY }) => {
-        context.lineTo(canvasX, canvasY);
-      });
+      lineThroughPoints(context, points);
       context.stroke();
 
-      // Draw average-line
+      // Draw baseline
       context.strokeStyle = PRIMARY_BASE(0.5);
       context.beginPath();
-      context.moveTo(graphMargin, baseLineYCanvasY);
-      context.lineTo(graphMargin + graphWidth, baseLineYCanvasY);
+      context.moveTo(graphMarginX, baseLineYCanvasY);
+      context.lineTo(graphMarginX + graphWidth, baseLineYCanvasY);
       context.stroke();
 
-      // Draw average legend body
+      // Draw baseline legend body
       if (baseLineAmount) {
         context.fillStyle = BACKGROUND_COLOR;
         context.beginPath();
-        context.moveTo(graphMargin + canvasSpacingUnit, baseLineYCanvasY);
+        context.moveTo(labelMarginX + canvasSpacingUnit, baseLineYCanvasY);
         context.lineTo(
-          graphMargin + canvasSpacingUnit,
+          labelMarginX + canvasSpacingUnit,
           baseLineYCanvasY - AVERAGE_LEGEND.HEIGHT / 2
         );
         context.lineTo(
-          graphMargin + canvasSpacingUnit + AVERAGE_LEGEND.WIDTH,
+          labelMarginX + canvasSpacingUnit + AVERAGE_LEGEND.WIDTH,
           baseLineYCanvasY - AVERAGE_LEGEND.HEIGHT / 2
         );
         context.lineTo(
-          graphMargin + canvasSpacingUnit + AVERAGE_LEGEND.WIDTH,
+          labelMarginX + canvasSpacingUnit + AVERAGE_LEGEND.WIDTH,
           baseLineYCanvasY + AVERAGE_LEGEND.HEIGHT / 2
         );
         context.lineTo(
-          graphMargin + canvasSpacingUnit,
+          labelMarginX + canvasSpacingUnit,
           baseLineYCanvasY + AVERAGE_LEGEND.HEIGHT / 2
         );
-        context.lineTo(graphMargin + canvasSpacingUnit, baseLineYCanvasY);
+        context.lineTo(labelMarginX + canvasSpacingUnit, baseLineYCanvasY);
         context.fill();
         context.stroke();
 
-        // Draw average legend text
+        // Draw baseline legend text
         context.textAlign = "center";
         context.font = "12px Arial";
         context.fillStyle = CONTRAST_COLOR;
         context.fillText(
           `$${Math.round(baseLineAmount)}`,
-          graphMargin + canvasSpacingUnit + AVERAGE_LEGEND.WIDTH / 2,
+          labelMarginX + canvasSpacingUnit + AVERAGE_LEGEND.WIDTH / 2,
           baseLineYCanvasY + canvasSpacingUnit / 2
         );
       }
-
-      // Draw graph axes
-      drawGraphAxes(context);
 
       // Draw active legend
       if (activeX && activeY) {
@@ -316,8 +289,8 @@ const PeriodAverageBase = props => {
         context.setLineDash([5, 5]);
         context.lineWidth = 1;
         context.beginPath();
-        context.moveTo(canvasX, graphMargin);
-        context.lineTo(canvasX, graphHeight + graphMargin);
+        context.moveTo(canvasX, graphMarginY);
+        context.lineTo(canvasX, graphDepth + graphMarginY);
         context.stroke();
 
         // Draw active legend body
@@ -325,27 +298,29 @@ const PeriodAverageBase = props => {
         context.strokeStyle = PRIMARY_COLOR;
         context.fillStyle = BACKGROUND_COLOR;
         context.beginPath();
-        const legendBottomY = graphMargin + 5 * canvasSpacingUnit;
+
+        const legendBottomY = graphMarginY + 5 * canvasSpacingUnit;
         const legendTopY = legendBottomY - 3 * canvasSpacingUnit;
-        const anchorY = canvasY < legendBottomY ? canvasY - graphMargin : 0;
-        context.moveTo(canvasX - ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
-        context.lineTo(canvasX - ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
+
+        const anchorY = canvasY < legendBottomY ? canvasY - graphMarginY : 0;
+        const anchorX = clamp(
+          canvasX,
+          labelMarginX,
+          canvasWidth - labelMarginX
+        );
+
+        context.moveTo(anchorX - ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
+        context.lineTo(anchorX - ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
         context.lineTo(
-          canvasX - ACTIVE_LEGEND.WIDTH / 2,
+          anchorX - ACTIVE_LEGEND.WIDTH / 2,
           anchorY + legendBottomY
         );
         context.lineTo(
-          canvasX + ACTIVE_LEGEND.WIDTH / 2,
+          anchorX + ACTIVE_LEGEND.WIDTH / 2,
           anchorY + legendBottomY
         );
-        context.lineTo(
-          canvasX + ACTIVE_LEGEND.WIDTH / 2,
-          anchorY + legendBottomY - 3 * canvasSpacingUnit
-        );
-        context.lineTo(
-          canvasX - ACTIVE_LEGEND.WIDTH / 2,
-          anchorY + legendBottomY - 3 * canvasSpacingUnit
-        );
+        context.lineTo(anchorX + ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
+        context.lineTo(anchorX - ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
         context.stroke();
         context.fill();
 
@@ -364,7 +339,7 @@ const PeriodAverageBase = props => {
         const dateLabel = moment(value.dateTime).format("DD MMM YY");
         context.fillText(
           `$${priceLabel}    ${dateLabel}`,
-          canvasX,
+          anchorX,
           anchorY + legendBottomY - canvasSpacingUnit
         );
       }
@@ -381,6 +356,7 @@ const PeriodAverageBase = props => {
 
     // Draw graph
     if (!disabled) {
+      drawGraphAxes(context);
       drawGraph(context);
     }
 
