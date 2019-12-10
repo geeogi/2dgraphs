@@ -5,9 +5,9 @@
  * @param {*} canvasHeight
  */
 export const getClearCanvasMethod = (
-  canvasContext,
-  canvasWidth,
-  canvasHeight
+  canvasContext: CanvasRenderingContext2D,
+  canvasWidth: number,
+  canvasHeight: number
 ) => () => canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
 
 /**
@@ -18,20 +18,20 @@ export const getClearCanvasMethod = (
  * @param {*} maxSecondaryValue
  */
 export const getScaleMethods = (
-  minPrimaryValue,
-  maxPrimaryValue,
-  minSecondaryValue,
-  maxSecondaryValue
+  minPrimaryValue: number,
+  maxPrimaryValue: number,
+  minSecondaryValue: number,
+  maxSecondaryValue: number
 ) => {
   const primaryValueRange = maxPrimaryValue - minPrimaryValue;
   const secondaryValueRange = maxSecondaryValue - minSecondaryValue;
   return {
-    scale: primaryValue => {
+    scale: (primaryValue: number) => {
       const normalPrimaryValue = primaryValue - minPrimaryValue;
       const primaryPercentage = normalPrimaryValue / primaryValueRange;
       return minSecondaryValue + primaryPercentage * secondaryValueRange;
     },
-    descale: secondaryValue => {
+    descale: (secondaryValue: number) => {
       const normalSecondaryValue = secondaryValue - minSecondaryValue;
       const secondaryPercentage = normalSecondaryValue / secondaryValueRange;
       return minPrimaryValue + secondaryPercentage * primaryValueRange;
@@ -48,11 +48,11 @@ export const getScaleMethods = (
  * @param {*} canvasResolutionScale
  */
 export const getScaleCanvasResolutionMethod = (
-  canvasContext,
-  canvasElement,
-  canvasWidth,
-  canvasHeight,
-  canvasResolutionScale
+  canvasContext: CanvasRenderingContext2D,
+  canvasElement: HTMLCanvasElement,
+  canvasWidth: number,
+  canvasHeight: number,
+  canvasResolutionScale: number
 ) => () => {
   canvasElement.style.width = canvasWidth + "px";
   canvasElement.style.height = canvasHeight + "px";
@@ -67,8 +67,8 @@ export const getScaleCanvasResolutionMethod = (
  * @param {*} canvasResolutionScale
  */
 export const getDescaleCanvasResolutionMethod = (
-  canvasContext,
-  canvasResolutionScale
+  canvasContext: CanvasRenderingContext2D,
+  canvasResolutionScale: number
 ) => () =>
   canvasContext.scale(1 / canvasResolutionScale, 1 / canvasResolutionScale);
 
@@ -79,7 +79,12 @@ export const getDescaleCanvasResolutionMethod = (
  * @param {*} clipWidth
  * @param {*} clipFloorCanvasY
  */
-export const clipPath = (context, pathPoints, clipWidth, clipFloorCanvasY) => {
+export const clipPath = (
+  context: CanvasRenderingContext2D,
+  pathPoints: { canvasX: number; canvasY: number }[],
+  clipWidth: number,
+  clipFloorCanvasY: number
+) => {
   context.beginPath();
   context.moveTo(0, clipFloorCanvasY);
   context.lineTo(0, clipFloorCanvasY);
@@ -96,7 +101,10 @@ export const clipPath = (context, pathPoints, clipWidth, clipFloorCanvasY) => {
  * @param {*} context
  * @param {*} pathPoints
  */
-export const lineThroughPoints = (context, pathPoints) => {
+export const lineThroughPoints = (
+  context: CanvasRenderingContext2D,
+  pathPoints: { canvasX: number; canvasY: number }[]
+) => {
   pathPoints.forEach(({ canvasX, canvasY }) => {
     context.lineTo(canvasX, canvasY);
   });
@@ -108,6 +116,6 @@ export const lineThroughPoints = (context, pathPoints) => {
  * @param {*} min
  * @param {*} max
  */
-export const clamp = (value, min, max) => {
+export const clamp = (value: number, min: number, max: number) => {
   return value < min ? min : value > max ? max : value;
 };

@@ -12,7 +12,7 @@ const roundDownToNearest = (value: number, multiple: number) => {
   return Math.floor(value / multiple) * multiple;
 };
 
-export const priceLabels = (
+export const getPriceLabels = (
   minPrice: number,
   maxPrice: number,
   numberOfLabels = 5
@@ -36,17 +36,13 @@ export const priceLabels = (
   });
 };
 
-export const dateLabels = (
+export const getDateLabels = (
   earliestDate: string,
   latestDate: string,
   minNumberOfLabels: number
 ) => {
   let dateLabels = [];
   let displayFormat = "MMM YY";
-
-  let momentToAdd = moment(earliestDate)
-    .startOf("month")
-    .add(1, "month");
 
   const tryLabels = (period: any, amount: number) => {
     const labelArray: any[] = [];

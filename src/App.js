@@ -111,8 +111,8 @@ function App() {
                   averagePrice={averagePrice}
                   earliestDate={earliestDate}
                   latestDate={latestDate}
-                  canvasHeight={height - 8}
-                  canvasWidth={width - 8}
+                  canvasHeight={height}
+                  canvasWidth={width}
                 />
               )}
             </ResponsiveGraph>
