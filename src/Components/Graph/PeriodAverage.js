@@ -51,7 +51,7 @@ const PeriodAverageBase = props => {
     const context = current.getContext("2d");
 
     // Calculate graph dimensions
-    const graphMarginY = 3 * canvasSpacingUnit;
+    const graphMarginY = 4 * canvasSpacingUnit;
     const graphMarginX = 0;
     const labelMarginX = 8 * canvasSpacingUnit;;
     const graphDepth = canvasHeight - 2 * graphMarginY;
