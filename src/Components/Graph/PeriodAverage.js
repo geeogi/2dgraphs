@@ -51,9 +51,9 @@ const PeriodAverageBase = props => {
     const context = current.getContext("2d");
 
     // Calculate graph dimensions
-    const graphMarginY = 8 * canvasSpacingUnit;
+    const graphMarginY = 3 * canvasSpacingUnit;
     const graphMarginX = 0;
-    const labelMarginX = graphMarginY;
+    const labelMarginX = 8 * canvasSpacingUnit;;
     const graphDepth = canvasHeight - 2 * graphMarginY;
     const graphWidth = canvasWidth - 2 * graphMarginX;
 
@@ -72,7 +72,7 @@ const PeriodAverageBase = props => {
     const yAxisMax = yLabels[yLabels.length - 1];
 
     // Get x-axis labels
-    const minNumberOfXLabels = canvasWidth < MOBILE_CANVAS_WIDTH ? 2 : 4;
+    const minNumberOfXLabels = canvasWidth < MOBILE_CANVAS_WIDTH ? 3 : 4;
     const { dateLabels: xLabels, displayFormat } = dateLabels(
       earliestDate,
       latestDate,
@@ -154,7 +154,7 @@ const PeriodAverageBase = props => {
       context.textAlign = "center";
       xLabels.forEach(unix => {
         const labelX = scaleDateX(unix);
-        if (labelX > labelMarginX) {
+        if (labelX > labelMarginX && labelX < graphWidth - labelMarginX) {
           const labelY = graphMarginY + graphDepth + canvasSpacingUnit * 3;
           context.fillText(moment(unix).format(displayFormat), labelX, labelY);
           context.moveTo(labelX, graphMarginY + graphDepth);
