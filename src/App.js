@@ -62,7 +62,7 @@ function App() {
       <Column>
         <H1>CoinTales</H1>
         <H4>Period average</H4>
-        <Row>
+        <Row padding={"0 8px"}>
           <Button
             onClick={() =>
               setDesiredEarliestDate(timeScales["1year"].startDate)

@@ -19,6 +19,8 @@ import {
 } from "./Utils/canvasUtils";
 import { dateLabels, dateToUnix, priceLabels } from "./Utils/labelUtils";
 
+const MOBILE_CANVAS_WIDTH = 600;
+
 const PeriodAverageBase = props => {
   const [hasSetup, setHasSetup] = useState();
 
@@ -70,7 +72,7 @@ const PeriodAverageBase = props => {
     const yAxisMax = yLabels[yLabels.length - 1];
 
     // Get x-axis labels
-    const minNumberOfXLabels = canvasWidth < 600 ? 2 : 4;
+    const minNumberOfXLabels = canvasWidth < MOBILE_CANVAS_WIDTH ? 2 : 4;
     const { dateLabels: xLabels, displayFormat } = dateLabels(
       earliestDate,
       latestDate,
@@ -152,10 +154,12 @@ const PeriodAverageBase = props => {
       context.textAlign = "center";
       xLabels.forEach(unix => {
         const labelX = scaleDateX(unix);
-        const labelY = graphMarginY + graphDepth + canvasSpacingUnit * 3;
-        context.fillText(moment(unix).format(displayFormat), labelX, labelY);
-        context.moveTo(labelX, graphMarginY + graphDepth);
-        context.lineTo(labelX, graphMarginY + graphDepth + canvasSpacingUnit);
+        if (labelX > labelMarginX) {
+          const labelY = graphMarginY + graphDepth + canvasSpacingUnit * 3;
+          context.fillText(moment(unix).format(displayFormat), labelX, labelY);
+          context.moveTo(labelX, graphMarginY + graphDepth);
+          context.lineTo(labelX, graphMarginY + graphDepth + canvasSpacingUnit);
+        }
       });
 
       // Add y-axis labels
@@ -164,8 +168,8 @@ const PeriodAverageBase = props => {
       yLabels.forEach(price => {
         const labelX = labelMarginX - 1.5 * canvasSpacingUnit;
         const labelY = graphMarginY + graphDepth - scalePriceY(price);
-        context.fillText(`$${Math.round(price)}`, labelX, labelY + 2);
-        context.moveTo(labelMarginX + canvasSpacingUnit, labelY);
+        context.fillText(`$${Math.round(price)}`, labelX, labelY + 3);
+        context.moveTo(labelMarginX, labelY);
         context.lineTo(graphWidth, labelY);
       });
 
@@ -242,7 +246,7 @@ const PeriodAverageBase = props => {
       context.stroke();
 
       // Draw baseline legend body
-      if (baseLineAmount) {
+      if (baseLineAmount && canvasWidth > MOBILE_CANVAS_WIDTH) {
         context.fillStyle = BACKGROUND_COLOR;
         context.beginPath();
         context.moveTo(labelMarginX + canvasSpacingUnit, baseLineYCanvasY);
