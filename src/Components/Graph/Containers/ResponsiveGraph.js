@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
 const ResponsiveGraphBase = styled.div`
-  min-height: 400px;
+  min-height: 300px;
   min-width: 200px;
   width: 100%;
 `;
