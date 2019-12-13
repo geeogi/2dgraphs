@@ -89,7 +89,7 @@ const PeriodAverageBase = (props: {
 
         // Calculate graph dimensions
         const graphMarginY = 4 * SPACING_UNIT;
-        const graphMarginX = 0;
+        const graphMarginX = 1 * SPACING_UNIT;
         const labelMarginX = 8 * SPACING_UNIT;
         const graphDepth = canvasHeight - 2 * graphMarginY;
         const graphWidth = canvasWidth - 2 * graphMarginX;
@@ -121,21 +121,15 @@ const PeriodAverageBase = (props: {
         );
 
         // Get x-axis scale helpers
-        const { scale: scaleUnixX } = getScaleMethods(
-          dateToUnix(earliestDate),
-          dateToUnix(latestDate),
-          0,
-          graphWidth
-        );
+        const unixMin = dateToUnix(earliestDate);
+        const unixMax = dateToUnix(latestDate);
+        const xScale = getScaleMethods(unixMin, unixMax, 0, graphWidth);
+        const { scale: scaleUnixX } = xScale;
         const scaleDateX = (date: string) => scaleUnixX(dateToUnix(date));
 
         // Get y-axis scale helpers
-        const { scale: scalePriceY, descale: descalePriceY } = getScaleMethods(
-          yLabels[0],
-          yLabels[yLabels.length - 1],
-          0,
-          graphDepth
-        );
+        const yScale = getScaleMethods(yLabels[0], maxPrice, 0, graphDepth);
+        const { scale: scalePriceY, descale: descalePriceY } = yScale;
 
         // Calculate baseline price y-coordinate
         const minActiveCanvasY = graphMarginY + 2 * SPACING_UNIT;
@@ -169,7 +163,7 @@ const PeriodAverageBase = (props: {
           // Add x-axis labels
           context.textAlign = "center";
           xLabels.forEach(unix => {
-            const labelX = scaleDateX(unix);
+            const labelX = graphMarginX + scaleDateX(unix);
             if (labelX > labelMarginX && labelX < graphWidth - labelMarginX) {
               const labelY = graphMarginY + graphDepth + SPACING_UNIT * 3;
               context.fillText(
@@ -304,9 +298,11 @@ const PeriodAverageBase = (props: {
           // Draw active legend
           if (activeX && activeY) {
             const pointsSortedByXPromityToActiveX = points.sort((a, b) => {
-              return (
-                Math.abs(a.canvasX - activeX) - Math.abs(b.canvasX - activeX)
-              );
+              const xDiff =
+                Math.abs(a.canvasX - activeX) - Math.abs(b.canvasX - activeX);
+              const yDiff =
+                Math.abs(a.canvasY - activeY) - Math.abs(b.canvasY - activeY);
+              return xDiff + yDiff;
             });
             const {
               canvasX,

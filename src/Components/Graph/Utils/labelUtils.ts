@@ -18,22 +18,23 @@ export const getPriceLabels = (
   numberOfLabels = 5
 ) => {
   const perfectStep = (maxPrice - minPrice) / numberOfLabels;
-  const multiple = [100, 250, 500, 1000].sort((a, b) => {
+  const [multiple] = [100, 250, 500, 1000].sort((a, b) => {
     return Math.abs(a - perfectStep) - Math.abs(b - perfectStep);
-  })[0];
-  const firstLabel = roundDownToNearest(minPrice, multiple);
-  const labelRange = maxPrice - firstLabel;
-  const labelStep = roundUpToNearest(
-    labelRange / (numberOfLabels - 1),
-    multiple
-  );
-  return [...Array(numberOfLabels)].map((_, index) => {
-    if (index === 0) {
-      return firstLabel;
-    } else {
-      return firstLabel + labelStep * index;
-    }
   });
+  const firstLabel = roundDownToNearest(minPrice, multiple);
+  const lastlabel = roundDownToNearest(maxPrice, multiple);
+  const labelRange = lastlabel - firstLabel;
+  const labelStep = roundUpToNearest(labelRange / numberOfLabels, multiple);
+  const labels = [];
+  while (labels.length <= numberOfLabels) {
+    const nextLabel = firstLabel + labelStep * labels.length;
+    if (nextLabel <= lastlabel) {
+      labels.push(firstLabel + labelStep * labels.length);
+    } else {
+      break;
+    }
+  }
+  return labels;
 };
 
 export const getDateLabels = (
@@ -42,7 +43,7 @@ export const getDateLabels = (
   minNumberOfLabels: number
 ) => {
   let dateLabels = [];
-  let displayFormat = "MMM YY";
+  let displayFormat = "MMM 'YY";
 
   const tryLabels = (period: any, amount: number) => {
     const labelArray: any[] = [];
