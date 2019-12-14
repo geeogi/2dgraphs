@@ -61,6 +61,8 @@ const PeriodAverageBase = (props: {
     values
   } = props;
 
+  const isMobile = canvasWidth <= MOBILE_CANVAS_WIDTH;
+
   useEffect(() => {
     // Fetch canvas context
     const { current } = canvasElement;
@@ -260,7 +262,7 @@ const PeriodAverageBase = (props: {
           context.stroke();
 
           // Draw baseline legend body (non-mobile only)
-          if (baselineAmount && canvasWidth > MOBILE_CANVAS_WIDTH) {
+          if (baselineAmount && !isMobile) {
             context.fillStyle = BACKGROUND_COLOR;
             context.beginPath();
             context.moveTo(labelMarginX + SPACING_UNIT, baselineYCanvasY);
@@ -302,7 +304,7 @@ const PeriodAverageBase = (props: {
                 Math.abs(a.canvasX - activeX) - Math.abs(b.canvasX - activeX);
               const yDiff =
                 Math.abs(a.canvasY - activeY) - Math.abs(b.canvasY - activeY);
-              return xDiff + yDiff;
+              return isMobile ? xDiff + yDiff : xDiff;
             });
             const {
               canvasX,

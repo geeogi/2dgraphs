@@ -75,7 +75,7 @@ function App() {
             🍃
           </span>
         </H1>
-        <P>High resolution Bitcoin charts</P>
+        <P>High performance Bitcoin charts</P>
       </Header>
       <GraphContainer>
         <H4>Period average</H4>
