@@ -1,10 +1,14 @@
 import styled from "styled-components";
+import { BORDER_COLOR } from "../Data/colors";
 
 export const Header = styled.div`
-  margin: 32px;
+  padding: 16px 32px;
+  border-bottom: solid 1px ${BORDER_COLOR};
+  margin-bottom: 32px;
   @media (max-width: 600px) {
-    margin: 0;
-    margin-top: 8px;
-    margin-bottom: 32px;
+    padding: 0;
+    padding-top: 8px;
+    padding-bottom: 32px;
+    margin-bottom: 16px;
   }
 `;
