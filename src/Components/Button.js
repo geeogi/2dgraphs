@@ -14,4 +14,7 @@ export const Button = styled.button`
   color: ${props => (props.active ? BORDER_COLOR : CONTRAST_COLOR)};
   border: 2px solid ${props => (props.active ? PRIMARY_COLOR : BORDER_COLOR)};
   cursor: pointer;
+  :hover {
+    background: ${props => (props.active ? PRIMARY_COLOR : BORDER_COLOR)};
+  }
 `;

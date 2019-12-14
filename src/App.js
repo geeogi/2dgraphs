@@ -1,13 +1,15 @@
 import moment from "moment";
 import React, { useState } from "react";
 import { Button } from "./Components/Button";
-import { Column } from "./Components/Column";
 import { InteractiveGraph } from "./Components/Graph/Containers/InteractiveGraph";
 import { ResponsiveGraph } from "./Components/Graph/Containers/ResponsiveGraph";
 import { PeriodAverage } from "./Components/Graph/PeriodAverage";
-import { H1, H4 } from "./Components/H";
+import { H1, H4, H3 } from "./Components/H";
 import { Row } from "./Components/Row";
 import BITCOIN_PRICE_DATA from "./Data/bitcoin-price.json";
+import { GraphContainer } from "./Components/GraphContainer";
+import { Header } from "./Components/Header";
+import { P } from "./Components/P";
 
 const currentMoment = () => moment("2019-11-11T23:59:59.999Z");
 
@@ -57,10 +59,25 @@ function App() {
   const earliestDate = values[0].dateTime;
   const latestDate = values[values.length - 1].dateTime;
 
+  console.log(`values: ${values}`);
+  console.log(`minPrice: ${minPrice}`);
+  console.log(`maxPrice: ${maxPrice}`);
+  console.log(`averagePrice: ${averagePrice}`);
+  console.log(`earliestDate: ${earliestDate}`);
+  console.log(`latestDate: ${latestDate}`);
+
   return (
     <main>
-      <Column>
-        <H1>CoinTales</H1>
+      <Header>
+        <H1>
+          CoinTales
+          <span aria-label="icon" role="img">
+            🍃
+          </span>
+        </H1>
+        <P>High resolution Bitcoin charts</P>
+      </Header>
+      <GraphContainer>
         <H4>Period average</H4>
         <Row padding={"0 8px"}>
           <Button
@@ -96,7 +113,6 @@ function App() {
             7d
           </Button>
         </Row>
-
         <InteractiveGraph>
           {({ activeX, activeY, isClicked }) => (
             <ResponsiveGraph>
@@ -118,7 +134,7 @@ function App() {
             </ResponsiveGraph>
           )}
         </InteractiveGraph>
-      </Column>
+      </GraphContainer>
     </main>
   );
 }
