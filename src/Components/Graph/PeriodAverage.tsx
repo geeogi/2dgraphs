@@ -324,7 +324,6 @@ const PeriodAverageBase = (props: {
             context.setLineDash([]);
 
             // Draw active legend body
-            context.lineWidth = 1;
             context.strokeStyle = PRIMARY_COLOR;
             context.fillStyle = BACKGROUND_COLOR;
             context.beginPath();
