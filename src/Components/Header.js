@@ -8,7 +8,7 @@ export const Header = styled.div`
   @media (max-width: 600px) {
     padding: 0;
     padding-top: 8px;
-    padding-bottom: 32px;
+    padding-bottom: 8px;
     margin-bottom: 16px;
   }
 `;
