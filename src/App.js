@@ -78,7 +78,7 @@ function App() {
         <P>Quick crypto charts</P>
       </Header>
       <GraphContainer>
-        <H4>Bitcoin (BTC): $7,138.31 USD (-1.71%)</H4>
+        <H4>Bitcoin (BTC): $7,138.31 USD</H4>
         <Row padding={"0 8px"}>
           <Button
             onClick={() =>
