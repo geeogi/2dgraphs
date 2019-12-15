@@ -249,12 +249,15 @@ const PeriodAverageBase = (props: {
 
           // Draw primary-line
           context.beginPath();
+          context.lineWidth = 2;
+          context.lineJoin = "miter";
           context.strokeStyle = PRIMARY_COLOR;
           context.moveTo(points[0].canvasX, points[0].canvasY);
           lineThroughPoints(context, points);
           context.stroke();
 
           // Draw baseline
+          context.lineWidth = 1;
           context.strokeStyle = PRIMARY_BASE(0.5);
           context.beginPath();
           context.moveTo(graphMarginX, baselineYCanvasY);
@@ -300,11 +303,9 @@ const PeriodAverageBase = (props: {
           // Draw active legend
           if (activeX && activeY) {
             const pointsSortedByXPromityToActiveX = points.sort((a, b) => {
-              const xDiff =
-                Math.abs(a.canvasX - activeX) - Math.abs(b.canvasX - activeX);
-              const yDiff =
-                Math.abs(a.canvasY - activeY) - Math.abs(b.canvasY - activeY);
-              return isMobile ? xDiff + yDiff : xDiff;
+              return (
+                Math.abs(a.canvasX - activeX) - Math.abs(b.canvasX - activeX)
+              );
             });
             const {
               canvasX,
@@ -314,6 +315,7 @@ const PeriodAverageBase = (props: {
 
             // Draw dashed active line
             context.strokeStyle = BORDER_COLOR;
+            context.lineWidth = 2;
             context.setLineDash([5, 5]);
             context.beginPath();
             context.moveTo(canvasX, graphMarginY);
@@ -322,6 +324,7 @@ const PeriodAverageBase = (props: {
             context.setLineDash([]);
 
             // Draw active legend body
+            context.lineWidth = 1;
             context.strokeStyle = PRIMARY_COLOR;
             context.fillStyle = BACKGROUND_COLOR;
             context.beginPath();
@@ -368,7 +371,7 @@ const PeriodAverageBase = (props: {
             context.fillStyle = PRIMARY_COLOR;
             context.strokeStyle = BACKGROUND_COLOR;
             context.beginPath();
-            context.arc(canvasX, canvasY, 5, 0, 2 * Math.PI);
+            context.arc(canvasX, canvasY, 6, 0, 2 * Math.PI);
             context.fill();
             context.stroke();
 
