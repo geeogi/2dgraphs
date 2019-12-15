@@ -250,7 +250,7 @@ const PeriodAverageBase = (props: {
           // Draw primary-line
           context.beginPath();
           context.lineWidth = 2;
-          context.lineJoin = "miter";
+          context.lineJoin = "round";
           context.strokeStyle = PRIMARY_COLOR;
           context.moveTo(points[0].canvasX, points[0].canvasY);
           lineThroughPoints(context, points);
