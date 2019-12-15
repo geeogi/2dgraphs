@@ -1,10 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
+import { MOBILE_SCREEN_WIDTH } from "../../../Data/constants";
 
 const ResponsiveGraphBase = styled.div`
   min-height: 400px;
   min-width: 200px;
   width: 100%;
+  @media (max-width: ${MOBILE_SCREEN_WIDTH}px) {
+    min-height: 300px;
+  }
 `;
 
 export const ResponsiveGraph = props => {

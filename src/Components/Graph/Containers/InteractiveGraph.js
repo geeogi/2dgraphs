@@ -30,12 +30,30 @@ export const InteractiveGraph = props => {
     });
   };
 
+  const handleTouchStart = e => {
+    const rect = e.target.getBoundingClientRect();
+    const x = e.changedTouches[0].clientX - rect.left; // x position within the element.
+    const y = e.changedTouches[0].clientY - rect.top; // x position within the element.
+    setActiveX(x);
+    setActiveY(y);
+  };
+
+  const handleTouchMove = handleTouchStart;
+  
+  const handleTouchEnd = () => {
+    setActiveX();
+    setActiveY();
+  };
+
   return (
     <InteractiveGraphBase
       ref={container}
       onMouseMove={handleMouseMove}
       onMouseDown={handleMouseDown}
       onMouseLeave={handleMouseLeave}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       {children({ activeX, activeY, isClicked })}
     </InteractiveGraphBase>

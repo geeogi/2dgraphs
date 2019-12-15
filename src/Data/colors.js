@@ -1,4 +1,4 @@
-// // Dark
+// Dark
 // export const PRIMARY_BASE = opacity => `rgba(9,211,172,${opacity})`;
 // export const SECONDARY_BASE = opacity => `rgba(255,0,115,${opacity})`;
 
