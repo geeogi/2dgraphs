@@ -6,7 +6,10 @@ import {
   CONTRAST_COLOR,
   PRIMARY_BASE,
   PRIMARY_COLOR,
-  SECONDARY_BASE
+  SECONDARY_BASE,
+  DARK_BACKGROUND_COLOR,
+  DARK_CONTRAST_COLOR,
+  DARK_BORDER_COLOR
 } from "../../Data/colors";
 import {
   ACTIVE_LEGEND,
@@ -324,8 +327,8 @@ const PeriodAverageBase = (props: {
             context.setLineDash([]);
 
             // Draw active legend body
-            context.strokeStyle = PRIMARY_COLOR;
-            context.fillStyle = BACKGROUND_COLOR;
+            context.strokeStyle = DARK_BORDER_COLOR;
+            context.fillStyle = DARK_BACKGROUND_COLOR;
             context.beginPath();
 
             const legendBottomY = graphMarginY + 5 * SPACING_UNIT;
@@ -375,7 +378,7 @@ const PeriodAverageBase = (props: {
             context.stroke();
 
             // Draw active legend text
-            context.fillStyle = CONTRAST_COLOR;
+            context.fillStyle = DARK_CONTRAST_COLOR;
             context.textAlign = "center";
             const priceLabel = Math.round(value.price);
             const dateLabel = moment(value.dateTime).format("DD MMM YY");

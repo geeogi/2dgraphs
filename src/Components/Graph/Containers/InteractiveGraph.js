@@ -39,7 +39,7 @@ export const InteractiveGraph = props => {
   };
 
   const handleTouchMove = handleTouchStart;
-  
+
   const handleTouchEnd = () => {
     setActiveX();
     setActiveY();
@@ -54,6 +54,7 @@ export const InteractiveGraph = props => {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
     >
       {children({ activeX, activeY, isClicked })}
     </InteractiveGraphBase>
