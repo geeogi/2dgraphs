@@ -71,9 +71,6 @@ function App() {
       <Header>
         <H1>
           CoinTales
-          <span aria-label="icon" role="img">
-            🍃
-          </span>
         </H1>
         <P>Quick crypto charts</P>
       </Header>
