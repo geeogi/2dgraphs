@@ -10,7 +10,7 @@ import {
   DARK_BACKGROUND_COLOR,
   DARK_CONTRAST_COLOR,
   DARK_BORDER_COLOR
-} from "../../Data/colors";
+} from "../../../Data/colors";
 import {
   ACTIVE_LEGEND,
   AVERAGE_LEGEND,
@@ -25,9 +25,9 @@ import {
   getScaleCanvasResolutionMethod,
   getScaleMethods,
   lineThroughPoints
-} from "./Utils/canvasUtils";
-import { dateToUnix, getDateLabels, getPriceLabels } from "./Utils/labelUtils";
-import { Canvas } from "../Canvas";
+} from "../Utils/canvasUtils";
+import { dateToUnix, getDateLabels, getPriceLabels } from "../Utils/labelUtils";
+import { Canvas } from "../../Canvas";
 
 const PeriodAverageBase = (props: {
   activeX: number;
@@ -417,6 +417,7 @@ const PeriodAverageBase = (props: {
     earliestDate,
     hasSetup,
     isClicked,
+    isMobile,
     latestDate,
     maxPrice,
     minPrice,

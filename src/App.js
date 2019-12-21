@@ -1,15 +1,15 @@
 import moment from "moment";
 import React, { useState } from "react";
 import { Button } from "./Components/Button";
-import { InteractiveGraph } from "./Components/Graph/Containers/InteractiveGraph";
-import { ResponsiveGraph } from "./Components/Graph/Containers/ResponsiveGraph";
-import { PeriodAverage } from "./Components/Graph/PeriodAverage";
-import { H1, H4, H3 } from "./Components/H";
-import { Row } from "./Components/Row";
-import BITCOIN_PRICE_DATA from "./Data/bitcoin-price.json";
-import { GraphContainer } from "./Components/GraphContainer";
+import { InteractiveGraph } from "./Components/Graph/Wrappers/InteractiveGraph";
+import { ResponsiveGraph } from "./Components/Graph/Wrappers/ResponsiveGraph";
+import { PeriodAverage } from "./Components/Graph/Implementations/PeriodAverage";
+import { StyledGraphContainer } from "./Components/StyledGraphContainer";
+import { H1, H4 } from "./Components/H";
 import { Header } from "./Components/Header";
 import { P } from "./Components/P";
+import { Row } from "./Components/Row";
+import BITCOIN_PRICE_DATA from "./Data/bitcoin-price.json";
 
 const currentMoment = () => moment("2019-11-11T23:59:59.999Z");
 
@@ -69,12 +69,10 @@ function App() {
   return (
     <main>
       <Header>
-        <H1>
-          CoinTales
-        </H1>
+        <H1>CoinTales</H1>
         <P>Quick crypto charts</P>
       </Header>
-      <GraphContainer>
+      <StyledGraphContainer>
         <H4>Bitcoin (BTC): $7,138.31 USD</H4>
         <Row padding={"0 8px"}>
           <Button
@@ -131,7 +129,7 @@ function App() {
             </ResponsiveGraph>
           )}
         </InteractiveGraph>
-      </GraphContainer>
+      </StyledGraphContainer>
     </main>
   );
 }
