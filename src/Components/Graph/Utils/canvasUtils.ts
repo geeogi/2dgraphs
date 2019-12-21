@@ -62,17 +62,6 @@ export const getScaleCanvasResolutionMethod = (
 };
 
 /**
- * Method: descale canvas
- * @param {*} canvasContext
- * @param {*} canvasResolutionScale
- */
-export const getDescaleCanvasResolutionMethod = (
-  canvasContext: CanvasRenderingContext2D,
-  canvasResolutionScale: number
-) => () =>
-  canvasContext.scale(1 / canvasResolutionScale, 1 / canvasResolutionScale);
-
-/**
  * Clips between the given path and the clip floor
  * @param {*} context
  * @param {*} pathPoints

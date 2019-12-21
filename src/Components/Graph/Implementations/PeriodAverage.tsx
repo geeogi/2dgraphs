@@ -4,30 +4,29 @@ import {
   BACKGROUND_COLOR,
   BORDER_COLOR,
   CONTRAST_COLOR,
+  DARK_BACKGROUND_COLOR,
+  DARK_BORDER_COLOR,
+  DARK_CONTRAST_COLOR,
   PRIMARY_BASE,
   PRIMARY_COLOR,
-  SECONDARY_BASE,
-  DARK_BACKGROUND_COLOR,
-  DARK_CONTRAST_COLOR,
-  DARK_BORDER_COLOR
+  SECONDARY_BASE
 } from "../../../Data/colors";
+import { Canvas } from "../../Canvas";
+import {
+  clamp,
+  clipPath,
+  getClearCanvasMethod,
+  getScaleCanvasResolutionMethod,
+  getScaleMethods,
+  lineThroughPoints
+} from "../Utils/canvasUtils";
+import { dateToUnix, getDateLabels, getPriceLabels } from "../Utils/labelUtils";
 import {
   ACTIVE_LEGEND,
   AVERAGE_LEGEND,
   MOBILE_CANVAS_WIDTH,
   SPACING_UNIT
 } from "./PeriodAverage/constants";
-import {
-  clamp,
-  clipPath,
-  getClearCanvasMethod,
-  getDescaleCanvasResolutionMethod,
-  getScaleCanvasResolutionMethod,
-  getScaleMethods,
-  lineThroughPoints
-} from "../Utils/canvasUtils";
-import { dateToUnix, getDateLabels, getPriceLabels } from "../Utils/labelUtils";
-import { Canvas } from "../../Canvas";
 
 const PeriodAverageBase = (props: {
   activeX: number;
@@ -43,8 +42,6 @@ const PeriodAverageBase = (props: {
   minPrice: number;
   values: { dateTime: string; price: number }[];
 }) => {
-  const [hasSetup, setHasSetup] = useState();
-
   // Element: the <canvas> element
   const canvasElement = useRef<HTMLCanvasElement>();
 
@@ -78,11 +75,6 @@ const PeriodAverageBase = (props: {
           current,
           canvasWidth,
           canvasHeight,
-          canvasResolutionScale
-        );
-
-        const descaleCanvasResolution = getDescaleCanvasResolutionMethod(
-          context,
           canvasResolutionScale
         );
 
@@ -390,16 +382,10 @@ const PeriodAverageBase = (props: {
           }
         };
 
-        // Setup graph resolution on first render
-        if (!hasSetup) {
-          scaleCanvasResolution();
-          setHasSetup(true);
-        } else {
-          descaleCanvasResolution();
-          scaleCanvasResolution();
-        }
+        // Setup graph resolution
+        scaleCanvasResolution();
 
-        // Draw graph on every render
+        // Draw graph
         drawGraphAxes(context);
         drawGraph(context);
 
@@ -415,7 +401,6 @@ const PeriodAverageBase = (props: {
     canvasResolutionScale,
     canvasWidth,
     earliestDate,
-    hasSetup,
     isClicked,
     isMobile,
     latestDate,
@@ -424,13 +409,7 @@ const PeriodAverageBase = (props: {
     values
   ]);
 
-  return (
-    <Canvas
-      ref={canvasElement as any}
-      height={canvasHeight}
-      width={canvasWidth}
-    />
-  );
+  return <Canvas ref={canvasElement as any} />;
 };
 
 export const PeriodAverage = memo(PeriodAverageBase);
