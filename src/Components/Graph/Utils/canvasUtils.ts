@@ -56,8 +56,8 @@ export const getScaleCanvasResolutionMethod = (
 ) => () => {
   canvasElement.style.width = canvasWidth + "px";
   canvasElement.style.height = canvasHeight + "px";
-  canvasElement.width = canvasWidth * 4;
-  canvasElement.height = canvasHeight * 4;
+  canvasElement.width = canvasWidth * canvasResolutionScale;
+  canvasElement.height = canvasHeight * canvasResolutionScale;
   canvasContext.scale(canvasResolutionScale, canvasResolutionScale);
 };
 
