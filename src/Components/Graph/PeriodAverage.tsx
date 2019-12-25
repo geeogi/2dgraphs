@@ -16,10 +16,10 @@ import { ACTIVE_LEGEND, SPACING_UNIT } from "./PeriodAverage/constants";
 import {
   clamp,
   clipPath,
+  getGradientMethod,
   getRetinaMethod,
   getScaleMethods,
-  lineThroughPoints,
-  getGradientMethod
+  lineThroughPoints
 } from "./Utils/canvasUtils";
 import { getParentDimensions } from "./Utils/domUtils";
 import { getInteractivityHandlers } from "./Utils/interactivityUtils";
@@ -44,14 +44,19 @@ const PeriodAverageBase = (props: {
   } = props;
 
   // Drawing method
-  const renderMethod = function(args?: {
+  function renderMethod(renderVariables?: {
     canvasElement?: HTMLCanvasElement;
     activeX?: number;
     activeY?: number;
     isClicked?: boolean;
   }) {
     // Extract render variables
-    const { canvasElement, activeX, activeY, isClicked } = args as any;
+    const {
+      canvasElement,
+      activeX,
+      activeY,
+      isClicked
+    } = renderVariables as any;
 
     // Fetch the desired canvas height and width
     const { height, width } = getParentDimensions(canvasElement);
@@ -151,7 +156,6 @@ const PeriodAverageBase = (props: {
       context.stroke();
     };
 
-    // Method: draw primary block
     const drawPrimaryBlock = (context: CanvasRenderingContext2D) => {
       // Primary-block: begin path
       context.beginPath();
@@ -174,7 +178,6 @@ const PeriodAverageBase = (props: {
       context.restore();
     };
 
-    // Method: draw secondary block
     const drawSecondaryBlock = (context: CanvasRenderingContext2D) => {
       // Secondary-block: create gradient
       context.fillStyle = makeGradient(SECONDARY_BASE(0.4), SECONDARY_BASE(0));
@@ -195,9 +198,7 @@ const PeriodAverageBase = (props: {
       context.restore();
     };
 
-    // Method: draw primary line
     const drawPrimaryLine = (context: CanvasRenderingContext2D) => {
-      // Draw primary-line
       context.beginPath();
       context.lineWidth = 2;
       context.lineJoin = "round";
@@ -208,7 +209,6 @@ const PeriodAverageBase = (props: {
     };
 
     const drawBaseline = (context: CanvasRenderingContext2D) => {
-      // Draw baseline
       context.lineWidth = 1;
       context.strokeStyle = PRIMARY_BASE(0.5);
       context.beginPath();
@@ -217,7 +217,6 @@ const PeriodAverageBase = (props: {
       context.stroke();
     };
 
-    // Method: draw active legend
     const drawActiveLegend = (context: CanvasRenderingContext2D) => {
       // Find nearest point to active coordinates
       const pointsSortedByXProximityToActiveX = points.sort((a, b) => {
@@ -291,7 +290,7 @@ const PeriodAverageBase = (props: {
     if (activeX && activeY) {
       drawActiveLegend(context);
     }
-  };
+  }
 
   // Fetch interactivity event listeners
   const eventHandlers = getInteractivityHandlers(renderMethod);
