@@ -71,6 +71,9 @@ const PeriodAverageBase = (props: {
     const graphDepth = height - 2 * graphMarginY;
     const graphWidth = width - 2 * graphMarginX;
 
+    const toCanvasY = (graphY: number) => graphMarginY + graphDepth - graphY;
+    const toCanvasX = (graphX: number) => graphMarginX + graphX;
+
     // Get canvas util methods
     const scaleRetina = getRetinaMethod(context, canvasElement, width, height);
     const makeGradient = getGradientMethod(context, graphMarginY, graphDepth);
@@ -96,7 +99,7 @@ const PeriodAverageBase = (props: {
 
     // Calculate average price y-coordinate
     const averagePriceGraphY = scalePriceY(averagePrice);
-    const averagePriceCanvasY = graphMarginY + graphDepth - averagePriceGraphY;
+    const averagePriceCanvasY = toCanvasY(averagePriceGraphY);
 
     // Determine baseline min/max
     const minBaselineCanvasY = graphMarginY + 2 * SPACING_UNIT;
@@ -115,8 +118,8 @@ const PeriodAverageBase = (props: {
     const points = values.map(value => {
       const graphX = scaleDateX(value.dateTime);
       const graphY = scalePriceY(value.price);
-      const canvasX = graphMarginX + graphX;
-      const canvasY = graphMarginY + graphDepth - graphY;
+      const canvasX = toCanvasX(graphX);
+      const canvasY = toCanvasY(graphY);
       return { canvasX, canvasY, value };
     });
 
@@ -169,9 +172,9 @@ const PeriodAverageBase = (props: {
 
       // Primary-block: draw and fill path
       context.beginPath();
-      context.moveTo(graphMarginX, graphMarginY + graphDepth);
+      context.moveTo(graphMarginX, toCanvasY(0));
       lineThroughPoints(context, points);
-      context.lineTo(graphMarginX + graphWidth, graphMarginY + graphDepth);
+      context.lineTo(toCanvasX(graphWidth), toCanvasY(0));
       context.fill();
 
       // Reset clip to default
@@ -188,10 +191,10 @@ const PeriodAverageBase = (props: {
 
       // Secondary-block: draw block
       context.beginPath();
-      context.moveTo(graphMarginX, baselineYCanvasY);
-      context.lineTo(graphMarginX + graphWidth, baselineYCanvasY);
-      context.lineTo(graphMarginX + graphWidth, graphMarginY + graphDepth);
-      context.lineTo(graphMarginX, graphMarginY + graphDepth);
+      context.moveTo(toCanvasX(0), baselineYCanvasY);
+      context.lineTo(toCanvasX(graphWidth), baselineYCanvasY);
+      context.lineTo(toCanvasX(graphWidth), toCanvasY(0));
+      context.lineTo(toCanvasX(0), toCanvasY(0));
       context.fill();
 
       // Reset clip to default
@@ -212,8 +215,8 @@ const PeriodAverageBase = (props: {
       context.lineWidth = 1;
       context.strokeStyle = PRIMARY_BASE(0.5);
       context.beginPath();
-      context.moveTo(graphMarginX, baselineYCanvasY);
-      context.lineTo(graphMarginX + graphWidth, baselineYCanvasY);
+      context.moveTo(toCanvasX(0), baselineYCanvasY);
+      context.lineTo(toCanvasX(graphWidth), baselineYCanvasY);
       context.stroke();
     };
 
@@ -229,8 +232,8 @@ const PeriodAverageBase = (props: {
       context.lineWidth = 2;
       context.setLineDash([5, 5]);
       context.beginPath();
-      context.moveTo(canvasX, graphMarginY);
-      context.lineTo(canvasX, graphDepth + graphMarginY);
+      context.moveTo(canvasX, toCanvasY(graphDepth));
+      context.lineTo(canvasX, toCanvasY(0));
       context.stroke();
       context.setLineDash([]);
 
@@ -239,10 +242,10 @@ const PeriodAverageBase = (props: {
       context.fillStyle = DARK_BACKGROUND_COLOR;
       context.beginPath();
 
-      const legendBottomY = graphMarginY + 5 * SPACING_UNIT;
-      const legendTopY = legendBottomY - 3 * SPACING_UNIT;
+      const legendTopY = toCanvasY(graphDepth - 2 * SPACING_UNIT);
+      const legendBottomY = toCanvasY(graphDepth - 5 * SPACING_UNIT);
 
-      const anchorY = canvasY < legendBottomY ? canvasY - graphMarginY : 0;
+      const anchorY = canvasY < legendBottomY ? canvasY - SPACING_UNIT : 0;
       const anchorX = clamp(canvasX, labelMarginX, width - labelMarginX);
 
       context.moveTo(anchorX - ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
