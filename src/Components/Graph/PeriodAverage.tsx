@@ -13,15 +13,14 @@ import {
 } from "../../Data/colors";
 import { Canvas } from "../Canvas";
 import { ACTIVE_LEGEND, SPACING_UNIT } from "./PeriodAverage/constants";
-import {
-  clamp,
-  clipPath,
-  getGradientMethod,
-  getRetinaMethod,
-  getScaleMethods,
-  lineThroughPoints
-} from "./Utils/canvasUtils";
+import { getRetinaMethod } from "./Utils/canvasUtils";
 import { getParentDimensions } from "./Utils/domUtils";
+import {
+  getGradientMethod,
+  clipPath,
+  lineThroughPoints
+} from "./Utils/drawUtils";
+import { getScaleMethods, clamp } from "./Utils/numberUtils";
 import { getInteractivityHandlers } from "./Utils/interactivityUtils";
 import { dateToUnix, getDateLabels, getPriceLabels } from "./Utils/labelUtils";
 
@@ -71,6 +70,7 @@ const PeriodAverageBase = (props: {
     const graphDepth = height - 2 * graphMarginY;
     const graphWidth = width - 2 * graphMarginX;
 
+    // Utils to convert from graph coordinates to canvas pixels
     const toCanvasY = (graphY: number) => graphMarginY + graphDepth - graphY;
     const toCanvasX = (graphX: number) => graphMarginX + graphX;
 
@@ -136,7 +136,7 @@ const PeriodAverageBase = (props: {
       // Add x-axis labels
       context.textAlign = "center";
       xLabels.forEach(unix => {
-        const labelX = graphMarginX + scaleDateX(unix);
+        const labelX = toCanvasX(scaleDateX(unix));
         if (labelX > labelMarginX && labelX < graphWidth - labelMarginX) {
           const labelY = graphMarginY + graphDepth + SPACING_UNIT * 3;
           context.fillText(moment(unix).format(xDisplayFormat), labelX, labelY);
@@ -150,7 +150,7 @@ const PeriodAverageBase = (props: {
       context.strokeStyle = BORDER_COLOR;
       yLabels.forEach(price => {
         const labelX = labelMarginX - 1.5 * SPACING_UNIT;
-        const labelY = graphMarginY + graphDepth - scalePriceY(price);
+        const labelY = toCanvasY(scalePriceY(price));
         context.fillText(`$${Math.round(price)}`, labelX, labelY + 3);
         context.moveTo(labelMarginX, labelY);
         context.lineTo(graphWidth, labelY);
@@ -172,7 +172,7 @@ const PeriodAverageBase = (props: {
 
       // Primary-block: draw and fill path
       context.beginPath();
-      context.moveTo(graphMarginX, toCanvasY(0));
+      context.moveTo(toCanvasX(0), toCanvasY(0));
       lineThroughPoints(context, points);
       context.lineTo(toCanvasX(graphWidth), toCanvasY(0));
       context.fill();
