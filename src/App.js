@@ -1,15 +1,14 @@
 import moment from "moment";
 import React, { useState } from "react";
 import { Button } from "./Components/Button";
-import { InteractiveGraph } from "./Components/Graph/Wrappers/InteractiveGraph";
-import { ResponsiveGraph } from "./Components/Graph/Wrappers/ResponsiveGraph";
-import { PeriodAverage } from "./Components/Graph/Implementations/PeriodAverage";
-import { StyledGraphContainer } from "./Components/StyledGraphContainer";
+import { PeriodAverage } from "./Components/Graph/PeriodAverage";
 import { H1, H4 } from "./Components/H";
 import { Header } from "./Components/Header";
 import { P } from "./Components/P";
 import { Row } from "./Components/Row";
+import { GraphContainer } from "./Components/GraphContainer";
 import BITCOIN_PRICE_DATA from "./Data/bitcoin-price.json";
+import { Graph } from "./Components/GraphContainer";
 
 const currentMoment = () => moment("2019-11-11T23:59:59.999Z");
 
@@ -59,20 +58,13 @@ function App() {
   const earliestDate = values[0].dateTime;
   const latestDate = values[values.length - 1].dateTime;
 
-  console.log(`values: ${values}`);
-  console.log(`minPrice: ${minPrice}`);
-  console.log(`maxPrice: ${maxPrice}`);
-  console.log(`averagePrice: ${averagePrice}`);
-  console.log(`earliestDate: ${earliestDate}`);
-  console.log(`latestDate: ${latestDate}`);
-
   return (
     <main>
       <Header>
         <H1>CoinTales</H1>
         <P>Quick crypto charts</P>
       </Header>
-      <StyledGraphContainer>
+      <GraphContainer>
         <H4>Bitcoin (BTC): $7,138.31 USD</H4>
         <Row padding={"0 8px"}>
           <Button
@@ -108,28 +100,17 @@ function App() {
             7d
           </Button>
         </Row>
-        <InteractiveGraph>
-          {({ activeX, activeY, isClicked }) => (
-            <ResponsiveGraph>
-              {({ height, width }) => (
-                <PeriodAverage
-                  activeX={activeX}
-                  activeY={activeY}
-                  isClicked={isClicked}
-                  values={values}
-                  minPrice={minPrice}
-                  maxPrice={maxPrice}
-                  averagePrice={averagePrice}
-                  earliestDate={earliestDate}
-                  latestDate={latestDate}
-                  canvasHeight={height}
-                  canvasWidth={width}
-                />
-              )}
-            </ResponsiveGraph>
-          )}
-        </InteractiveGraph>
-      </StyledGraphContainer>
+        <Graph>
+          <PeriodAverage
+            values={values}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+            averagePrice={averagePrice}
+            earliestDate={earliestDate}
+            latestDate={latestDate}
+          />
+        </Graph>
+      </GraphContainer>
     </main>
   );
 }

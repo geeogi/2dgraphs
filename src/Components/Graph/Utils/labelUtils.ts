@@ -22,19 +22,19 @@ export const getPriceLabels = (
     return Math.abs(a - perfectStep) - Math.abs(b - perfectStep);
   });
   const firstLabel = roundDownToNearest(minPrice, multiple);
-  const lastlabel = roundDownToNearest(maxPrice, multiple);
-  const labelRange = lastlabel - firstLabel;
+  const lastLabel = roundDownToNearest(maxPrice, multiple);
+  const labelRange = lastLabel - firstLabel;
   const labelStep = roundUpToNearest(labelRange / numberOfLabels, multiple);
-  const labels = [];
-  while (labels.length <= numberOfLabels) {
-    const nextLabel = firstLabel + labelStep * labels.length;
-    if (nextLabel <= lastlabel) {
-      labels.push(firstLabel + labelStep * labels.length);
+  const priceLabels = [];
+  while (priceLabels.length <= numberOfLabels) {
+    const nextLabel = firstLabel + labelStep * priceLabels.length;
+    if (nextLabel <= lastLabel) {
+      priceLabels.push(firstLabel + labelStep * priceLabels.length);
     } else {
       break;
     }
   }
-  return labels;
+  return { priceLabels };
 };
 
 export const getDateLabels = (

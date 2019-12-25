@@ -47,13 +47,13 @@ export const getScaleMethods = (
  * @param {*} canvasHeight
  * @param {*} canvasResolutionScale
  */
-export const getScaleCanvasResolutionMethod = (
+export const getRetinaMethod = (
   canvasContext: CanvasRenderingContext2D,
   canvasElement: HTMLCanvasElement,
   canvasWidth: number,
-  canvasHeight: number,
-  canvasResolutionScale: number
+  canvasHeight: number
 ) => () => {
+  const canvasResolutionScale = 4;
   canvasElement.style.width = canvasWidth + "px";
   canvasElement.style.height = canvasHeight + "px";
   canvasElement.width = canvasWidth * canvasResolutionScale;
@@ -107,4 +107,17 @@ export const lineThroughPoints = (
  */
 export const clamp = (value: number, min: number, max: number) => {
   return value < min ? min : value > max ? max : value;
+};
+
+export const getGradientMethod = (
+  context: CanvasRenderingContext2D,
+  graphMarginY: number,
+  graphDepth: number
+) => (primaryColor: string, secondaryColor: string) => {
+  const top = graphMarginY;
+  const bottom = graphMarginY + graphDepth;
+  const gradient = context.createLinearGradient(0, top, 0, bottom);
+  gradient.addColorStop(0, primaryColor);
+  gradient.addColorStop(1, secondaryColor);
+  return gradient;
 };

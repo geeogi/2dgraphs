@@ -1,4 +1,4 @@
-import { MOBILE_SCREEN_WIDTH } from "../../../../Data/constants";
+import { MOBILE_SCREEN_WIDTH } from "../../../Data/constants";
 
 export const ACTIVE_LEGEND = {
   WIDTH: 120
