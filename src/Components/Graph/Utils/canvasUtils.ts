@@ -1,16 +1,4 @@
 /**
- * Returns a method which clears the canvas
- * @param {*} canvasContext
- * @param {*} canvasWidth
- * @param {*} canvasHeight
- */
-export const getClearCanvasMethod = (
-  canvasContext: CanvasRenderingContext2D,
-  canvasWidth: number,
-  canvasHeight: number
-) => () => canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
-
-/**
  * Method: Scale canvas resolution for retina displays
  * @param {*} canvasContext
  * @param {*} canvasElement

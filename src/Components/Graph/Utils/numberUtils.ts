@@ -1,5 +1,6 @@
 /**
- * Returns the input value only if its between min & max, otherwise returns either min or max depending on which is closest
+ * Returns the input value if its between min & max,
+ * otherwise returns either min or max depending on which is closest
  * @param {*} value
  * @param {*} min
  * @param {*} max
@@ -9,7 +10,7 @@ export const clamp = (value: number, min: number, max: number) => {
 };
 
 /**
- * * Returns a method which will scale and descale linearly between two value ranges
+ * * Returns methods which will scale and descale linearly between two value ranges
  * @param {*} minPrimaryValue
  * @param {*} maxPrimaryValue
  * @param {*} minSecondaryValue
@@ -23,6 +24,7 @@ export const getScaleMethods = (
 ) => {
   const primaryValueRange = maxPrimaryValue - minPrimaryValue;
   const secondaryValueRange = maxSecondaryValue - minSecondaryValue;
+
   return {
     scale: (primaryValue: number) => {
       const normalPrimaryValue = primaryValue - minPrimaryValue;

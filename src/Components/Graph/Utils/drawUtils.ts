@@ -54,3 +54,55 @@ export const getGradientMethod = (
   gradient.addColorStop(1, secondaryColor);
   return gradient;
 };
+
+/**
+ * Stroke a point path
+ * @param context
+ * @param pathPoints
+ * @param stokeStyle
+ * @param lineWidth
+ */
+export const drawLine = (
+  context: CanvasRenderingContext2D,
+  pathPoints: { canvasX: number; canvasY: number }[],
+  stokeStyle: string | CanvasGradient | CanvasPattern,
+  lineWidth = 1
+) => {
+  context.beginPath();
+  context.lineWidth = lineWidth;
+  context.lineJoin = "round";
+  context.strokeStyle = stokeStyle;
+  context.moveTo(pathPoints[0].canvasX, pathPoints[0].canvasY);
+  lineThroughPoints(context, pathPoints);
+  context.stroke();
+};
+
+/**
+ * Fill a point path
+ * @param context
+ * @param pathPoints
+ * @param fillStyle
+ * @param clip
+ */
+export const fillPath = (
+  context: CanvasRenderingContext2D,
+  pathPoints: { canvasX: number; canvasY: number }[],
+  fillStyle: string | CanvasGradient | CanvasPattern,
+  clip?: () => void
+) => {
+  context.beginPath();
+  context.fillStyle = fillStyle;
+
+  // Save context state before applying clip
+  context.save();
+  if (clip) {
+    clip();
+  }
+
+  context.beginPath();
+  lineThroughPoints(context, pathPoints);
+  context.fill();
+
+  // Reset context state to reset clip
+  context.restore();
+};

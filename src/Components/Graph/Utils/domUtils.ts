@@ -28,7 +28,7 @@ export const getCoordinatesOfMouseEvent = (e: MouseEvent) => {
 };
 
 /**
- * Method: Get the coordinates of a mouse event
+ * Method: Get the coordinates of a touch event
  * @param {*} e
  */
 export const getCoordinatesOfTouchEvent = (e: TouchEvent) => {

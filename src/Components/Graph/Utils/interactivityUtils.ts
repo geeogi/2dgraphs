@@ -1,5 +1,13 @@
-import { getCoordinatesOfMouseEvent, getCoordinatesOfTouchEvent } from "./domUtils";
+import {
+  getCoordinatesOfMouseEvent,
+  getCoordinatesOfTouchEvent
+} from "./domUtils";
 
+/**
+ * Return event listeners which will call the render method with activeX,
+ * activeY and isClicked whenever any of these values change
+ * @param renderMethod
+ */
 export const getInteractivityHandlers = (
   renderMethod: (args: {
     canvasElement: HTMLCanvasElement;
