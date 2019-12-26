@@ -80,7 +80,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
 
     // Get canvas util methods
     const scaleRetina = getRetinaMethod(context, canvasElement, width, height);
-    const setGradient = getGradientMethod(context, GRAPH_MARGIN_Y, graphDepth);
+    const getGradient = getGradientMethod(context, GRAPH_MARGIN_Y, graphDepth);
 
     // Get x-axis scale helpers
     const unixMin = dateToUnix(earliestDate);
@@ -94,18 +94,11 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
     // Calculate average price y-coordinate
     const averagePriceCanvasY = toCanvasY(scalePriceY(averagePrice));
 
-    // Determine baseline min/max
-    const minBaselineCanvasY = GRAPH_MARGIN_Y + 2 * SPACING_UNIT;
-    const maxBaselineCanvasY = GRAPH_MARGIN_Y + graphDepth - 2 * SPACING_UNIT;
-
     // Determine baseline price y-coordinate
-    const unclampedBaselineY =
-      activeY && isClicked ? activeY : averagePriceCanvasY;
-    const baselineYCanvasY = clamp(
-      unclampedBaselineY,
-      minBaselineCanvasY,
-      maxBaselineCanvasY
-    );
+    const minCanvasY = GRAPH_MARGIN_Y + 2 * SPACING_UNIT;
+    const maxCanvasY = GRAPH_MARGIN_Y + graphDepth - 2 * SPACING_UNIT;
+    const rawY = activeY && isClicked ? activeY : averagePriceCanvasY;
+    const baselineYCanvasY = clamp(rawY, minCanvasY, maxCanvasY);
 
     // Calculate primary line points (price vs. date)
     const points = values.map(value => {
@@ -113,68 +106,6 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
       const graphY = scalePriceY(value.price);
       return { canvasX: toCanvasX(graphX), canvasY: toCanvasY(graphY), value };
     });
-
-    const drawActiveLegend = (context: CanvasRenderingContext2D) => {
-      // Fetch nearest point to active coordinates
-      const [{ canvasX, canvasY, value }] = points.sort((a, b) => {
-        return Math.abs(a.canvasX - activeX) - Math.abs(b.canvasX - activeX);
-      });
-
-      // Draw dashed active line
-      context.strokeStyle = BORDER_COLOR;
-      context.lineWidth = 2;
-      context.setLineDash([5, 5]);
-      context.beginPath();
-      context.moveTo(canvasX, toCanvasY(graphDepth));
-      context.lineTo(canvasX, toCanvasY(0));
-      context.stroke();
-      context.setLineDash([]);
-
-      // Draw active legend body
-      context.strokeStyle = DARK_BORDER_COLOR;
-      context.fillStyle = DARK_BACKGROUND_COLOR;
-      context.beginPath();
-
-      const legendTopY = toCanvasY(graphDepth - 2 * SPACING_UNIT);
-      const legendBottomY = toCanvasY(graphDepth - 5 * SPACING_UNIT);
-
-      const anchorY = canvasY < legendBottomY ? canvasY - SPACING_UNIT : 0;
-      const anchorX = clamp(canvasX, LABEL_MARGIN_X, width - LABEL_MARGIN_X);
-
-      context.moveTo(anchorX - ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
-      context.lineTo(anchorX - ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
-      context.lineTo(
-        anchorX - ACTIVE_LEGEND.WIDTH / 2,
-        anchorY + legendBottomY
-      );
-      context.lineTo(
-        anchorX + ACTIVE_LEGEND.WIDTH / 2,
-        anchorY + legendBottomY
-      );
-      context.lineTo(anchorX + ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
-      context.lineTo(anchorX - ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
-      context.stroke();
-      context.fill();
-
-      // Draw active legend circular handle
-      context.fillStyle = PRIMARY_COLOR;
-      context.strokeStyle = BACKGROUND_COLOR;
-      context.beginPath();
-      context.arc(canvasX, canvasY, 6, 0, 2 * Math.PI);
-      context.fill();
-      context.stroke();
-
-      // Draw active legend text
-      context.fillStyle = DARK_CONTRAST_COLOR;
-      context.textAlign = "center";
-      const priceLabel = Math.round(value.price);
-      const dateLabel = moment(value.dateTime).format("DD MMM YY");
-      context.fillText(
-        `$${priceLabel}    ${dateLabel}`,
-        anchorX,
-        anchorY + legendBottomY - SPACING_UNIT
-      );
-    };
 
     // Scale retina
     scaleRetina();
@@ -209,7 +140,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
           canvasY: toCanvasY(0)
         }
       ],
-      setGradient(PRIMARY_BASE(0.4), PRIMARY_BASE(0)),
+      getGradient(PRIMARY_BASE(0.4), PRIMARY_BASE(0)),
       () => clipPath(context, points, width, baselineYCanvasY)
     );
 
@@ -224,7 +155,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
           canvasY: toCanvasY(graphDepth)
         }
       ],
-      setGradient(SECONDARY_BASE(0.4), SECONDARY_BASE(0)),
+      getGradient(SECONDARY_BASE(0.4), SECONDARY_BASE(0)),
       () => clipPath(context, points, width, baselineYCanvasY)
     );
 
@@ -243,7 +174,63 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
 
     // Draw active legend, if active
     if (activeX && activeY) {
-      drawActiveLegend(context);
+      // Fetch nearest point to active coordinates
+      const [{ canvasX, canvasY, value }] = points.sort((a, b) => {
+        return Math.abs(a.canvasX - activeX) - Math.abs(b.canvasX - activeX);
+      });
+
+      // Draw dashed active line
+      drawLine(
+        context,
+        [
+          { canvasX, canvasY: toCanvasY(graphDepth) },
+          { canvasX, canvasY: toCanvasY(0) }
+        ],
+        BORDER_COLOR,
+        2,
+        [5, 5]
+      );
+
+      // Draw active legend body
+      context.strokeStyle = DARK_BORDER_COLOR;
+      context.fillStyle = DARK_BACKGROUND_COLOR;
+      context.beginPath();
+
+      const legendTopY = toCanvasY(graphDepth - 2 * SPACING_UNIT);
+      const legendBottomY = toCanvasY(graphDepth - 5 * SPACING_UNIT);
+
+      const anchorY = canvasY < legendBottomY ? canvasY - SPACING_UNIT : 0;
+      const anchorX = clamp(canvasX, LABEL_MARGIN_X, width - LABEL_MARGIN_X);
+
+      context.moveTo(anchorX - ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
+      context.lineTo(anchorX - ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
+      context.lineTo(
+        anchorX - ACTIVE_LEGEND.WIDTH / 2,
+        anchorY + legendBottomY
+      );
+      context.lineTo(
+        anchorX + ACTIVE_LEGEND.WIDTH / 2,
+        anchorY + legendBottomY
+      );
+      context.lineTo(anchorX + ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
+      context.stroke();
+      context.fill();
+
+      // Draw active legend circular handle
+      context.fillStyle = PRIMARY_COLOR;
+      context.strokeStyle = BACKGROUND_COLOR;
+      context.beginPath();
+      context.arc(canvasX, canvasY, 6, 0, 2 * Math.PI);
+      context.fill();
+      context.stroke();
+
+      // Draw active legend text
+      context.fillStyle = DARK_CONTRAST_COLOR;
+      context.textAlign = "center";
+      const priceLabel = Math.round(value.price);
+      const dateLabel = moment(value.dateTime).format("DD MMM YY");
+      const label = `$${priceLabel}    ${dateLabel}`;
+      context.fillText(label, anchorX, anchorY + legendBottomY - SPACING_UNIT);
     }
   };
 };

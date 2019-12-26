@@ -66,15 +66,19 @@ export const drawLine = (
   context: CanvasRenderingContext2D,
   pathPoints: { canvasX: number; canvasY: number }[],
   stokeStyle: string | CanvasGradient | CanvasPattern,
-  lineWidth = 1
+  lineWidth: number = 1,
+  lineDash: number[] = []
 ) => {
+  context.save();
   context.beginPath();
   context.lineWidth = lineWidth;
   context.lineJoin = "round";
+  context.setLineDash(lineDash);
   context.strokeStyle = stokeStyle;
   context.moveTo(pathPoints[0].canvasX, pathPoints[0].canvasY);
   lineThroughPoints(context, pathPoints);
   context.stroke();
+  context.restore();
 };
 
 /**
@@ -90,11 +94,11 @@ export const fillPath = (
   fillStyle: string | CanvasGradient | CanvasPattern,
   clip?: () => void
 ) => {
+  context.save();
   context.beginPath();
   context.fillStyle = fillStyle;
 
-  // Save context state before applying clip
-  context.save();
+  
   if (clip) {
     clip();
   }
@@ -103,6 +107,6 @@ export const fillPath = (
   lineThroughPoints(context, pathPoints);
   context.fill();
 
-  // Reset context state to reset clip
+  
   context.restore();
 };
