@@ -1,6 +1,6 @@
 import React, { memo, useCallback, useEffect, useRef } from "react";
 import { Canvas } from "../Canvas";
-import { getRenderMethod } from "./PeriodAverage/renderMethod";
+import { getPeriodAverageRenderMethod } from "./PeriodAverage/renderMethod";
 import { getInteractivityHandlers } from "./Utils/interactivityUtils";
 
 const PeriodAverageBase = (props: {
@@ -12,7 +12,7 @@ const PeriodAverageBase = (props: {
   values: { dateTime: string; price: number }[];
 }) => {
   // Fetch render method
-  const renderMethod = getRenderMethod(props);
+  const renderMethod = getPeriodAverageRenderMethod(props);
 
   // Create render method React callback
   const callbackRenderMethod = useCallback(renderMethod, [props]);

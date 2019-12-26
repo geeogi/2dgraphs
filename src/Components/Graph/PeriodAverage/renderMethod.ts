@@ -31,7 +31,7 @@ interface Props {
   values: { dateTime: string; price: number }[];
 }
 
-export const getRenderMethod = (props: Props) => {
+export const getPeriodAverageRenderMethod = (props: Props) => {
   const {
     averagePrice,
     earliestDate,
@@ -41,12 +41,24 @@ export const getRenderMethod = (props: Props) => {
     values
   } = props;
 
-  return (renderVariables?: {
+  const graphMarginY = 4 * SPACING_UNIT;
+  const graphMarginX = 1 * SPACING_UNIT;
+  const labelMarginX = 8 * SPACING_UNIT;
+
+  // Get x-axis labels
+  const xConfig = getDateLabels(earliestDate, latestDate, 4);
+  const { dateLabels: xLabels, displayFormat: xDisplayFormat } = xConfig;
+
+  // Get y-axis labels
+  const yConfig = getPriceLabels(minPrice, maxPrice, 4);
+  const { priceLabels: yLabels } = yConfig;
+
+  return function render(renderVariables?: {
     canvasElement?: HTMLCanvasElement;
     activeX?: number;
     activeY?: number;
     isClicked?: boolean;
-  }) => {
+  }) {
     // Extract render variables
     const {
       canvasElement,
@@ -62,9 +74,6 @@ export const getRenderMethod = (props: Props) => {
     const context = canvasElement.getContext("2d");
 
     // Calculate graph dimensions
-    const graphMarginY = 4 * SPACING_UNIT;
-    const graphMarginX = 1 * SPACING_UNIT;
-    const labelMarginX = 8 * SPACING_UNIT;
     const graphDepth = height - 2 * graphMarginY;
     const graphWidth = width - 2 * graphMarginX;
 
@@ -75,14 +84,6 @@ export const getRenderMethod = (props: Props) => {
     // Get canvas util methods
     const scaleRetina = getRetinaMethod(context, canvasElement, width, height);
     const gradient = getGradientMethod(context, graphMarginY, graphDepth);
-
-    // Get y-axis labels
-    const yConfig = getPriceLabels(minPrice, maxPrice, 4);
-    const { priceLabels: yLabels } = yConfig;
-
-    // Get x-axis labels
-    const xConfig = getDateLabels(earliestDate, latestDate, 4);
-    const { dateLabels: xLabels, displayFormat: xDisplayFormat } = xConfig;
 
     // Get x-axis scale helpers
     const unixMin = dateToUnix(earliestDate);
