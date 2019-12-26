@@ -2,7 +2,6 @@ import moment from "moment";
 import {
   BACKGROUND_COLOR,
   BORDER_COLOR,
-  CONTRAST_COLOR,
   DARK_BACKGROUND_COLOR,
   DARK_BORDER_COLOR,
   DARK_CONTRAST_COLOR,
@@ -21,6 +20,8 @@ import {
 } from "../Utils/drawUtils";
 import { dateToUnix, getDateLabels, getPriceLabels } from "../Utils/labelUtils";
 import { clamp, getScaleMethods } from "../Utils/numberUtils";
+import { drawXAxes, drawYAxes } from "./../Utils/axesUtils";
+import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y, LABEL_MARGIN_X } from "./constants";
 
 interface Props {
   averagePrice: number;
@@ -40,10 +41,6 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
     minPrice,
     values
   } = props;
-
-  const graphMarginY = 4 * SPACING_UNIT;
-  const graphMarginX = 1 * SPACING_UNIT;
-  const labelMarginX = 8 * SPACING_UNIT;
 
   // Get x-axis labels
   const xConfig = getDateLabels(earliestDate, latestDate, 4);
@@ -74,35 +71,32 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
     const context = canvasElement.getContext("2d");
 
     // Calculate graph dimensions
-    const graphDepth = height - 2 * graphMarginY;
-    const graphWidth = width - 2 * graphMarginX;
+    const graphDepth = height - 2 * GRAPH_MARGIN_Y;
+    const graphWidth = width - 2 * GRAPH_MARGIN_X;
 
     // Utils to convert from graph coordinates to canvas pixels
-    const toCanvasY = (graphY: number) => graphMarginY + graphDepth - graphY;
-    const toCanvasX = (graphX: number) => graphMarginX + graphX;
+    const toCanvasY = (graphY: number) => GRAPH_MARGIN_Y + graphDepth - graphY;
+    const toCanvasX = (graphX: number) => GRAPH_MARGIN_X + graphX;
 
     // Get canvas util methods
     const scaleRetina = getRetinaMethod(context, canvasElement, width, height);
-    const gradient = getGradientMethod(context, graphMarginY, graphDepth);
+    const setGradient = getGradientMethod(context, GRAPH_MARGIN_Y, graphDepth);
 
     // Get x-axis scale helpers
     const unixMin = dateToUnix(earliestDate);
     const unixMax = dateToUnix(latestDate);
-    const xScale = getScaleMethods(unixMin, unixMax, 0, graphWidth);
-    const { scale: scaleUnixX } = xScale;
+    const scaleUnixX = getScaleMethods(unixMin, unixMax, 0, graphWidth);
     const scaleDateX = (date: string) => scaleUnixX(dateToUnix(date));
 
     // Get y-axis scale helpers
-    const yScale = getScaleMethods(yLabels[0], maxPrice, 0, graphDepth);
-    const { scale: scalePriceY } = yScale;
+    const scalePriceY = getScaleMethods(yLabels[0], maxPrice, 0, graphDepth);
 
     // Calculate average price y-coordinate
-    const averagePriceGraphY = scalePriceY(averagePrice);
-    const averagePriceCanvasY = toCanvasY(averagePriceGraphY);
+    const averagePriceCanvasY = toCanvasY(scalePriceY(averagePrice));
 
     // Determine baseline min/max
-    const minBaselineCanvasY = graphMarginY + 2 * SPACING_UNIT;
-    const maxBaselineCanvasY = graphMarginY + graphDepth - 2 * SPACING_UNIT;
+    const minBaselineCanvasY = GRAPH_MARGIN_Y + 2 * SPACING_UNIT;
+    const maxBaselineCanvasY = GRAPH_MARGIN_Y + graphDepth - 2 * SPACING_UNIT;
 
     // Determine baseline price y-coordinate
     const unclampedBaselineY =
@@ -120,48 +114,11 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
       return { canvasX: toCanvasX(graphX), canvasY: toCanvasY(graphY), value };
     });
 
-    // Method: Draw x,y axes and add labels
-    const drawGraphAxes = (context: CanvasRenderingContext2D) => {
-      context.beginPath();
-      context.setLineDash([]);
-      context.fillStyle = CONTRAST_COLOR;
-      context.strokeStyle = CONTRAST_COLOR;
-      context.lineWidth = 1;
-      context.font = "12px Arial";
-      context.textAlign = "start";
-
-      // Add x-axis labels
-      context.textAlign = "center";
-      xLabels.forEach(unix => {
-        const labelX = toCanvasX(scaleDateX(unix));
-        if (labelX > labelMarginX && labelX < graphWidth - labelMarginX) {
-          const labelY = graphMarginY + graphDepth + SPACING_UNIT * 3;
-          context.fillText(moment(unix).format(xDisplayFormat), labelX, labelY);
-          context.moveTo(labelX, graphMarginY + graphDepth);
-          context.lineTo(labelX, graphMarginY + graphDepth + SPACING_UNIT);
-        }
-      });
-
-      // Add y-axis labels
-      context.textAlign = "end";
-      context.strokeStyle = BORDER_COLOR;
-      yLabels.forEach(price => {
-        const labelX = labelMarginX - 1.5 * SPACING_UNIT;
-        const labelY = toCanvasY(scalePriceY(price));
-        context.fillText(`$${Math.round(price)}`, labelX, labelY + 3);
-        context.moveTo(labelMarginX, labelY);
-        context.lineTo(graphWidth, labelY);
-      });
-
-      context.stroke();
-    };
-
     const drawActiveLegend = (context: CanvasRenderingContext2D) => {
-      // Find nearest point to active coordinates
-      const pointsSortedByXProximityToActiveX = points.sort((a, b) => {
+      // Fetch nearest point to active coordinates
+      const [{ canvasX, canvasY, value }] = points.sort((a, b) => {
         return Math.abs(a.canvasX - activeX) - Math.abs(b.canvasX - activeX);
       });
-      const { canvasX, canvasY, value } = pointsSortedByXProximityToActiveX[0];
 
       // Draw dashed active line
       context.strokeStyle = BORDER_COLOR;
@@ -182,7 +139,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
       const legendBottomY = toCanvasY(graphDepth - 5 * SPACING_UNIT);
 
       const anchorY = canvasY < legendBottomY ? canvasY - SPACING_UNIT : 0;
-      const anchorX = clamp(canvasX, labelMarginX, width - labelMarginX);
+      const anchorX = clamp(canvasX, LABEL_MARGIN_X, width - LABEL_MARGIN_X);
 
       context.moveTo(anchorX - ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
       context.lineTo(anchorX - ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
@@ -219,11 +176,29 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
       );
     };
 
-    // Draw graph
+    // Scale retina
     scaleRetina();
 
-    drawGraphAxes(context);
+    // Draw x-axis
+    drawXAxes(
+      context,
+      xLabels,
+      unix => toCanvasX(scaleDateX(unix)),
+      unix => moment(unix).format(xDisplayFormat),
+      graphWidth,
+      graphDepth
+    );
 
+    // Draw y-axis
+    drawYAxes(
+      context,
+      yLabels,
+      price => toCanvasY(scalePriceY(price)),
+      price => `$${Math.round(price)}`,
+      graphWidth
+    );
+
+    // Draw primary block
     fillPath(
       context,
       [
@@ -234,10 +209,11 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
           canvasY: toCanvasY(0)
         }
       ],
-      gradient(PRIMARY_BASE(0.4), PRIMARY_BASE(0)),
+      setGradient(PRIMARY_BASE(0.4), PRIMARY_BASE(0)),
       () => clipPath(context, points, width, baselineYCanvasY)
     );
 
+    // Draw secondary block
     fillPath(
       context,
       [
@@ -248,10 +224,11 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
           canvasY: toCanvasY(graphDepth)
         }
       ],
-      gradient(SECONDARY_BASE(0.4), SECONDARY_BASE(0)),
+      setGradient(SECONDARY_BASE(0.4), SECONDARY_BASE(0)),
       () => clipPath(context, points, width, baselineYCanvasY)
     );
 
+    // Draw primary line
     drawLine(
       context,
       [
@@ -261,8 +238,10 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
       PRIMARY_COLOR
     );
 
+    // Draw baseline
     drawLine(context, points, PRIMARY_COLOR);
 
+    // Draw active legend, if active
     if (activeX && activeY) {
       drawActiveLegend(context);
     }

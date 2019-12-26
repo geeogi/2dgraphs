@@ -10,7 +10,7 @@ export const clamp = (value: number, min: number, max: number) => {
 };
 
 /**
- * * Returns methods which will scale and descale linearly between two value ranges
+ * * Returns method which will scale linearly between two value ranges
  * @param {*} minPrimaryValue
  * @param {*} maxPrimaryValue
  * @param {*} minSecondaryValue
@@ -25,16 +25,9 @@ export const getScaleMethods = (
   const primaryValueRange = maxPrimaryValue - minPrimaryValue;
   const secondaryValueRange = maxSecondaryValue - minSecondaryValue;
 
-  return {
-    scale: (primaryValue: number) => {
-      const normalPrimaryValue = primaryValue - minPrimaryValue;
-      const primaryPercentage = normalPrimaryValue / primaryValueRange;
-      return minSecondaryValue + primaryPercentage * secondaryValueRange;
-    },
-    descale: (secondaryValue: number) => {
-      const normalSecondaryValue = secondaryValue - minSecondaryValue;
-      const secondaryPercentage = normalSecondaryValue / secondaryValueRange;
-      return minPrimaryValue + secondaryPercentage * primaryValueRange;
-    }
+  return (primaryValue: number) => {
+    const normalPrimaryValue = primaryValue - minPrimaryValue;
+    const primaryPercentage = normalPrimaryValue / primaryValueRange;
+    return minSecondaryValue + primaryPercentage * secondaryValueRange;
   };
 };

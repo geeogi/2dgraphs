@@ -39,16 +39,16 @@ export const lineThroughPoints = (
 /**
  * Get a method which can be used to configure a vertical gradient
  * @param {*} context
- * @param {*} graphMarginY
+ * @param {*} GRAPH_MARGIN_Y
  * @param {*} graphDepth
  */
 export const getGradientMethod = (
   context: CanvasRenderingContext2D,
-  graphMarginY: number,
+  GRAPH_MARGIN_Y: number,
   graphDepth: number
 ) => (primaryColor: string, secondaryColor: string) => {
-  const top = graphMarginY;
-  const bottom = graphMarginY + graphDepth;
+  const top = GRAPH_MARGIN_Y;
+  const bottom = GRAPH_MARGIN_Y + graphDepth;
   const gradient = context.createLinearGradient(0, top, 0, bottom);
   gradient.addColorStop(0, primaryColor);
   gradient.addColorStop(1, secondaryColor);
