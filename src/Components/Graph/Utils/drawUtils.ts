@@ -72,7 +72,7 @@ export const drawLine = (
   context.save();
   context.beginPath();
   context.lineWidth = lineWidth;
-  context.lineJoin = "round";
+  context.lineJoin = "miter";
   context.setLineDash(lineDash);
   context.strokeStyle = stokeStyle;
   context.moveTo(pathPoints[0].canvasX, pathPoints[0].canvasY);

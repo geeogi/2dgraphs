@@ -170,7 +170,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
     );
 
     // Draw primary line
-    drawLine(context, points, PRIMARY_COLOR, 2);
+    drawLine(context, points, PRIMARY_COLOR);
 
     // Draw active legend, if active
     if (activeX && activeY) {
