@@ -159,7 +159,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
       () => clipPath(context, points, width, baselineYCanvasY)
     );
 
-    // Draw primary line
+    // Draw baseline line
     drawLine(
       context,
       [
@@ -169,8 +169,8 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
       PRIMARY_COLOR
     );
 
-    // Draw baseline
-    drawLine(context, points, PRIMARY_COLOR);
+    // Draw primary line
+    drawLine(context, points, PRIMARY_COLOR, 2);
 
     // Draw active legend, if active
     if (activeX && activeY) {
