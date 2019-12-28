@@ -11,7 +11,7 @@ const PeriodAverageBase = (props: {
   minPrice: number;
   values: { dateTime: string; price: number }[];
 }) => {
-  const truncatedValues = props.values.filter((_, index) => index < 1000);
+  const truncatedValues = props.values.filter((_, index) => index < 40);
   useEffect(() => {
     /*======= Creating a canvas =========*/
 
@@ -34,9 +34,20 @@ const PeriodAverageBase = (props: {
       // Vertex shader source code
       var vertCode =
         "attribute vec3 coordinates;" +
+        "attribute vec3 prev;" +
+        "attribute vec3 next;" +
+        "attribute vec2 aCorner;" +
         "void main(void) {" +
         " gl_Position = vec4(coordinates, 1.0);" +
-        " gl_Position.y = gl_Position.y - 0.5;" +
+        " gl_Position = vec4(prev, 1.0);" +
+        " gl_Position = vec4(next, 1.0);" +
+        "vec2 AB = normalize(normalize(gl_Position.xy - prev.xy) * 1000.0);" +
+        "vec2 BC = normalize(normalize(next.xy - gl_Position.xy) * 1000.0);" +
+        "vec2 tangent = normalize(AB + BC);" +
+        "vec2 miter = vec2(-tangent.y, tangent.x);" +
+        "vec2 normalA = vec2(-AB.y, AB.x);" +
+        "float miterLength = 1.0 / dot(miter, normalA);" +
+        "gl_Position.xy = gl_Position.xy + (aCorner * miter * miterLength * 0.01);" +
         "}";
 
       // Create a vertex shader object
@@ -77,74 +88,113 @@ const PeriodAverageBase = (props: {
       // Use the combined shader program object
       gl.useProgram(shaderProgram);
 
-      /*======= Defining and storing the geometry ======*/
+      /*======= Defining the geometry ======*/
 
-      const pureVertices: number[] = [];
+      const vertex: number[] = [];
+
       truncatedValues.forEach((value, index) => {
-        pureVertices.push((index / truncatedValues.length) * 2 - 1);
-        pureVertices.push((value.price / props.maxPrice) * 2 - 1);
-        pureVertices.push(0.5);
+        vertex.push((index / truncatedValues.length) * 2 - 1);
+        vertex.push((value.price / props.maxPrice) * 2 - 1);
+        vertex.push(0.5);
+        // Same again
+        vertex.push((index / truncatedValues.length) * 2 - 1);
+        vertex.push((value.price / props.maxPrice) * 2 - 1);
+        vertex.push(0.5);
       });
 
-      const vertices: number[] = [];
-      pureVertices.forEach((vertex, index) => {
-        if (index % 3 === 0) {
-          // first triangle: first corner
-          vertices.push(pureVertices[index]);
-          vertices.push(pureVertices[index + 1]);
-          vertices.push(pureVertices[index + 2]);
-          // first triangle: second corner
-          vertices.push(pureVertices[index + 3]);
-          vertices.push(pureVertices[index + 4]);
-          vertices.push(pureVertices[index + 5]);
-          // first triangle: third corner
-          vertices.push(pureVertices[index + 3]);
-          vertices.push(pureVertices[index + 4] + 0.01);
-          vertices.push(pureVertices[index + 5]);
-          // second triangle: first corner
-          vertices.push(pureVertices[index]);
-          vertices.push(pureVertices[index + 1]);
-          vertices.push(pureVertices[index + 2]);
-          // second triangle: second corner
-          vertices.push(pureVertices[index]);
-          vertices.push(pureVertices[index + 1] + 0.01);
-          vertices.push(pureVertices[index + 2]);
-          // second triangle: third corner
-          vertices.push(pureVertices[index + 3]);
-          vertices.push(pureVertices[index + 4] + 0.01);
-          vertices.push(pureVertices[index + 5]);
-        }
-      });
+      const prev: number[] = JSON.parse(JSON.stringify(vertex));
 
-      // Create an empty buffer object
+      prev.unshift(0.0);
+      prev.unshift(0.0);
+      prev.unshift(0.0);
+      prev.unshift(0.0);
+      prev.unshift(0.0);
+      prev.unshift(0.0);
+      prev.splice(-1, 1);
+      prev.splice(-1, 1);
+      prev.splice(-1, 1);
+      prev.splice(-1, 1);
+      prev.splice(-1, 1);
+      prev.splice(-1, 1);
+
+      const next: number[] = JSON.parse(JSON.stringify(vertex));
+
+      next.shift();
+      next.shift();
+      next.shift();
+      next.shift();
+      next.shift();
+      next.shift();
+      next.push(0.0);
+      next.push(0.0);
+      next.push(0.0);
+      next.push(0.0);
+      next.push(0.0);
+      next.push(0.0);
+
+      /*======= Storing the geometry: vertex ======*/
+
       var vertex_buffer = gl.createBuffer();
-
-      // Bind appropriate array buffer to it
       gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
-
-      // Pass the vertex data to the buffer
-      gl.bufferData(
-        gl.ARRAY_BUFFER,
-        new Float32Array(vertices),
-        gl.STATIC_DRAW
-      );
-
-      // Unbind the buffer
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertex), gl.STATIC_DRAW);
       gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-      /*======= Associating shaders to buffer objects ======*/
+      /*======= Associating shaders to buffer objects: vertex ======*/
 
-      // Bind vertex buffer object
       gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
-
-      // Get the attribute location
       var coord = gl.getAttribLocation(shaderProgram, "coordinates");
-
-      // Point an attribute to the currently bound VBO
       gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0);
-
-      // Enable the attribute
       gl.enableVertexAttribArray(coord);
+
+      /*======= Storing the geometry: prev ======*/
+
+      var prev_buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, prev_buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(prev), gl.STATIC_DRAW);
+      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+      /*======= Associating shaders to buffer objects: prev ======*/
+
+      gl.bindBuffer(gl.ARRAY_BUFFER, prev_buffer);
+      var prev_gl = gl.getAttribLocation(shaderProgram, "prev");
+      gl.vertexAttribPointer(prev_gl, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(prev_gl);
+
+      /*======= Storing the geometry: next ======*/
+
+      var next_buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, next_buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(next), gl.STATIC_DRAW);
+      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+      /*======= Associating shaders to buffer objects: next ======*/
+
+      gl.bindBuffer(gl.ARRAY_BUFFER, next_buffer);
+      var next_gl = gl.getAttribLocation(shaderProgram, "next");
+      gl.vertexAttribPointer(next_gl, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(next_gl);
+
+      /*======= Storing the geometry: aCorner ======*/
+
+      const aCorner: number[] = [];
+      truncatedValues.forEach(() => {
+        aCorner.push(-1);
+        aCorner.push(-1);
+        aCorner.push(1);
+        aCorner.push(1);
+      });
+
+      var aCorner_buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, aCorner_buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(aCorner), gl.STATIC_DRAW);
+      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+      /*======= Associating shaders to buffer objects: aCorner ======*/
+
+      gl.bindBuffer(gl.ARRAY_BUFFER, aCorner_buffer);
+      var aCorner_gl = gl.getAttribLocation(shaderProgram, "aCorner");
+      gl.vertexAttribPointer(aCorner_gl, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(aCorner_gl);
 
       /*============ Drawing the lines =============*/
 
@@ -161,7 +211,7 @@ const PeriodAverageBase = (props: {
       gl.viewport(0, 0, canvas.width, canvas.height);
 
       // Draw the lines
-      gl.drawArrays(gl.TRIANGLES, 0, truncatedValues.length * 6);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, truncatedValues.length);
     }
   });
 

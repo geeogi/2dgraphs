@@ -57,7 +57,7 @@ function App() {
       : `/BTC/${selectedTimeScaleKey}.json`;
     fetch(URL)
       .then(response => response.json())
-      .then(data => setTimeout(() => setPriceData(data), 1000));
+      .then(data => setTimeout(() => setPriceData(data), 0));
   }, [selectedTimeScaleKey]);
 
   if (!priceData) {
