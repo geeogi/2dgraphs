@@ -116,6 +116,7 @@ function App() {
           />
         </Graph>
       </GraphContainer>
+      <canvas id="my_Canvas" />
     </main>
   );
 }
