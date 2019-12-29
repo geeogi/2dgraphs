@@ -11,7 +11,7 @@ const PeriodAverageBase = (props: {
   minPrice: number;
   values: { dateTime: string; price: number }[];
 }) => {
-  const truncatedValues = props.values.filter((_, index) => index < 40);
+  const truncatedValues = props.values.filter((_, index) => index < 5000);
   useEffect(() => {
     /*======= Creating a canvas =========*/
 
@@ -39,15 +39,14 @@ const PeriodAverageBase = (props: {
         "attribute vec2 aCorner;" +
         "void main(void) {" +
         " gl_Position = vec4(coordinates, 1.0);" +
-        " gl_Position = vec4(prev, 1.0);" +
-        " gl_Position = vec4(next, 1.0);" +
-        "vec2 AB = normalize(normalize(gl_Position.xy - prev.xy) * 1000.0);" +
-        "vec2 BC = normalize(normalize(next.xy - gl_Position.xy) * 1000.0);" +
+        " vec2 uScreen = vec2(1000.0,400.0);" +
+        "vec2 AB = normalize(normalize(gl_Position.xy - prev.xy) * uScreen);" +
+        "vec2 BC = normalize(normalize(next.xy - gl_Position.xy) * uScreen);" +
         "vec2 tangent = normalize(AB + BC);" +
         "vec2 miter = vec2(-tangent.y, tangent.x);" +
         "vec2 normalA = vec2(-AB.y, AB.x);" +
         "float miterLength = 1.0 / dot(miter, normalA);" +
-        "gl_Position.xy = gl_Position.xy + (aCorner * miter * miterLength * 0.01);" +
+        "gl_Position.xy = gl_Position.xy + (aCorner.x * miter * miterLength * 1.0) / uScreen.xy;" +
         "}";
 
       // Create a vertex shader object
@@ -104,12 +103,12 @@ const PeriodAverageBase = (props: {
 
       const prev: number[] = JSON.parse(JSON.stringify(vertex));
 
-      prev.unshift(0.0);
-      prev.unshift(0.0);
-      prev.unshift(0.0);
-      prev.unshift(0.0);
-      prev.unshift(0.0);
-      prev.unshift(0.0);
+      prev.unshift(1.0);
+      prev.unshift(1.0);
+      prev.unshift(1.0);
+      prev.unshift(1.0);
+      prev.unshift(1.0);
+      prev.unshift(1.0);
       prev.splice(-1, 1);
       prev.splice(-1, 1);
       prev.splice(-1, 1);
@@ -131,6 +130,10 @@ const PeriodAverageBase = (props: {
       next.push(0.0);
       next.push(0.0);
       next.push(0.0);
+
+      console.log(prev);
+      console.log(vertex);
+      console.log(next);
 
       /*======= Storing the geometry: vertex ======*/
 
@@ -178,10 +181,14 @@ const PeriodAverageBase = (props: {
 
       const aCorner: number[] = [];
       truncatedValues.forEach(() => {
-        aCorner.push(-1);
+        aCorner.push(1);
         aCorner.push(-1);
         aCorner.push(1);
+        aCorner.push(-1);
         aCorner.push(1);
+        aCorner.push(-1);
+        aCorner.push(1);
+        aCorner.push(-1);
       });
 
       var aCorner_buffer = gl.createBuffer();
@@ -211,7 +218,8 @@ const PeriodAverageBase = (props: {
       gl.viewport(0, 0, canvas.width, canvas.height);
 
       // Draw the lines
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, truncatedValues.length);
+      // gl.drawArrays(gl.LINE_STRIP, 0, truncatedValues.length * 2);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, truncatedValues.length * 2);
     }
   });
 
