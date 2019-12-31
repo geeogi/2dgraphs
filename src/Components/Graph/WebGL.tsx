@@ -62,7 +62,7 @@ export const WebGL = (props: {
         "}";
 
       var lineFShader =
-        "void main(void) {" + "gl_FragColor = vec4(1, 1, 0.0, 0.1);" + "}";
+        "void main(void) {" + "gl_FragColor = vec4(1, 0, 1.0, 1);" + "}";
 
       // Create a shader program object to store the combined shader program
       const lineProgram = initProgram(gl, lineVShader, lineFShader);
@@ -125,7 +125,7 @@ export const WebGL = (props: {
       /*============ Drawing the lines =============*/
 
       // Clear the canvas
-      gl.clearColor(0.5, 0.5, 0.5, 0.9);
+      gl.clearColor(0, 0, 0, 0);
 
       // Enable the depth test
       gl.enable(gl.DEPTH_TEST);
@@ -154,7 +154,7 @@ export const WebGL = (props: {
 
       // Fragment shader source code
       var areaFShader =
-        "void main(void) {" + "gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);" + "}";
+        "void main(void) {" + "gl_FragColor = vec4(0.0, 0.0, 1.0, 0.3);" + "}";
 
       const areaProgram = initProgram(gl, areaVShader, areaFShader);
 
