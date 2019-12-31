@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { initProgram, initBuffer, bindBuffer } from "../../WebGL/utils";
 
 export const WebGL = (props: {
   averagePrice: number;
@@ -43,7 +44,7 @@ export const WebGL = (props: {
       /*=================== Shaders ====================*/
 
       // Vertex shader source code
-      var vertCodeForLines =
+      var lineVShader =
         "attribute vec3 vertex;" +
         "attribute vec3 prev;" +
         "attribute vec3 next;" +
@@ -60,42 +61,14 @@ export const WebGL = (props: {
         "gl_Position.xy = gl_Position.xy + (offsetDirection.x * miter * miterLength * 2.0) / uScreen.xy;" +
         "}";
 
-      // Create a vertex shader object
-      var vertShader = gl.createShader(gl.VERTEX_SHADER);
-
-      // Attach vertex shader source code
-      gl.shaderSource(vertShader, vertCodeForLines);
-
-      // Compile the vertex shader
-      gl.compileShader(vertShader);
-
-      // Fragment shader source code
-      var fragCode =
+      var lineFShader =
         "void main(void) {" + "gl_FragColor = vec4(1, 1, 0.0, 0.1);" + "}";
 
-      // Create fragment shader object
-      var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-
-      // Attach fragment shader source code
-      gl.shaderSource(fragShader, fragCode);
-
-      // Compile the fragment shader
-      gl.compileShader(fragShader);
-
       // Create a shader program object to store the combined shader program
-      var shaderProgram = gl.createProgram();
-
-      // Attach a vertex shader
-      gl.attachShader(shaderProgram, vertShader);
-
-      // Attach a fragment shader
-      gl.attachShader(shaderProgram, fragShader);
-
-      // Link both the programs
-      gl.linkProgram(shaderProgram);
+      const lineProgram = initProgram(gl, lineVShader, lineFShader);
 
       // Use the combined shader program object
-      gl.useProgram(shaderProgram);
+      gl.useProgram(lineProgram);
 
       /*======= Defining the geometry ======*/
 
@@ -126,79 +99,28 @@ export const WebGL = (props: {
       nextLineVertices.push(0, 0, 0, 0, 0, 0);
 
       /*======= Storing the geometry: vertex ======*/
-
-      var lineVertices_buffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, lineVertices_buffer);
-      gl.bufferData(
-        gl.ARRAY_BUFFER,
-        new Float32Array(lineVertices),
-        gl.STATIC_DRAW
-      );
-      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      var lineVertices_buffer = initBuffer(gl, lineVertices);
 
       /*======= Storing the geometry: prev ======*/
-
-      var prevLineVertices_buffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, prevLineVertices_buffer);
-      gl.bufferData(
-        gl.ARRAY_BUFFER,
-        new Float32Array(prevLineVertices),
-        gl.STATIC_DRAW
-      );
-      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      var prevLineVertices_buffer = initBuffer(gl, prevLineVertices);
 
       /*======= Storing the geometry: next ======*/
-
-      var nextLineVertices_buffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, nextLineVertices_buffer);
-      gl.bufferData(
-        gl.ARRAY_BUFFER,
-        new Float32Array(nextLineVertices),
-        gl.STATIC_DRAW
-      );
-      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      var nextLineVertices_buffer = initBuffer(gl, nextLineVertices);
 
       /*======= Storing the geometry: offsetDirection ======*/
-
-      var offsetDirection_buffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, offsetDirection_buffer);
-      gl.bufferData(
-        gl.ARRAY_BUFFER,
-        new Float32Array(offsetDirection),
-        gl.STATIC_DRAW
-      );
-      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      var offsetDirection_buffer = initBuffer(gl, offsetDirection);
 
       /*======= Associating shaders to buffer objects: vertex ======*/
-
-      gl.bindBuffer(gl.ARRAY_BUFFER, lineVertices_buffer);
-      var vertex = gl.getAttribLocation(shaderProgram, "vertex");
-      gl.vertexAttribPointer(vertex, 3, gl.FLOAT, false, 0, 0);
-      gl.enableVertexAttribArray(vertex);
+      bindBuffer(gl, lineProgram, lineVertices_buffer, "vertex");
 
       /*======= Associating shaders to buffer objects: prev ======*/
-
-      gl.bindBuffer(gl.ARRAY_BUFFER, prevLineVertices_buffer);
-      var prevVertex = gl.getAttribLocation(shaderProgram, "prev");
-      gl.vertexAttribPointer(prevVertex, 3, gl.FLOAT, false, 0, 0);
-      gl.enableVertexAttribArray(prevVertex);
+      bindBuffer(gl, lineProgram, prevLineVertices_buffer, "prev");
 
       /*======= Associating shaders to buffer objects: next ======*/
-
-      gl.bindBuffer(gl.ARRAY_BUFFER, nextLineVertices_buffer);
-      var nextVertex = gl.getAttribLocation(shaderProgram, "next");
-      gl.vertexAttribPointer(nextVertex, 3, gl.FLOAT, false, 0, 0);
-      gl.enableVertexAttribArray(nextVertex);
+      bindBuffer(gl, lineProgram, nextLineVertices_buffer, "next");
 
       /*======= Associating shaders to buffer objects: offsetDirection ======*/
-
-      gl.bindBuffer(gl.ARRAY_BUFFER, offsetDirection_buffer);
-      var offsetDirection_gl = gl.getAttribLocation(
-        shaderProgram,
-        "offsetDirection"
-      );
-      gl.vertexAttribPointer(offsetDirection_gl, 3, gl.FLOAT, false, 0, 0);
-      gl.enableVertexAttribArray(offsetDirection_gl);
+      bindBuffer(gl, lineProgram, offsetDirection_buffer, "offsetDirection");
 
       /*============ Drawing the lines =============*/
 
@@ -224,48 +146,20 @@ export const WebGL = (props: {
       /*=================== Shaders ====================*/
 
       // Vertex shader source code
-      var vertCodeForArea =
+      var areaVShader =
         "attribute vec3 vertex;" +
         "void main(void) {" +
         " gl_Position = vec4(vertex, 1.0);" +
         "}";
 
-      // Create a vertex shader object
-      var vertShaderArea = gl.createShader(gl.VERTEX_SHADER);
-
-      // Attach vertex shader source code
-      gl.shaderSource(vertShaderArea, vertCodeForArea);
-
-      // Compile the vertex shader
-      gl.compileShader(vertShaderArea);
-
       // Fragment shader source code
-      var fragCodeArea =
+      var areaFShader =
         "void main(void) {" + "gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);" + "}";
 
-      // Create fragment shader object
-      var fragShaderArea = gl.createShader(gl.FRAGMENT_SHADER);
-
-      // Attach fragment shader source code
-      gl.shaderSource(fragShaderArea, fragCodeArea);
-
-      // Compile the fragment shader
-      gl.compileShader(fragShaderArea);
-
-      // Create a shader program object to store the combined shader program
-      var shaderProgramArea = gl.createProgram();
-
-      // Attach a vertex shader
-      gl.attachShader(shaderProgramArea, vertShaderArea);
-
-      // Attach a fragment shader
-      gl.attachShader(shaderProgramArea, fragShaderArea);
-
-      // Link both the programs
-      gl.linkProgram(shaderProgramArea);
+      const areaProgram = initProgram(gl, areaVShader, areaFShader);
 
       // Use the combined shader program object
-      gl.useProgram(shaderProgramArea);
+      gl.useProgram(areaProgram);
 
       /*======= Defining the geometry ======*/
 
@@ -281,35 +175,12 @@ export const WebGL = (props: {
       });
 
       /*======= Storing the geometry: offsetDirection ======*/
-
-      var fillAreaVertices_buffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, fillAreaVertices_buffer);
-      gl.bufferData(
-        gl.ARRAY_BUFFER,
-        new Float32Array(fillAreaVertices),
-        gl.STATIC_DRAW
-      );
-      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      var fillAreaVertices_buffer = initBuffer(gl, fillAreaVertices);
 
       /*======= Associating shaders to buffer objects: vertex ======*/
+      bindBuffer(gl, areaProgram, fillAreaVertices_buffer, "vertex");
 
-      gl.bindBuffer(gl.ARRAY_BUFFER, fillAreaVertices_buffer);
-      var vertexArea = gl.getAttribLocation(shaderProgramArea, "vertex");
-      gl.vertexAttribPointer(vertexArea, 3, gl.FLOAT, false, 0, 0);
-      gl.enableVertexAttribArray(vertexArea);
-
-      /*============ Drawing the lines =============*/
-
-      // Clear the canvas
-      gl.clearColor(0.5, 0.5, 0.5, 0.9);
-
-      // Enable the depth test
-      gl.enable(gl.DEPTH_TEST);
-
-      // Set the view port
-      gl.viewport(0, 0, canvas.width, canvas.height);
-
-      // Draw the lines
+      /*============ Drawing the area =============*/
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, values.length * 2);
     }
   });
