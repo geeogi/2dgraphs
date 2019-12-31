@@ -7,6 +7,7 @@ import { H1, H4 } from "./Components/H";
 import { Header } from "./Components/Header";
 import { P } from "./Components/P";
 import { Row } from "./Components/Row";
+import { WebGL } from "./Components/Graph/WebGL";
 
 const currentMoment = () => moment("2019-12-27T00:00:00.0000000Z");
 
@@ -107,6 +108,16 @@ function App() {
         </Row>
         <Graph>
           <PeriodAverage
+            values={values}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+            averagePrice={averagePrice}
+            earliestDate={earliestDate}
+            latestDate={latestDate}
+          />
+        </Graph>
+        <Graph>
+          <WebGL
             values={values}
             minPrice={minPrice}
             maxPrice={maxPrice}
