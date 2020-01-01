@@ -1,45 +1,42 @@
-import { initProgram, initBuffer, bindBuffer } from "./setupUtils";
+import { initProgram, initArrayBuffer, enableAttribute } from "./setupUtils";
 
-export const getDrawLineMethod = (
+export const getDrawPathMethod = (
   gl: WebGLRenderingContext,
-  linePoints: { x: number; y: number; z: number }[]
+  linePoints: { x: number; y: number; z: number }[],
+  rgba: string
 ) => {
-  /*=================== Shaders ====================*/
-
-  // Vertex shader source code
-  var lineVShader =
-    "attribute vec3 vertex;" +
-    "attribute vec3 prev;" +
-    "attribute vec3 next;" +
-    "attribute vec2 offsetDirection;" +
+  const lineVShader =
+    "uniform vec2 uResolution;" +
+    "attribute vec3 aVertex;" +
+    "attribute vec3 aPrev;" +
+    "attribute vec3 aNext;" +
+    "attribute vec2 aDirection;" +
     "void main(void) {" +
-    " gl_Position = vec4(vertex, 1.0);" +
-    " vec2 uScreen = vec2(1000.0,400.0);" +
-    " vec2 AB = normalize(normalize(gl_Position.xy - prev.xy) * uScreen);" +
-    " vec2 BC = normalize(normalize(next.xy - gl_Position.xy) * uScreen);" +
+    " gl_Position = vec4(aVertex, 1.0);" +
+    " vec2 AB = normalize(normalize(gl_Position.xy - aPrev.xy) * uResolution);" +
+    " vec2 BC = normalize(normalize(aNext.xy - gl_Position.xy) * uResolution);" +
     " vec2 tangent = normalize(AB + BC);" +
     " vec2 miter = vec2(-tangent.y, tangent.x);" +
     " vec2 normalA = vec2(-AB.y, AB.x);" +
     " float miterLength = 1.0 / dot(miter, normalA);" +
-    " gl_Position.xy = gl_Position.xy + (offsetDirection.x * miter * miterLength * 2.0) / uScreen.xy;" +
+    " gl_Position.xy = gl_Position.xy + (aDirection.x * miter * miterLength * 2.0) / uResolution.xy;" +
     "}";
 
-  var lineFShader =
-    "void main(void) {" + "gl_FragColor = vec4(0, 0, 1.0, 1);" + "}";
+  const lineFShader =
+    "void main(void) {" + "gl_FragColor = vec4" + rgba + ";" + "}";
 
   // Create a shader program object to store the combined shader program
   const lineProgram = initProgram(gl, lineVShader, lineFShader);
 
-  /*======= Defining the geometry ======*/
-
+  // Calculate geometry
   const lineVertices: number[] = [];
   const prevVertices: number[] = [0, 0, 0, 0, 0, 0];
   const nextVertices: number[] = [];
-  const offsetDirection: number[] = [];
+  const direction: number[] = [];
 
   linePoints.forEach((point, index) => {
     const { x, y, z = 1 } = point;
-    // Vertex
+    // aVertex
     lineVertices.push(x, y, z);
     lineVertices.push(x, y, z);
     // Prev
@@ -50,43 +47,33 @@ export const getDrawLineMethod = (
       nextVertices.push(x, y, z);
       nextVertices.push(x, y, z);
     }
-    // Offset direction
-    offsetDirection.push(1, -1, 1, -1, 1, -1);
+    // Direction
+    direction.push(1, -1, 1, -1, 1, -1);
   });
 
   nextVertices.push(0, 0, 0, 0, 0, 0);
 
-  /*======= Storing the geometry: vertex ======*/
-  var lineVertices_buffer = initBuffer(gl, lineVertices);
+  // Upload buffers to GLSL
+  const lineVertices_buffer = initArrayBuffer(gl, lineVertices);
+  const prevVertices_buffer = initArrayBuffer(gl, prevVertices);
+  const nextVertices_buffer = initArrayBuffer(gl, nextVertices);
+  const direction_buffer = initArrayBuffer(gl, direction);
 
-  /*======= Storing the geometry: prev ======*/
-  var prevVertices_buffer = initBuffer(gl, prevVertices);
-
-  /*======= Storing the geometry: next ======*/
-  var nextVertices_buffer = initBuffer(gl, nextVertices);
-
-  /*======= Storing the geometry: offsetDirection ======*/
-  var offsetDirection_buffer = initBuffer(gl, offsetDirection);
-
-  return () => {
+  return (width: number, height: number) => {
     // Use the combined shader program object
     gl.useProgram(lineProgram);
 
-    /*======= Associating shaders to buffer objects: vertex ======*/
-    bindBuffer(gl, lineProgram, lineVertices_buffer, "vertex");
+    // Enable attributes
+    enableAttribute(gl, lineProgram, lineVertices_buffer, "aVertex");
+    enableAttribute(gl, lineProgram, prevVertices_buffer, "aPrev");
+    enableAttribute(gl, lineProgram, nextVertices_buffer, "aNext");
+    enableAttribute(gl, lineProgram, direction_buffer, "aDirection");
 
-    /*======= Associating shaders to buffer objects: prev ======*/
-    bindBuffer(gl, lineProgram, prevVertices_buffer, "prev");
+    // Set screen resolution
+    const uniformLocation = gl.getUniformLocation(lineProgram, "uResolution");
+    gl.uniform2fv(uniformLocation, [width, height]);
 
-    /*======= Associating shaders to buffer objects: next ======*/
-    bindBuffer(gl, lineProgram, nextVertices_buffer, "next");
-
-    /*======= Associating shaders to buffer objects: offsetDirection ======*/
-    bindBuffer(gl, lineProgram, offsetDirection_buffer, "offsetDirection");
-
-    /*============ Drawing the lines =============*/
-
-    // Draw the lines
+    // Draw the line
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, linePoints.length * 2);
   };
 };

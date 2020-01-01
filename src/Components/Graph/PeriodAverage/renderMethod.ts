@@ -19,7 +19,7 @@ import {
   getGradientMethod
 } from "../Utils/drawUtils";
 import { dateToUnix, getDateLabels, getPriceLabels } from "../Utils/labelUtils";
-import { clamp, getScaleMethods } from "../Utils/numberUtils";
+import { clamp, getScaleMethod } from "../Utils/numberUtils";
 import { drawXAxes, drawYAxes } from "./../Utils/axesUtils";
 import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y, LABEL_MARGIN_X } from "./constants";
 
@@ -85,11 +85,11 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
     // Get x-axis scale helpers
     const unixMin = dateToUnix(earliestDate);
     const unixMax = dateToUnix(latestDate);
-    const scaleUnixX = getScaleMethods(unixMin, unixMax, 0, graphWidth);
+    const scaleUnixX = getScaleMethod(unixMin, unixMax, 0, graphWidth);
     const scaleDateX = (date: string) => scaleUnixX(dateToUnix(date));
 
     // Get y-axis scale helpers
-    const scalePriceY = getScaleMethods(yLabels[0], maxPrice, 0, graphDepth);
+    const scalePriceY = getScaleMethod(yLabels[0], maxPrice, 0, graphDepth);
 
     // Calculate average price y-coordinate
     const averagePriceCanvasY = toCanvasY(scalePriceY(averagePrice));

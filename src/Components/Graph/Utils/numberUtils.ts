@@ -16,7 +16,7 @@ export const clamp = (value: number, min: number, max: number) => {
  * @param {*} minSecondaryValue
  * @param {*} maxSecondaryValue
  */
-export const getScaleMethods = (
+export const getScaleMethod = (
   minPrimaryValue: number,
   maxPrimaryValue: number,
   minSecondaryValue: number,

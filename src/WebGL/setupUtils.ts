@@ -48,7 +48,7 @@ export const initProgram = (
   return program;
 };
 
-export const initBuffer = (gl: WebGLRenderingContext, values: number[]) => {
+export const initArrayBuffer = (gl: WebGLRenderingContext, values: number[]) => {
   const buffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(values), gl.STATIC_DRAW);
@@ -59,7 +59,7 @@ export const initBuffer = (gl: WebGLRenderingContext, values: number[]) => {
   return buffer;
 };
 
-export const bindBuffer = (
+export const enableAttribute = (
   gl: WebGLRenderingContext,
   program: WebGLProgram,
   buffer: WebGLBuffer,
