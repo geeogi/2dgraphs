@@ -1,10 +1,11 @@
 import React, { useEffect, useRef } from "react";
 import { resizeGlCanvas } from "../../WebGL/canvasUtils";
 import { getDrawAreaMethod } from "../../WebGL/drawArea";
-import { getDrawPathMethod } from "../../WebGL/drawLine";
+import { getDrawPathMethod } from "../../WebGL/drawPath";
 import { getParentDimensions } from "./Utils/domUtils";
 import { dateToUnix, getDateLabels, getPriceLabels } from "./Utils/labelUtils";
 import { getScaleMethod } from "./Utils/numberUtils";
+import { getDrawHorizontalLineMethod } from "../../WebGL/drawLine";
 
 export const WebGL = (props: {
   averagePrice: number;
@@ -26,8 +27,8 @@ export const WebGL = (props: {
   } = props;
 
   // Initialize canvas coordinates
-  const linePoints: { x: number; y: number; z: number }[] = [];
-  const areaPoints: { x: number; y: number; z: number }[] = [];
+  const linePoints: { x: number; y: number }[] = [];
+  const areaPoints: { x: number; y: number }[] = [];
 
   // Get x-axis labels
   const xConfig = getDateLabels(earliestDate, latestDate, 4);
@@ -46,14 +47,21 @@ export const WebGL = (props: {
   // Get y-axis scale helpers
   const scalePriceY = getScaleMethod(yLabels[0], maxPrice, -1, 1);
 
+  // Margin helpers
+  // const withMarginY = (heightPx: number, marginYPx: number, y: number) => {
+  //   const yPercentage = (y + 1) / 2;
+  //   const marginY = (marginYPx / heightPx) * 2; // 0.12
+  //   const availableY = 2 - marginY;
+  //   return marginY + yPercentage * availableY - 1;
+  // };
+
   // Populate coordinates
   values.forEach(value => {
     const x = scaleDateX(value.dateTime);
     const y = scalePriceY(value.price);
-    const z = 0.99;
-    linePoints.push({ x, y, z });
-    areaPoints.push({ x, y, z });
-    areaPoints.push({ x, y: -1, z });
+    linePoints.push({ x, y });
+    areaPoints.push({ x, y });
+    areaPoints.push({ x, y: -1 });
   });
 
   useEffect(() => {
@@ -69,13 +77,13 @@ export const WebGL = (props: {
         );
         const drawPrimaryArea = getDrawAreaMethod(gl, areaPoints);
         const drawAxesLines = yLabels.map(label =>
-          getDrawPathMethod(
+          getDrawHorizontalLineMethod(
             gl,
             [
-              { x: -0.8, y: scalePriceY(label), z: 0 },
-              { x: 0.8, y: scalePriceY(label), z: 0 }
+              { x: -0.8, y: scalePriceY(label) },
+              { x: 0.8, y: scalePriceY(label) }
             ],
-            "(1.0,1.0,0,1.0)"
+            "(0,0,0,0.2)"
           )
         );
 
@@ -97,8 +105,8 @@ export const WebGL = (props: {
           gl.viewport(0, 0, canvasElement.width, canvasElement.height);
 
           // Draw elements
-          drawAxesLines.forEach(method => method(width, height));
           drawPrimaryPath(width, height);
+          drawAxesLines.forEach(method => method(width, height));
           drawPrimaryArea();
         };
 

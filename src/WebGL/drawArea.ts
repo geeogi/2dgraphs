@@ -2,7 +2,7 @@ import { enableAttribute, initArrayBuffer, initProgram } from "./setupUtils";
 
 export const getDrawAreaMethod = (
   gl: WebGLRenderingContext,
-  areaPoints: { x: number; y: number; z: number }[]
+  areaPoints: { x: number; y: number; z?: number }[]
 ) => {
   // Vertex shader source code
   var areaVShader =
@@ -11,6 +11,11 @@ export const getDrawAreaMethod = (
     "void main(void) {" +
     " gl_Position = vec4(aVertex, 1.0);" +
     " vY = gl_Position.y;" +
+    // Apply y margin
+    " float marginY = 0.12;" +
+    " float yPercentage = (gl_Position.y + 1.0) / 2.0;" +
+    " float availableY = 2.0 - (2.0 * marginY);" +
+    " gl_Position.y = marginY + yPercentage * availableY - 1.0;" +
     "}";
 
   // Fragment shader source code
@@ -26,7 +31,7 @@ export const getDrawAreaMethod = (
   /*======= Defining the geometry ======*/
   const fillAreaVertices: number[] = [];
   areaPoints.forEach(point => {
-    const { x, y, z = 1 } = point;
+    const { x, y, z = 0 } = point;
     fillAreaVertices.push(x, y, z);
   });
 
