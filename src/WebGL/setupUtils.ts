@@ -1,5 +1,5 @@
 export const initProgram = (
-  gl: WebGL2RenderingContext,
+  gl: WebGLRenderingContext,
   shaderSource: string,
   fragSource: string
 ) => {
@@ -48,7 +48,7 @@ export const initProgram = (
   return program;
 };
 
-export const initBuffer = (gl: WebGL2RenderingContext, values: number[]) => {
+export const initBuffer = (gl: WebGLRenderingContext, values: number[]) => {
   const buffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(values), gl.STATIC_DRAW);
@@ -60,7 +60,7 @@ export const initBuffer = (gl: WebGL2RenderingContext, values: number[]) => {
 };
 
 export const bindBuffer = (
-  gl: WebGL2RenderingContext,
+  gl: WebGLRenderingContext,
   program: WebGLProgram,
   buffer: WebGLBuffer,
   attributeName: string

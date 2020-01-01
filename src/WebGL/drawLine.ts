@@ -1,7 +1,7 @@
 import { initProgram, initBuffer, bindBuffer } from "./setupUtils";
 
 export const getDrawLineMethod = (
-  gl: WebGL2RenderingContext,
+  gl: WebGLRenderingContext,
   linePoints: { x: number; y: number; z: number }[]
 ) => {
   /*=================== Shaders ====================*/

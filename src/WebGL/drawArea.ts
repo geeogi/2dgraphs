@@ -1,7 +1,7 @@
 import { bindBuffer, initBuffer, initProgram } from "./setupUtils";
 
 export const getDrawAreaMethod = (
-  gl: WebGL2RenderingContext,
+  gl: WebGLRenderingContext,
   areaPoints: { x: number; y: number; z: number }[]
 ) => {
   /*=================== Shaders ====================*/
