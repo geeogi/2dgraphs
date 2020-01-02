@@ -11,23 +11,6 @@ export const WebGL = (props: {
 }) => {
   const canvasElementRef = useRef<HTMLCanvasElement>();
 
-  const {
-    averagePrice,
-    earliestDate,
-    latestDate,
-    maxPrice,
-    minPrice,
-    values
-  } = props;
-
-  // Margin helpers
-  // const withMarginY = (heightPx: number, marginYPx: number, y: number) => {
-  //   const yPercentage = (y + 1) / 2;
-  //   const marginY = (marginYPx / heightPx) * 2; // 0.12
-  //   const availableY = 2 - marginY;
-  //   return marginY + yPercentage * availableY - 1;
-  // };
-
   useEffect(() => {
     const canvasElement = canvasElementRef && canvasElementRef.current;
     if (canvasElement) {
@@ -35,16 +18,7 @@ export const WebGL = (props: {
 
       if (gl) {
         // Initial render
-        const renderMethod = getRenderMethod(
-          averagePrice,
-          earliestDate,
-          latestDate,
-          maxPrice,
-          minPrice,
-          values,
-          gl,
-          canvasElement
-        );
+        const renderMethod = getRenderMethod(props, gl, canvasElement);
 
         // Initial render
         renderMethod();
