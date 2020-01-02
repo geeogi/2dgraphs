@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { getWebGLInteractivityHandlers } from "../../WebGL/eventUtils";
 import { CanvasGL } from "../Canvas";
 import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "./PeriodAverage/constants";
 import { dateToUnix, getDateLabels, getPriceLabels } from "./Utils/labelUtils";
@@ -50,10 +51,18 @@ export const WebGL = (props: {
         yLabels,
         values
       };
-      const renderGLCanvas = getRenderMethod(renderProps, gl, canvasElement);
+      const renderGLCanvas = getRenderMethod(
+        renderProps,
+        gl,
+        canvasElement,
+        margin
+      );
 
       // Define render method with provided arguments
-      const render = () => {
+      const doRender = (args?: { activeX?: number; activeY?: number }) => {
+        // Extract render args
+        const { activeX, activeY } = args || {};
+
         // Calculate resolution
         const resolution: [number, number] = [
           canvasElement.offsetWidth,
@@ -61,17 +70,46 @@ export const WebGL = (props: {
         ];
 
         // Call render method
-        renderGLCanvas(resolution, margin);
+        renderGLCanvas(resolution, activeX, activeY);
       };
 
       // Render on page load
-      render();
+      doRender();
+
+      // Define resize handler
+      const onResize = () => doRender();
 
       // Attach event listener to render on resize event
-      window.addEventListener("resize", render);
+      window.addEventListener("resize", onResize);
 
-      // Remove event listener on cleanup
-      return () => window.removeEventListener("resize", render);
+      // Fetch interactivity event listeners
+      const {
+        handleMouseDown,
+        handleMouseLeave,
+        handleMouseMove,
+        handleTouchEnd,
+        handleTouchMove,
+        handleTouchStart
+      } = getWebGLInteractivityHandlers(doRender);
+
+      // Attach interactivity event listeners
+      canvasElement.addEventListener("mousedown", handleMouseDown);
+      canvasElement.addEventListener("mouseleave", handleMouseLeave);
+      canvasElement.addEventListener("mousemove", handleMouseMove);
+      canvasElement.addEventListener("touchend", handleTouchEnd);
+      canvasElement.addEventListener("touchmove", handleTouchMove);
+      canvasElement.addEventListener("touchstart", handleTouchStart);
+
+      // Remove event listeners on cleanup
+      return () => {
+        window.removeEventListener("resize", onResize);
+        canvasElement.removeEventListener("mousedown", handleMouseDown);
+        canvasElement.removeEventListener("mouseleave", handleMouseLeave);
+        canvasElement.removeEventListener("mousemove", handleMouseMove);
+        canvasElement.removeEventListener("touchend", handleTouchEnd);
+        canvasElement.removeEventListener("touchmove", handleTouchMove);
+        canvasElement.removeEventListener("touchstart", handleTouchStart);
+      };
     }
   });
 

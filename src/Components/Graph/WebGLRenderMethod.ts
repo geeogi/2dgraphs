@@ -13,7 +13,8 @@ export const getRenderMethod = (
     yLabels: number[];
   },
   gl: WebGLRenderingContext,
-  canvasElement: HTMLCanvasElement
+  canvasElement: HTMLCanvasElement,
+  margin: [number, number]
 ) => {
   const {
     scaleDateX,
@@ -56,8 +57,19 @@ export const getRenderMethod = (
   const drawPrimaryArea = getDrawAreaMethod(gl, areaPoints, blue);
   const drawYAxis = getDrawLinesMethod(gl, yAxis, grey, "horizontal");
   const drawXAxis = getDrawLinesMethod(gl, xAxis, grey, "vertical");
+  const drawActiveAxis = getDrawLinesMethod(
+    gl,
+    [
+      [
+        { x: 0, y: 1 },
+        { x: 0, y: -1 }
+      ]
+    ],
+    grey,
+    "vertical"
+  );
 
-  return (resolution: [number, number], margin: [number, number]) => {
+  return (resolution: [number, number], activeX?: number, activeY?: number) => {
     // Resize canvas
     resizeGlCanvas(gl);
 
@@ -85,5 +97,6 @@ export const getRenderMethod = (
     drawXAxis(resolution, normalizedMargin);
     drawPrimaryArea(resolution, normalizedMargin);
     drawPrimaryPath(resolution, normalizedMargin);
+    drawActiveAxis(resolution, normalizedMargin);
   };
 };
