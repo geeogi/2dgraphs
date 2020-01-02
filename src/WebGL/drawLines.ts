@@ -1,8 +1,8 @@
 import { enableAttribute, initArrayBuffer, initProgram } from "./setupUtils";
 
-export const getDrawHorizontalLineMethod = (
+export const getDrawHorizontalLinesMethod = (
   gl: WebGLRenderingContext,
-  linePoints: { x: number; y: number; z?: number }[],
+  lines: { x: number; y: number; z?: number }[][],
   rgba: string
 ) => {
   const lineVShader =
@@ -25,13 +25,21 @@ export const getDrawHorizontalLineMethod = (
   const lineVertices: number[] = [];
   const direction: number[] = [];
 
-  linePoints.forEach(point => {
-    const { x, y, z = 0 } = point;
+  lines.forEach(line => {
     // aVertex
-    lineVertices.push(x, y, z);
-    lineVertices.push(x, y, z);
+    lineVertices.push(line[0].x, line[0].y, line[0].z || 0);
+    lineVertices.push(line[0].x, line[0].y, line[0].z || 0);
+    lineVertices.push(line[1].x, line[1].y, line[1].z || 0);
+    lineVertices.push(line[1].x, line[1].y, line[1].z || 0);
+    lineVertices.push(line[1].x, line[1].y, line[1].z || 0);
+    lineVertices.push(line[0].x, line[0].y, line[0].z || 0);
     // Direction
-    direction.push(1, -1, 1, -1, 1, -1);
+    direction.push(1, -1, 1);
+    direction.push(-1, 1, -1);
+    direction.push(1, -1, 1);
+    direction.push(-1, 1, -1);
+    direction.push(1, -1, 1);
+    direction.push(-1, 1, -1);
   });
 
   // Upload buffers to GLSL
@@ -54,6 +62,6 @@ export const getDrawHorizontalLineMethod = (
     gl.uniform2fv(marginResolution, margin);
 
     // Draw the line
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, linePoints.length * 2);
+    gl.drawArrays(gl.TRIANGLES, 0, lines.length * 6);
   };
 };
