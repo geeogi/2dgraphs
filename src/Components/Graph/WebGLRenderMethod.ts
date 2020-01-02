@@ -68,16 +68,27 @@ export const getRenderMethod = (
 
   // Define drawing methods
   const drawPrimaryPath = getDrawPathMethod(gl, linePoints, "(0,0,1.0,1)");
-  const drawPrimaryArea = getDrawAreaMethod(gl, areaPoints);
-  const drawYAxis = getDrawLinesMethod(gl, yAxis, "(0,0,0,0.3)", "horizontal");
-  const drawXAxis = getDrawLinesMethod(gl, xAxis, "(0,0,0,0.3)", "vertical");
+  const drawPrimaryArea = getDrawAreaMethod(gl, areaPoints, "(0, 0, 1.0, 0.5)");
+  const drawYAxis = getDrawLinesMethod(
+    gl,
+    yAxis,
+    "(0.9,0.9,0.9,1)",
+    "horizontal"
+  );
+  const drawXAxis = getDrawLinesMethod(
+    gl,
+    xAxis,
+    "(0.9,0.9,0.9,1)",
+    "vertical"
+  );
 
   return (resolution: [number, number], margin: [number, number]) => {
     // Clear the canvas
     gl.clearColor(0, 0, 0, 0);
 
-    // Enable the depth test
-    gl.enable(gl.DEPTH_TEST);
+    // Enable alpha blend
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     // Clear the color and depth buffer
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -92,9 +103,9 @@ export const getRenderMethod = (
     ];
 
     // Draw the elements
-    drawPrimaryPath(resolution, normalizedMargin);
     drawYAxis(resolution, normalizedMargin);
     drawXAxis(resolution, normalizedMargin);
     drawPrimaryArea(resolution, normalizedMargin);
+    drawPrimaryPath(resolution, normalizedMargin);
   };
 };

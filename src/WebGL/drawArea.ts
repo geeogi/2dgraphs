@@ -2,7 +2,8 @@ import { enableAttribute, initArrayBuffer, initProgram } from "./setupUtils";
 
 export const getDrawAreaMethod = (
   gl: WebGLRenderingContext,
-  areaPoints: { x: number; y: number; z?: number }[]
+  areaPoints: { x: number; y: number; z?: number }[],
+  rgba: string
 ) => {
   // Vertex shader source code
   var areaVShader =
@@ -19,7 +20,7 @@ export const getDrawAreaMethod = (
   var areaFShader =
     "varying mediump float vY;" +
     "void main(void) {" +
-    " gl_FragColor = vec4(0.0, 0.0, 1.0, 0.5);" +
+    ` gl_FragColor = vec4${rgba};` +
     " gl_FragColor.a = gl_FragColor.a * ((vY+1.0)/2.0);" +
     "}";
 
