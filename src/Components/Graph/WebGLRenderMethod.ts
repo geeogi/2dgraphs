@@ -1,38 +1,28 @@
+import { resizeGlCanvas } from "../../WebGL/canvasUtils";
 import { getDrawAreaMethod } from "../../WebGL/drawArea";
 import { getDrawLinesMethod } from "../../WebGL/drawLines";
 import { getDrawPathMethod } from "../../WebGL/drawPath";
-import { dateToUnix, getDateLabels, getPriceLabels } from "./Utils/labelUtils";
-import { getScaleMethod } from "./Utils/numberUtils";
 
 export const getRenderMethod = (
   props: {
-    earliestDate: string;
-    latestDate: string;
-    maxPrice: number;
-    minPrice: number;
+    scaleDateX: (date: string) => number;
+    scalePriceY: (price: number) => number;
+    scaleUnixX: (dateToUnix: number) => number;
     values: { dateTime: string; price: number }[];
+    xLabels: number[];
+    yLabels: number[];
   },
   gl: WebGLRenderingContext,
   canvasElement: HTMLCanvasElement
 ) => {
-  const { earliestDate, latestDate, maxPrice, minPrice, values } = props;
-
-  // Get x-axis labels
-  const xConfig = getDateLabels(earliestDate, latestDate, 4);
-  const { dateLabels: xLabels } = xConfig;
-
-  // Get y-axis labels
-  const yConfig = getPriceLabels(minPrice, maxPrice, 4);
-  const { priceLabels: yLabels } = yConfig;
-
-  // Get x-axis scale helpers
-  const unixMin = dateToUnix(earliestDate);
-  const unixMax = dateToUnix(latestDate);
-  const scaleUnixX = getScaleMethod(unixMin, unixMax, -1, 1);
-  const scaleDateX = (date: string) => scaleUnixX(dateToUnix(date));
-
-  // Get y-axis scale helpers
-  const scalePriceY = getScaleMethod(yLabels[0], maxPrice, -1, 1);
+  const {
+    scaleDateX,
+    scalePriceY,
+    scaleUnixX,
+    values,
+    xLabels,
+    yLabels
+  } = props;
 
   // Initialize canvas coordinates
   const linePoints: { x: number; y: number }[] = [];
@@ -60,22 +50,17 @@ export const getRenderMethod = (
   ]);
 
   // Define drawing methods
-  const drawPrimaryPath = getDrawPathMethod(gl, linePoints, "(0,0,1.0,1)");
-  const drawPrimaryArea = getDrawAreaMethod(gl, areaPoints, "(0, 0, 1.0, 0.5)");
-  const drawYAxis = getDrawLinesMethod(
-    gl,
-    yAxis,
-    "(0.9,0.9,0.9,1)",
-    "horizontal"
-  );
-  const drawXAxis = getDrawLinesMethod(
-    gl,
-    xAxis,
-    "(0.9,0.9,0.9,1)",
-    "vertical"
-  );
+  const grey = "(0.9,0.9,0.9,1)";
+  const blue = "(0,0,1.0,1)";
+  const drawPrimaryPath = getDrawPathMethod(gl, linePoints, blue);
+  const drawPrimaryArea = getDrawAreaMethod(gl, areaPoints, blue);
+  const drawYAxis = getDrawLinesMethod(gl, yAxis, grey, "horizontal");
+  const drawXAxis = getDrawLinesMethod(gl, xAxis, grey, "vertical");
 
   return (resolution: [number, number], margin: [number, number]) => {
+    // Resize canvas
+    resizeGlCanvas(gl);
+
     // Clear the canvas
     gl.clearColor(0, 0, 0, 0);
 
