@@ -42,7 +42,7 @@ export const getDateLabels = (
   latestDate: string,
   minNumberOfLabels: number
 ) => {
-  let dateLabels = [];
+  let dateLabels: number[] = [];
   let displayFormat = "MMM 'YY";
 
   const tryLabels = (period: any, amount: number) => {

@@ -1,5 +1,5 @@
 import { getDrawAreaMethod } from "../../WebGL/drawArea";
-import { getDrawHorizontalLinesMethod } from "../../WebGL/drawLines";
+import { getDrawLinesMethod } from "../../WebGL/drawLines";
 import { getDrawPathMethod } from "../../WebGL/drawPath";
 import { dateToUnix, getDateLabels, getPriceLabels } from "./Utils/labelUtils";
 import { getScaleMethod } from "./Utils/numberUtils";
@@ -56,15 +56,21 @@ export const getRenderMethod = (
   });
 
   // Define axis coordinates
-  const yAxis = yLabels.map(label => [
-    { x: -0.8, y: scalePriceY(label) },
-    { x: 1, y: scalePriceY(label) }
+  const yAxis = yLabels.map(price => [
+    { x: -1, y: scalePriceY(price) },
+    { x: 1, y: scalePriceY(price) }
+  ]);
+
+  const xAxis = xLabels.map(unix => [
+    { x: scaleUnixX(unix / 1000), y: -1.1 },
+    { x: scaleUnixX(unix / 1000), y: -1 }
   ]);
 
   // Define drawing methods
   const drawPrimaryPath = getDrawPathMethod(gl, linePoints, "(0,0,1.0,1)");
   const drawPrimaryArea = getDrawAreaMethod(gl, areaPoints);
-  const drawAxesLines = getDrawHorizontalLinesMethod(gl, yAxis, "(0,0,0,0.3)");
+  const drawYAxis = getDrawLinesMethod(gl, yAxis, "(0,0,0,0.3)", "horizontal");
+  const drawXAxis = getDrawLinesMethod(gl, xAxis, "(0,0,0,0.3)", "vertical");
 
   return (resolution: [number, number], margin: [number, number]) => {
     // Clear the canvas
@@ -87,7 +93,8 @@ export const getRenderMethod = (
 
     // Draw the elements
     drawPrimaryPath(resolution, normalizedMargin);
-    drawAxesLines(resolution, normalizedMargin);
+    drawYAxis(resolution, normalizedMargin);
+    drawXAxis(resolution, normalizedMargin);
     drawPrimaryArea(resolution, normalizedMargin);
   };
 };

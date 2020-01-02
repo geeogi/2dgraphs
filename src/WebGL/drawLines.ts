@@ -1,9 +1,10 @@
 import { enableAttribute, initArrayBuffer, initProgram } from "./setupUtils";
 
-export const getDrawHorizontalLinesMethod = (
+export const getDrawLinesMethod = (
   gl: WebGLRenderingContext,
   lines: { x: number; y: number; z?: number }[][],
-  rgba: string
+  rgba: string,
+  mode: "horizontal" | "vertical"
 ) => {
   const lineVShader =
     "uniform vec2 uResolution;" +
@@ -12,7 +13,7 @@ export const getDrawHorizontalLinesMethod = (
     "attribute vec2 aDirection;" +
     "void main(void) {" +
     " gl_Position = vec4(aVertex, 1.0);" +
-    " gl_Position.y = gl_Position.y + (aDirection.y * 2.0) / uResolution.y;" +
+    " gl_Position.xy = gl_Position.xy + (aDirection.xy * 2.0) / uResolution.xy;" +
     " gl_Position.xy = gl_Position.xy * uMargin;" +
     "}";
 
@@ -34,12 +35,21 @@ export const getDrawHorizontalLinesMethod = (
     lineVertices.push(line[1].x, line[1].y, line[1].z || 0);
     lineVertices.push(line[0].x, line[0].y, line[0].z || 0);
     // Direction
-    direction.push(1, -1, 1);
-    direction.push(-1, 1, -1);
-    direction.push(1, -1, 1);
-    direction.push(-1, 1, -1);
-    direction.push(1, -1, 1);
-    direction.push(-1, 1, -1);
+    if (mode === "horizontal") {
+      direction.push(0, -1, 0);
+      direction.push(0, 1, 0);
+      direction.push(0, -1, 0);
+      direction.push(0, 1, 0);
+      direction.push(0, -1, 0);
+      direction.push(0, 1, 0);
+    } else if (mode === "vertical") {
+      direction.push(-1, 0, 0);
+      direction.push(1, 0, 0);
+      direction.push(-1, 0, 0);
+      direction.push(1, 0, 0);
+      direction.push(-1, 0, 0);
+      direction.push(1, 0, 0);
+    }
   });
 
   // Upload buffers to GLSL

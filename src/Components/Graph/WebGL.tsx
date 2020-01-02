@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { resizeGlCanvas } from "../../WebGL/canvasUtils";
 import { getParentDimensions } from "./Utils/domUtils";
 import { getRenderMethod } from "./WebGLRenderMethod";
+import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "./PeriodAverage/constants";
 
 export const WebGL = (props: {
   averagePrice: number;
@@ -13,7 +14,7 @@ export const WebGL = (props: {
 }) => {
   const canvasElementRef = useRef<HTMLCanvasElement>();
 
-  const margin: [number, number] = [150, 150];
+  const margin: [number, number] = [GRAPH_MARGIN_X, GRAPH_MARGIN_Y];
 
   useEffect(() => {
     const canvasElement = canvasElementRef && canvasElementRef.current;
