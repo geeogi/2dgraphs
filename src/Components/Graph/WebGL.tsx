@@ -5,7 +5,7 @@ import { getDrawPathMethod } from "../../WebGL/drawPath";
 import { getParentDimensions } from "./Utils/domUtils";
 import { dateToUnix, getDateLabels, getPriceLabels } from "./Utils/labelUtils";
 import { getScaleMethod } from "./Utils/numberUtils";
-import { getDrawHorizontalLineMethod } from "../../WebGL/drawLine";
+import { getDrawHorizontalLineMethod } from "../../WebGL/drawLines";
 
 export const WebGL = (props: {
   averagePrice: number;
@@ -105,9 +105,9 @@ export const WebGL = (props: {
           gl.viewport(0, 0, canvasElement.width, canvasElement.height);
 
           // Draw elements
-          drawPrimaryPath(width, height);
-          drawAxesLines.forEach(method => method(width, height));
-          drawPrimaryArea();
+          drawPrimaryPath(width, height, 150, 150);
+          drawAxesLines.forEach(method => method(width, height, 150, 150));
+          drawPrimaryArea(width, height, 150, 150);
         };
 
         // Initial render

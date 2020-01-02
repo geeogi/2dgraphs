@@ -1,4 +1,4 @@
-import { initProgram, initArrayBuffer, enableAttribute } from "./setupUtils";
+import { enableAttribute, initArrayBuffer, initProgram } from "./setupUtils";
 
 export const getDrawHorizontalLineMethod = (
   gl: WebGLRenderingContext,
@@ -7,16 +7,21 @@ export const getDrawHorizontalLineMethod = (
 ) => {
   const lineVShader =
     "uniform vec2 uResolution;" +
+    "uniform float uMarginX;" +
+    "uniform float uMarginY;" +
     "attribute vec3 aVertex;" +
     "attribute vec2 aDirection;" +
     "void main(void) {" +
     " float aspect = uResolution.y / uResolution.x;" +
     " gl_Position = vec4(aVertex, 1.0);" +
     " gl_Position.y = gl_Position.y + (aDirection.y * 2.0) / uResolution.y;" +
-    // Apply y margin
-    " float marginY = 0.12;" +
+    " float marginX = uMarginX / uResolution.x;" +
+    " float marginY = uMarginY / uResolution.y;" +
+    " float xPercentage = (gl_Position.x + 1.0) / 2.0;" +
     " float yPercentage = (gl_Position.y + 1.0) / 2.0;" +
+    " float availableX = 2.0 - (2.0 * marginX);" +
     " float availableY = 2.0 - (2.0 * marginY);" +
+    " gl_Position.x = marginX + xPercentage * availableX - 1.0;" +
     " gl_Position.y = marginY + yPercentage * availableY - 1.0;" +
     "}";
 
@@ -42,7 +47,12 @@ export const getDrawHorizontalLineMethod = (
   const lineVertices_buffer = initArrayBuffer(gl, lineVertices);
   const direction_buffer = initArrayBuffer(gl, direction);
 
-  return (width: number, height: number) => {
+  return (
+    width: number,
+    height: number,
+    marginX: number = 0,
+    marginY: number = 0
+  ) => {
     // Use the combined shader program object
     gl.useProgram(lineProgram);
 
@@ -51,8 +61,16 @@ export const getDrawHorizontalLineMethod = (
     enableAttribute(gl, lineProgram, direction_buffer, "aDirection");
 
     // Set screen resolution
-    const uniformLocation = gl.getUniformLocation(lineProgram, "uResolution");
-    gl.uniform2fv(uniformLocation, [width, height]);
+    const resolutionParam = gl.getUniformLocation(lineProgram, "uResolution");
+    gl.uniform2fv(resolutionParam, [width, height]);
+
+    // Set marginX
+    const marginXParam = gl.getUniformLocation(lineProgram, "uMarginX");
+    gl.uniform1f(marginXParam, marginX);
+
+    // Set marginY
+    const marginYParam = gl.getUniformLocation(lineProgram, "uMarginY");
+    gl.uniform1f(marginYParam, marginY);
 
     // Draw the line
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, linePoints.length * 2);
