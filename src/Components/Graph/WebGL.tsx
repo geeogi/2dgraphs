@@ -27,21 +27,21 @@ export const WebGL = (props: {
 
         // Initial render
         const { width, height } = getParentDimensions(canvasElement);
-        resizeGlCanvas(gl, width, height);
+        resizeGlCanvas(canvasElement, width, height);
         renderMethod([width, height], margin);
 
         // Resize handler
-        const onResize = () => {
+        const onResizeGL = () => {
           const { width, height } = getParentDimensions(canvasElement);
-          resizeGlCanvas(gl, width, height);
+          resizeGlCanvas(canvasElement, width, height);
           renderMethod([width, height], margin);
         };
 
         // Attach event listener to render on resize
-        window.addEventListener("resize", onResize);
+        window.addEventListener("resize", onResizeGL);
 
         // Remove event listener on cleanup
-        return () => window.removeEventListener("resize", onResize);
+        return () => window.removeEventListener("resize", onResizeGL);
       }
     }
   });

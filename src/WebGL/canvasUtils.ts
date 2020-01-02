@@ -1,16 +1,11 @@
 export const resizeGlCanvas = (
-  gl: WebGLRenderingContext,
+  canvasElement: HTMLCanvasElement,
   width: number,
   height: number
 ) => {
-  const canvas: HTMLCanvasElement = gl.canvas as any;
-  const desiredCSSWidth = width;
-  const desiredCSSHeight = height;
-  const devicePixelRatio = window.devicePixelRatio;
-
-  canvas.width = desiredCSSWidth * devicePixelRatio;
-  canvas.height = desiredCSSHeight * devicePixelRatio;
-
-  canvas.style.width = desiredCSSWidth + "px";
-  canvas.style.height = desiredCSSHeight + "px";
+  const canvasResolutionScale = 4;
+  canvasElement.style.width = width + "px";
+  canvasElement.style.height = height + "px";
+  canvasElement.width = width * canvasResolutionScale;
+  canvasElement.height = height * canvasResolutionScale;
 };

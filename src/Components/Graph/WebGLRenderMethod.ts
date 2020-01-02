@@ -6,7 +6,6 @@ import { getScaleMethod } from "./Utils/numberUtils";
 
 export const getRenderMethod = (
   props: {
-    averagePrice: number;
     earliestDate: string;
     latestDate: string;
     maxPrice: number;
@@ -16,18 +15,11 @@ export const getRenderMethod = (
   gl: WebGLRenderingContext,
   canvasElement: HTMLCanvasElement
 ) => {
-  const {
-    averagePrice,
-    earliestDate,
-    latestDate,
-    maxPrice,
-    minPrice,
-    values
-  } = props;
+  const { earliestDate, latestDate, maxPrice, minPrice, values } = props;
 
   // Get x-axis labels
   const xConfig = getDateLabels(earliestDate, latestDate, 4);
-  const { dateLabels: xLabels, displayFormat: xDisplayFormat } = xConfig;
+  const { dateLabels: xLabels } = xConfig;
 
   // Get y-axis labels
   const yConfig = getPriceLabels(minPrice, maxPrice, 4);
@@ -55,12 +47,13 @@ export const getRenderMethod = (
     areaPoints.push({ x, y: -1 });
   });
 
-  // Define axis coordinates
+  // Define y-axis coordinates
   const yAxis = yLabels.map(price => [
     { x: -1, y: scalePriceY(price) },
     { x: 1, y: scalePriceY(price) }
   ]);
 
+  // Define x-axis coordinates
   const xAxis = xLabels.map(unix => [
     { x: scaleUnixX(unix / 1000), y: -1.1 },
     { x: scaleUnixX(unix / 1000), y: -1 }
