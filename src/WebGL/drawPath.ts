@@ -7,19 +7,22 @@ export const getDrawPathMethod = (
 ) => {
   const lineVShader =
     "uniform vec2 uResolution;" +
+    "uniform vec2 uMargin;" +
     "attribute vec3 aVertex;" +
     "attribute vec3 aPrev;" +
     "attribute vec3 aNext;" +
     "attribute vec2 aDirection;" +
     "void main(void) {" +
     " gl_Position = vec4(aVertex, 1.0);" +
-    " vec2 AB = normalize(normalize(gl_Position.xy - aPrev.xy) * uResolution);" +
-    " vec2 BC = normalize(normalize(aNext.xy - gl_Position.xy) * uResolution);" +
+    " vec2 uScreen = uResolution * uMargin;" +
+    " vec2 AB = normalize(normalize(gl_Position.xy - aPrev.xy) * uScreen);" +
+    " vec2 BC = normalize(normalize(aNext.xy - gl_Position.xy) * uScreen);" +
     " vec2 tangent = normalize(AB + BC);" +
     " vec2 miter = vec2(-tangent.y, tangent.x);" +
     " vec2 normalA = vec2(-AB.y, AB.x);" +
     " float miterLength = 1.0 / dot(miter, normalA);" +
-    " gl_Position.xy = gl_Position.xy + (aDirection.x * miter * miterLength * 2.0) / uResolution.xy;" +
+    " gl_Position.xy = gl_Position.xy + (aDirection.x * miter * miterLength * 2.0) / uScreen.xy;" +
+    " gl_Position.xy = gl_Position.xy * uMargin;" +
     "}";
 
   const lineFShader = `void main(void) { gl_FragColor = vec4${rgba}; }`;
@@ -46,8 +49,13 @@ export const getDrawPathMethod = (
       nextVertices.push(x, y, z);
       nextVertices.push(x, y, z);
     }
-    // Direction
-    direction.push(1, -1, 1, -1, 1, -1);
+    // Miter direction
+    if (index === 0 || index === pathPoints.length - 1) {
+      // First and last points have no miter
+      direction.push(0, 0, 0, 0, 0, 0);
+    } else {
+      direction.push(1, -1, 1, -1, 1, -1);
+    }
   });
 
   nextVertices.push(0, 0, 0, 0, 0, 0);
@@ -58,7 +66,7 @@ export const getDrawPathMethod = (
   const nextVertices_buffer = initArrayBuffer(gl, nextVertices);
   const direction_buffer = initArrayBuffer(gl, direction);
 
-  return (width: number, height: number) => {
+  return (resolution: [number, number], margin: [number, number]) => {
     // Use the combined shader program object
     gl.useProgram(lineProgram);
 
@@ -68,9 +76,12 @@ export const getDrawPathMethod = (
     enableAttribute(gl, lineProgram, nextVertices_buffer, "aNext");
     enableAttribute(gl, lineProgram, direction_buffer, "aDirection");
 
-    // Set screen resolution
-    const uniformLocation = gl.getUniformLocation(lineProgram, "uResolution");
-    gl.uniform2fv(uniformLocation, [width, height]);
+    // Enable uniforms
+    const resolutionUniform = gl.getUniformLocation(lineProgram, "uResolution");
+    gl.uniform2fv(resolutionUniform, resolution);
+
+    const marginResolution = gl.getUniformLocation(lineProgram, "uMargin");
+    gl.uniform2fv(marginResolution, margin);
 
     // Draw the line
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, pathPoints.length * 2);

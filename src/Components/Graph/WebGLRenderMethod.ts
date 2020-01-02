@@ -1,18 +1,8 @@
-import { resizeGlCanvas } from "../../WebGL/canvasUtils";
 import { getDrawAreaMethod } from "../../WebGL/drawArea";
 import { getDrawHorizontalLineMethod } from "../../WebGL/drawLines";
 import { getDrawPathMethod } from "../../WebGL/drawPath";
-import { getParentDimensions } from "./Utils/domUtils";
 import { dateToUnix, getDateLabels, getPriceLabels } from "./Utils/labelUtils";
 import { getScaleMethod } from "./Utils/numberUtils";
-
-// Margin helpers
-const withMargin = (totalPx: number, marginPx: number, value: number) => {
-  const totalPercentage = (value + 1) / 2;
-  const margin = (marginPx / totalPx) * 2;
-  const available = 2 - 2 * margin;
-  return margin + totalPercentage * available - 1;
-};
 
 export const getRenderMethod = (
   props: {
@@ -52,62 +42,39 @@ export const getRenderMethod = (
   // Get y-axis scale helpers
   const scalePriceY = getScaleMethod(yLabels[0], maxPrice, -1, 1);
 
-  // Cache width, height
-  let initialWidth: number;
-  let initialHeight: number;
+  // Initialize canvas coordinates
+  const linePoints: { x: number; y: number }[] = [];
+  const areaPoints: { x: number; y: number }[] = [];
 
-  // Cache drawing methods
-  let drawPrimaryPath: (width: number, height: number) => void;
-  let drawPrimaryArea: (width: number, height: number) => void;
-  let drawAxesLines: ((width: number, height: number) => void)[];
+  // Populate coordinates
+  values.forEach(value => {
+    const x = scaleDateX(value.dateTime);
+    const y = scalePriceY(value.price);
+    linePoints.push({ x, y });
+    areaPoints.push({ x, y });
+    areaPoints.push({ x, y: -1 });
+  });
 
-  const initializeDrawingMethods = (width: number, height: number) => {
-    // Initialize canvas coordinates
-    const linePoints: { x: number; y: number }[] = [];
-    const areaPoints: { x: number; y: number }[] = [];
+  const horizontalAxes = yLabels.map(label => [
+    { x: -0.8, y: scalePriceY(label) },
+    { x: 0.8, y: scalePriceY(label) }
+  ]);
 
-    // Populate coordinates
-    values.forEach(value => {
-      const x = withMargin(width, 150, scaleDateX(value.dateTime));
-      const y = withMargin(height, 100, scalePriceY(value.price));
-      linePoints.push({ x, y });
-      areaPoints.push({ x, y });
-      areaPoints.push({ x, y: withMargin(height, 100, -1) });
-    });
+  // Define drawing methods
+  const drawPrimaryPath = getDrawPathMethod(gl, linePoints, "(0,0,1.0,1)");
+  const drawPrimaryArea = getDrawAreaMethod(gl, areaPoints);
+  const drawAxesLines = yLabels.map(label =>
+    getDrawHorizontalLineMethod(
+      gl,
+      [
+        { x: -0.8, y: scalePriceY(label) },
+        { x: 0.8, y: scalePriceY(label) }
+      ],
+      "(0,0,0,0.2)"
+    )
+  );
 
-    // Initialize drawing methods
-    drawPrimaryPath = getDrawPathMethod(gl, linePoints, "(0,0,1.0,1)");
-    drawPrimaryArea = getDrawAreaMethod(gl, areaPoints);
-    drawAxesLines = yLabels.map(label =>
-      getDrawHorizontalLineMethod(
-        gl,
-        [
-          { x: -0.8, y: scalePriceY(label) },
-          { x: 0.8, y: scalePriceY(label) }
-        ],
-        "(0,0,0,0.2)"
-      )
-    );
-  };
-  
-  initializeDrawingMethods(1000, 400);
-
-  return () => {
-    // Fetch the canvas size
-    const { width, height } = getParentDimensions(canvasElement);
-
-    // Initialize or re-initialize drawing setup if necessary
-    if (
-      !initialWidth ||
-      initialWidth !== width ||
-      !initialHeight ||
-      initialHeight !== height
-    ) {
-      resizeGlCanvas(gl, width, height);
-      initializeDrawingMethods(width, height);
-      console.log("initializing");
-    }
-
+  return (resolution: [number, number], margin: [number, number]) => {
     // Clear the canvas
     gl.clearColor(0, 0, 0, 0);
 
@@ -120,9 +87,15 @@ export const getRenderMethod = (
     // Set the view port
     gl.viewport(0, 0, canvasElement.width, canvasElement.height);
 
+    // Convert px to [-1,1] clip space
+    const normalizedMargin: [number, number] = [
+      1 - margin[0] / resolution[0],
+      1 - margin[1] / resolution[1]
+    ];
+
     // Draw the elements
-    drawPrimaryPath(width, height);
-    drawAxesLines.forEach(f => f(width, height));
-    drawPrimaryArea(width, height);
+    drawPrimaryPath(resolution, normalizedMargin);
+    drawAxesLines.forEach(f => f(resolution, normalizedMargin));
+    drawPrimaryArea(resolution, normalizedMargin);
   };
 };

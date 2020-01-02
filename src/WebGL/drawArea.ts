@@ -6,11 +6,12 @@ export const getDrawAreaMethod = (
 ) => {
   // Vertex shader source code
   var areaVShader =
-    "uniform vec2 uResolution;" +
+    "uniform vec2 uMargin;" +
     "attribute vec3 aVertex;" +
     "varying mediump float vY;" +
     "void main(void) {" +
     " gl_Position = vec4(aVertex, 1.0);" +
+    " gl_Position.xy = gl_Position.xy * uMargin;" +
     " vY = gl_Position.y;" +
     "}";
 
@@ -34,16 +35,16 @@ export const getDrawAreaMethod = (
   /*======= Storing the geometry ======*/
   var fillAreaVertices_buffer = initArrayBuffer(gl, fillAreaVertices);
 
-  return (width: number, height: number) => {
+  return (resolution: [number, number], margin: [number, number]) => {
     // Use the combined shader program object
     gl.useProgram(areaProgram);
 
     /*======= Associating shaders to buffer objects: vertex ======*/
     enableAttribute(gl, areaProgram, fillAreaVertices_buffer, "aVertex");
 
-    // Set screen resolution
-    const resolutionParam = gl.getUniformLocation(areaProgram, "uResolution");
-    gl.uniform2fv(resolutionParam, [width, height]);
+    // Enable uniforms
+    const marginResolution = gl.getUniformLocation(areaProgram, "uMargin");
+    gl.uniform2fv(marginResolution, margin);
 
     /*============ Drawing the area =============*/
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, areaPoints.length);

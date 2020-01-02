@@ -1,4 +1,6 @@
 import React, { useEffect, useRef } from "react";
+import { resizeGlCanvas } from "../../WebGL/canvasUtils";
+import { getParentDimensions } from "./Utils/domUtils";
 import { getRenderMethod } from "./WebGLRenderMethod";
 
 export const WebGL = (props: {
@@ -11,23 +13,34 @@ export const WebGL = (props: {
 }) => {
   const canvasElementRef = useRef<HTMLCanvasElement>();
 
+  const margin: [number, number] = [150, 150];
+
   useEffect(() => {
     const canvasElement = canvasElementRef && canvasElementRef.current;
     if (canvasElement) {
       const gl = canvasElement.getContext("webgl");
 
       if (gl) {
-        // Initial render
+        // Get render method
         const renderMethod = getRenderMethod(props, gl, canvasElement);
 
         // Initial render
-        renderMethod();
+        const { width, height } = getParentDimensions(canvasElement);
+        resizeGlCanvas(gl, width, height);
+        renderMethod([width, height], margin);
+
+        // Resize handler
+        const onResize = () => {
+          const { width, height } = getParentDimensions(canvasElement);
+          resizeGlCanvas(gl, width, height);
+          renderMethod([width, height], margin);
+        };
 
         // Attach event listener to render on resize
-        window.addEventListener("resize", renderMethod);
+        window.addEventListener("resize", onResize);
 
         // Remove event listener on cleanup
-        return () => window.removeEventListener("resize", renderMethod);
+        return () => window.removeEventListener("resize", onResize);
       }
     }
   });

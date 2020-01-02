@@ -7,12 +7,13 @@ export const getDrawHorizontalLineMethod = (
 ) => {
   const lineVShader =
     "uniform vec2 uResolution;" +
+    "uniform vec2 uMargin;" +
     "attribute vec3 aVertex;" +
     "attribute vec2 aDirection;" +
     "void main(void) {" +
-    " float aspect = uResolution.y / uResolution.x;" +
     " gl_Position = vec4(aVertex, 1.0);" +
     " gl_Position.y = gl_Position.y + (aDirection.y * 2.0) / uResolution.y;" +
+    " gl_Position.xy = gl_Position.xy * uMargin;" +
     "}";
 
   const lineFShader = `void main(void) { gl_FragColor = vec4${rgba}; }`;
@@ -37,7 +38,7 @@ export const getDrawHorizontalLineMethod = (
   const lineVertices_buffer = initArrayBuffer(gl, lineVertices);
   const direction_buffer = initArrayBuffer(gl, direction);
 
-  return (width: number, height: number) => {
+  return (resolution: [number, number], margin: [number, number]) => {
     // Use the combined shader program object
     gl.useProgram(lineProgram);
 
@@ -45,9 +46,12 @@ export const getDrawHorizontalLineMethod = (
     enableAttribute(gl, lineProgram, lineVertices_buffer, "aVertex");
     enableAttribute(gl, lineProgram, direction_buffer, "aDirection");
 
-    // Set screen resolution
-    const resolutionParam = gl.getUniformLocation(lineProgram, "uResolution");
-    gl.uniform2fv(resolutionParam, [width, height]);
+    // Enable uniforms
+    const resolutionUniform = gl.getUniformLocation(lineProgram, "uResolution");
+    gl.uniform2fv(resolutionUniform, resolution);
+
+    const marginResolution = gl.getUniformLocation(lineProgram, "uMargin");
+    gl.uniform2fv(marginResolution, margin);
 
     // Draw the line
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, linePoints.length * 2);
