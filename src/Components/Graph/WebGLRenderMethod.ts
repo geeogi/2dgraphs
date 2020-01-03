@@ -1,8 +1,8 @@
-import { getDrawCircleMethod } from "./../../WebGL/drawCircle";
 import { resizeGlCanvas } from "../../WebGL/canvasUtils";
 import { getDrawAreaMethod } from "../../WebGL/drawArea";
 import { getDrawLinesMethod } from "../../WebGL/drawLines";
 import { getDrawPathMethod } from "../../WebGL/drawPath";
+import { getDrawPointMethod } from "../../WebGL/drawPoint";
 
 export const getRenderMethod = (
   props: {
@@ -57,11 +57,6 @@ export const getRenderMethod = (
     { x: 0, y: -1 }
   ];
 
-  const activeXAxis = [
-    { x: 1, y: 0 },
-    { x: -1, y: 0 }
-  ];
-
   // Define primary drawing methods
   const grey = "(0.9,0.9,0.9,1)";
   const blue = "(0,0,1.0,1)";
@@ -77,7 +72,7 @@ export const getRenderMethod = (
     "(1.0,0,1.0,1.0)",
     "vertical"
   );
-  const drawActiveCircle = getDrawCircleMethod(
+  const drawActivePoint = getDrawPointMethod(
     gl,
     { x: 0, y: 0, r: 1 },
     "(0,1.0,1.0,1.0)"
@@ -124,7 +119,7 @@ export const getRenderMethod = (
       });
 
       drawYActiveAxis(resolution, scale, [x, 0]);
-      drawActiveCircle(resolution, scale, [x, y]);
+      drawActivePoint(resolution, scale, [x, y]);
     }
   };
 };

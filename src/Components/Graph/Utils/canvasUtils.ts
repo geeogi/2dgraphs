@@ -12,7 +12,7 @@ export const getRetinaMethod = (
   canvasWidth: number,
   canvasHeight: number
 ) => () => {
-  const canvasResolutionScale = 4;
+  const canvasResolutionScale = window.devicePixelRatio;
   canvasElement.style.width = canvasWidth + "px";
   canvasElement.style.height = canvasHeight + "px";
   canvasElement.width = canvasWidth * canvasResolutionScale;

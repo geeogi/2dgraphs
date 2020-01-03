@@ -1,10 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { getWebGLInteractivityHandlers } from "../../WebGL/eventUtils";
 import { CanvasGL } from "../Canvas";
+import { AbsoluteLabel, RelativeGraphContainer } from "../GraphContainer";
 import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "./PeriodAverage/constants";
 import { dateToUnix, getDateLabels, getPriceLabels } from "./Utils/labelUtils";
 import { getScaleMethod } from "./Utils/numberUtils";
 import { getRenderMethod } from "./WebGLRenderMethod";
+import moment from "moment";
 
 export const WebGL = (props: {
   averagePrice: number;
@@ -71,6 +73,25 @@ export const WebGL = (props: {
 
         // Call render method
         renderGLCanvas(resolution, activeX, activeY);
+
+        // Position labels
+        yLabels.forEach(label => {
+          const labelElement = document.getElementById(JSON.stringify(label));
+          if (labelElement) {
+            const yTopPercentage = 1 - (scalePriceY(label) + 1) / 2;
+            const yTop = yTopPercentage * (resolution[1] - margin[1]);
+            labelElement.style.top = Math.floor(yTop) + "px";
+          }
+        });
+        xLabels.forEach(label => {
+          const labelElement = document.getElementById(JSON.stringify(label));
+          if (labelElement) {
+            const xLeftPercentage = 1 - (scaleUnixX(label / 1000) + 1) / 2;
+            const xLeft = xLeftPercentage * (resolution[0] - margin[0]);
+            labelElement.style.left = Math.floor(xLeft) + "px";
+            labelElement.style.top = Math.floor(resolution[1]) + "px";
+          }
+        });
       };
 
       // Render on page load
@@ -113,5 +134,17 @@ export const WebGL = (props: {
     }
   });
 
-  return <CanvasGL ref={canvasElementRef as any} />;
+  return (
+    <RelativeGraphContainer>
+      <CanvasGL ref={canvasElementRef as any} />
+      {yLabels.map(label => (
+        <AbsoluteLabel id={JSON.stringify(label)}>${label}</AbsoluteLabel>
+      ))}
+      {xLabels.map(label => (
+        <AbsoluteLabel id={JSON.stringify(label)}>
+          {moment(label).format("MMM 'YY")}
+        </AbsoluteLabel>
+      ))}
+    </RelativeGraphContainer>
+  );
 };

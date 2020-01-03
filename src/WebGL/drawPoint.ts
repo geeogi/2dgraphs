@@ -1,6 +1,6 @@
 import { enableAttribute, initArrayBuffer, initProgram } from "./setupUtils";
 
-export const getDrawCircleMethod = (
+export const getDrawPointMethod = (
   gl: WebGLRenderingContext,
   circle: { x: number; y: number; r: number },
   rgba: string
