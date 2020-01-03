@@ -1,3 +1,4 @@
+import { getDrawCircleMethod } from "./../../WebGL/drawCircle";
 import { resizeGlCanvas } from "../../WebGL/canvasUtils";
 import { getDrawAreaMethod } from "../../WebGL/drawArea";
 import { getDrawLinesMethod } from "../../WebGL/drawLines";
@@ -61,7 +62,7 @@ export const getRenderMethod = (
     { x: -1, y: 0 }
   ];
 
-  // Define drawing methods
+  // Define primary drawing methods
   const grey = "(0.9,0.9,0.9,1)";
   const blue = "(0,0,1.0,1)";
   const drawPrimaryPath = getDrawPathMethod(gl, linePoints, blue);
@@ -69,21 +70,22 @@ export const getRenderMethod = (
   const drawYAxis = getDrawLinesMethod(gl, yAxis, grey, "horizontal");
   const drawXAxis = getDrawLinesMethod(gl, xAxis, grey, "vertical");
 
+  // Define active drawing methods
   const drawYActiveAxis = getDrawLinesMethod(
     gl,
     [activeYAxis],
-    grey,
+    "(1.0,0,1.0,1.0)",
     "vertical"
   );
-  const drawXActiveAxis = getDrawLinesMethod(
+  const drawActiveCircle = getDrawCircleMethod(
     gl,
-    [activeXAxis],
-    grey,
-    "horizontal"
+    { x: 0, y: 0, r: 1 },
+    "(0,1.0,1.0,1.0)"
   );
 
+  /* RENDER FUNCTION */
   return (resolution: [number, number], activeX?: number, activeY?: number) => {
-    // Resize canvas
+    // Resize canvas if necessary
     resizeGlCanvas(gl);
 
     // Clear the canvas
@@ -112,13 +114,17 @@ export const getRenderMethod = (
     drawPrimaryPath(resolution, scale);
 
     // Draw the active elements
-    if (activeX && activeY) {
-      // Calculate active translation
-      const xTranslation = (2 * activeX) / resolution[0] - 1;
-      const yTranslation = (2 * (resolution[1] - activeY)) / resolution[1] - 1;
+    if (activeX) {
+      // Convert px to [-1,1] clip space
+      const clipSpaceX = (2 * activeX) / resolution[0] - 1;
 
-      drawYActiveAxis(resolution, scale, [xTranslation, 0]);
-      drawXActiveAxis(resolution, scale, [0, yTranslation]);
+      // Fetch nearest point to active coordinates
+      const [{ x, y }] = linePoints.sort((a, b) => {
+        return Math.abs(a.x - clipSpaceX) - Math.abs(b.x - clipSpaceX);
+      });
+
+      drawYActiveAxis(resolution, scale, [x, 0]);
+      drawActiveCircle(resolution, scale, [x, y]);
     }
   };
 };
