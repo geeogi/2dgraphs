@@ -1,7 +1,11 @@
 import React, { useEffect, useRef } from "react";
 import { getWebGLInteractivityHandlers } from "../../WebGL/eventUtils";
 import { CanvasGL } from "../Canvas";
-import { AbsoluteLabel, RelativeGraphContainer } from "../GraphContainer";
+import {
+  AxisLabel,
+  RelativeGraphContainer,
+  ActiveLegend
+} from "../GraphContainer";
 import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "./PeriodAverage/constants";
 import { dateToUnix, getDateLabels, getPriceLabels } from "./Utils/labelUtils";
 import { getScaleMethod } from "./Utils/numberUtils";
@@ -24,7 +28,7 @@ export const WebGL = (props: {
 
   // Get x-axis labels
   const xConfig = getDateLabels(earliestDate, latestDate, 4);
-  const { dateLabels: xLabels } = xConfig;
+  const { dateLabels: xLabels, displayFormat } = xConfig;
 
   // Get y-axis labels
   const yConfig = getPriceLabels(minPrice, maxPrice, 4);
@@ -44,17 +48,43 @@ export const WebGL = (props: {
     const gl = canvasElement && canvasElement.getContext("webgl");
 
     if (canvasElement && gl) {
-      // Initialize render method
-      const renderProps = {
-        scaleDateX,
-        scaleUnixX,
-        scalePriceY,
-        xLabels,
-        yLabels,
-        values
+      // Position labels
+      const positionLabels = () => {
+        const resolution: [number, number] = [
+          canvasElement.offsetWidth,
+          canvasElement.offsetHeight
+        ];
+
+        yLabels.forEach(label => {
+          const labelElement = document.getElementById(JSON.stringify(label));
+          if (labelElement) {
+            const yTopPercentage = 1 - (scalePriceY(label) + 1) / 2;
+            const yTop = yTopPercentage * (resolution[1] - margin[1]);
+            labelElement.style.top = Math.floor(yTop) + "px";
+          }
+        });
+
+        xLabels.forEach(label => {
+          const labelElement = document.getElementById(JSON.stringify(label));
+          if (labelElement) {
+            const xLeftPercentage = (scaleUnixX(label / 1000) + 1) / 2;
+            const xLeft = xLeftPercentage * (resolution[0] - margin[0]);
+            labelElement.style.left = Math.floor(xLeft) + "px";
+            labelElement.style.top = Math.floor(resolution[1]) + "px";
+          }
+        });
       };
+
+      // Initialize GL render method
       const renderGLCanvas = getRenderMethod(
-        renderProps,
+        {
+          scaleDateX,
+          scaleUnixX,
+          scalePriceY,
+          xLabels,
+          yLabels,
+          values
+        },
         gl,
         canvasElement,
         margin
@@ -74,31 +104,18 @@ export const WebGL = (props: {
         // Call render method
         renderGLCanvas(resolution, activeX, activeY);
 
-        // Position labels
-        yLabels.forEach(label => {
-          const labelElement = document.getElementById(JSON.stringify(label));
-          if (labelElement) {
-            const yTopPercentage = 1 - (scalePriceY(label) + 1) / 2;
-            const yTop = yTopPercentage * (resolution[1] - margin[1]);
-            labelElement.style.top = Math.floor(yTop) + "px";
-          }
-        });
-        xLabels.forEach(label => {
-          const labelElement = document.getElementById(JSON.stringify(label));
-          if (labelElement) {
-            const xLeftPercentage = 1 - (scaleUnixX(label / 1000) + 1) / 2;
-            const xLeft = xLeftPercentage * (resolution[0] - margin[0]);
-            labelElement.style.left = Math.floor(xLeft) + "px";
-            labelElement.style.top = Math.floor(resolution[1]) + "px";
-          }
-        });
+        // Position active legend
+        const activeLegendElement = document.getElementById("active-legend");
+        if (activeLegendElement && activeX) {
+          activeLegendElement.style.left = Math.floor(activeX) + "px";
+        }
       };
 
-      // Render on page load
-      doRender();
-
       // Define resize handler
-      const onResize = () => doRender();
+      const onResize = () => {
+        doRender();
+        positionLabels(); // Labels will need repositioning on resize
+      };
 
       // Attach event listener to render on resize event
       window.addEventListener("resize", onResize);
@@ -121,6 +138,10 @@ export const WebGL = (props: {
       canvasElement.addEventListener("touchmove", handleTouchMove);
       canvasElement.addEventListener("touchstart", handleTouchStart);
 
+      // Render and position labels on page load
+      doRender();
+      positionLabels();
+
       // Remove event listeners on cleanup
       return () => {
         window.removeEventListener("resize", onResize);
@@ -138,13 +159,14 @@ export const WebGL = (props: {
     <RelativeGraphContainer>
       <CanvasGL ref={canvasElementRef as any} />
       {yLabels.map(label => (
-        <AbsoluteLabel id={JSON.stringify(label)}>${label}</AbsoluteLabel>
+        <AxisLabel id={JSON.stringify(label)}>${label}</AxisLabel>
       ))}
       {xLabels.map(label => (
-        <AbsoluteLabel id={JSON.stringify(label)}>
-          {moment(label).format("MMM 'YY")}
-        </AbsoluteLabel>
+        <AxisLabel id={JSON.stringify(label)}>
+          {moment(label).format(displayFormat)}
+        </AxisLabel>
       ))}
+      <ActiveLegend id="active-legend">$7,134 – 4th Jan 20</ActiveLegend>
     </RelativeGraphContainer>
   );
 };
