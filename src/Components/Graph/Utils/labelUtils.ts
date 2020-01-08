@@ -85,7 +85,6 @@ export const getDateLabels = (
 
   // 1 week intervals
   if (dateLabels.length < minNumberOfLabels) {
-    displayFormat = "Do MMM";
     dateLabels = tryLabels("week", 1);
   }
 

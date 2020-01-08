@@ -78,7 +78,7 @@ export const getRenderMethod = (
     "(0,1.0,1.0,1.0)"
   );
 
-  /* RENDER FUNCTION */
+  /* WEBGL RENDER FUNCTION */
   return (resolution: [number, number], activeX?: number, activeY?: number) => {
     // Resize canvas if necessary
     resizeGlCanvas(gl);
@@ -92,9 +92,6 @@ export const getRenderMethod = (
 
     // Clear the color and depth buffer
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    // Set the view port
-    gl.viewport(0, 0, canvasElement.width, canvasElement.height);
 
     // Convert px margin to [-1,1] clip space scale
     const scale: [number, number] = [
@@ -118,6 +115,7 @@ export const getRenderMethod = (
         return Math.abs(a.x - clipSpaceX) - Math.abs(b.x - clipSpaceX);
       });
 
+      // Draw the active elements
       drawYActiveAxis(resolution, scale, [x, 0]);
       drawActivePoint(resolution, scale, [x, y]);
     }

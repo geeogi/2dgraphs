@@ -23,12 +23,18 @@ export const AxisLabel = styled.label`
   font-size: 12px;
 `;
 
-export const ActiveLegend = styled.div`
+interface ActiveLegendProps {
+  width: number;
+}
+
+export const ActiveLegend = styled.div<ActiveLegendProps>`
+  width: ${props => `${props.width}px`};
   background: ${CONTRAST_COLOR};
   color: ${BACKGROUND_COLOR};
   position: absolute;
   top: 0;
   left: 0;
   padding: 4px 8px;
-  border-radius: 8px;
+  font-size: 14px;
+  text-align: center;
 `;

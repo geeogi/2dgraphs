@@ -12,5 +12,8 @@ export const resizeGlCanvas = (gl: any) => {
     // Make the canvas the same size
     gl.canvas.width = displayWidth;
     gl.canvas.height = displayHeight;
+
+    // Set the GL view port
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   }
 };
