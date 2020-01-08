@@ -77,7 +77,7 @@ export const WebGL = (props: {
       if (labelElement) {
         const xLeftPercentage = (scaleUnixX(label / 1000) + 1) / 2;
         const xLeft = xLeftPercentage * (resolution[0] - margin[0]);
-        labelElement.style.left = Math.floor(xLeft) + "px";
+        labelElement.style.left = Math.floor(xLeft - 24) + "px";
         labelElement.style.top = Math.floor(resolution[1]) + "px";
       }
     });

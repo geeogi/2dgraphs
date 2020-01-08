@@ -14,7 +14,7 @@ export const getDrawLinesMethod = (
     "attribute vec2 aDirection;" +
     "void main(void) {" +
     " gl_Position = vec4(aVertex, 1.0);" +
-    " gl_Position.xy = gl_Position.xy + (aDirection.xy * 2.0) / uResolution.xy;" +
+    " gl_Position.xy = gl_Position.xy + (aDirection.xy * 1.0) / uResolution.xy;" +
     " gl_Position.xy = gl_Position.xy + uTranslation;" +
     " gl_Position.xy = gl_Position.xy * uScale;" +
     "}";

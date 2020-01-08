@@ -21,7 +21,7 @@ export const getDrawPathMethod = (
     " vec2 miter = vec2(-tangent.y, tangent.x);" +
     " vec2 normalA = vec2(-AB.y, AB.x);" +
     " float miterLength = min(1.0 / dot(miter, normalA), 5.0);" +
-    " gl_Position.xy = gl_Position.xy + (aDirection.x * miter * miterLength * 2.0) / uScreen.xy;" +
+    " gl_Position.xy = gl_Position.xy + (aDirection.x * miter * miterLength * 1.0) / uScreen.xy;" +
     " gl_Position.xy = gl_Position.xy * uMargin;" +
     "}";
 
