@@ -1,12 +1,12 @@
 import moment from "moment";
 import {
   BACKGROUND_COLOR,
-  BORDER_COLOR,
   DARK_BACKGROUND_COLOR,
   DARK_BORDER_COLOR,
   DARK_CONTRAST_COLOR,
   PRIMARY_BASE,
-  PRIMARY_COLOR
+  PRIMARY_COLOR,
+  SECONDARY_COLOR
 } from "../../../Config/colors";
 import {
   ACTIVE_LEGEND,
@@ -142,9 +142,8 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
           { canvasX, canvasY: toCanvasY(graphDepth) },
           { canvasX, canvasY: toCanvasY(0) }
         ],
-        BORDER_COLOR,
-        2,
-        [5, 5]
+        SECONDARY_COLOR,
+        1
       );
 
       // Draw active legend body
@@ -185,7 +184,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
       context.textAlign = "center";
       const priceLabel = Math.round(value.price);
       const dateLabel = moment(value.dateTime).format("DD MMM YY");
-      const label = `$${priceLabel}    ${dateLabel}`;
+      const label = `$${priceLabel} – ${dateLabel}`;
       context.fillText(label, anchorX, anchorY + legendBottomY - SPACING_UNIT);
     }
   };

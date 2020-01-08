@@ -34,7 +34,7 @@ export const ActiveLegend = styled.div<ActiveLegendProps>`
   position: absolute;
   top: 0;
   left: 0;
-  padding: 4px 8px;
-  font-size: 14px;
+  padding: 4px 0px;
+  font-size: 12px;
   text-align: center;
 `;

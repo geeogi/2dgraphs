@@ -1,3 +1,8 @@
+import {
+  BORDER_COLOR_GL,
+  PRIMARY_COLOR_GL,
+  SECONDARY_COLOR_GL
+} from "../../../Config/colors";
 import { resizeGlCanvas } from "./WebGLUtils/canvasUtils";
 import { getDrawAreaMethod } from "./WebGLUtils/drawArea";
 import { getDrawLinesMethod } from "./WebGLUtils/drawLines";
@@ -57,24 +62,27 @@ export const getRenderMethod = (
   ];
 
   // Define primary drawing methods
-  const grey = "(0.9,0.9,0.9,1)";
-  const blue = "(0,0,1.0,1)";
-  const drawPrimaryPath = getDrawPathMethod(gl, linePoints, blue);
-  const drawPrimaryArea = getDrawAreaMethod(gl, areaPoints, blue);
-  const drawYAxis = getDrawLinesMethod(gl, yAxis, grey, "horizontal");
-  const drawXAxis = getDrawLinesMethod(gl, xAxis, grey, "vertical");
+  const drawPrimaryPath = getDrawPathMethod(gl, linePoints, PRIMARY_COLOR_GL);
+  const drawPrimaryArea = getDrawAreaMethod(gl, areaPoints, PRIMARY_COLOR_GL);
+  const drawYAxis = getDrawLinesMethod(
+    gl,
+    yAxis,
+    BORDER_COLOR_GL,
+    "horizontal"
+  );
+  const drawXAxis = getDrawLinesMethod(gl, xAxis, BORDER_COLOR_GL, "vertical");
 
   // Define active drawing methods
   const drawYActiveAxis = getDrawLinesMethod(
     gl,
     [activeYAxis],
-    "(1.0,0,1.0,1.0)",
+    SECONDARY_COLOR_GL,
     "vertical"
   );
   const drawActivePoint = getDrawPointMethod(
     gl,
     { x: 0, y: 0, r: 1 },
-    "(0,1.0,1.0,1.0)"
+    PRIMARY_COLOR_GL
   );
 
   /* WEBGL RENDER FUNCTION */

@@ -6,13 +6,13 @@ import {
   AxisLabel,
   RelativeGraphContainer
 } from "../../GraphContainer";
-import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "../constants";
+import { ACTIVE_LEGEND, GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "../constants";
 import { dateToUnix, getDateLabels, getPriceLabels } from "../labelUtils";
 import { clamp, getScaleMethod } from "../numberUtils";
 import { getRenderMethod } from "./WebGLRenderMethod";
 import { getWebGLInteractivityHandlers } from "./WebGLUtils/eventUtils";
 
-const ACTIVE_LEGEND_WIDTH = 160;
+const ACTIVE_LEGEND_WIDTH = ACTIVE_LEGEND.WIDTH;
 const ACTIVE_LEGEND_ID = "active-legend";
 
 export const WebGL = (props: {
@@ -139,7 +139,7 @@ export const WebGL = (props: {
 
             // Format display variables
             const displayPrice = Math.round(price);
-            const displayDate = moment(dateTime).format("Do MMM YY");
+            const displayDate = moment(dateTime).format("DD MMM YY");
 
             // Update DOM element
             activeLegendElement.style.left = clippedX + "px";
