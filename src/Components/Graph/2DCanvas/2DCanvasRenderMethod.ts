@@ -6,22 +6,25 @@ import {
   DARK_BORDER_COLOR,
   DARK_CONTRAST_COLOR,
   PRIMARY_BASE,
-  PRIMARY_COLOR,
-  SECONDARY_BASE
+  PRIMARY_COLOR
 } from "../../../Config/colors";
-import { ACTIVE_LEGEND, SPACING_UNIT } from "../constants";
+import {
+  ACTIVE_LEGEND,
+  GRAPH_MARGIN_X,
+  GRAPH_MARGIN_Y,
+  LABEL_MARGIN_X,
+  SPACING_UNIT
+} from "../constants";
+import { dateToUnix, getDateLabels, getPriceLabels } from "../labelUtils";
+import { clamp, getScaleMethod } from "../numberUtils";
+import { drawXAxes, drawYAxes } from "./2DCanvasUtils/axesUtils";
 import { getRetinaMethod } from "./2DCanvasUtils/canvasUtils";
 import { getParentDimensions } from "./2DCanvasUtils/domUtils";
 import {
-  clipPath,
   drawLine,
   fillPath,
   getGradientMethod
 } from "./2DCanvasUtils/drawUtils";
-import { dateToUnix, getDateLabels, getPriceLabels } from "../labelUtils";
-import { clamp, getScaleMethod } from "../numberUtils";
-import { drawXAxes, drawYAxes } from "./2DCanvasUtils/axesUtils";
-import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y, LABEL_MARGIN_X } from "../constants";
 
 interface Props {
   averagePrice: number;
@@ -33,14 +36,7 @@ interface Props {
 }
 
 export const getPeriodAverageRenderMethod = (props: Props) => {
-  const {
-    averagePrice,
-    earliestDate,
-    latestDate,
-    maxPrice,
-    minPrice,
-    values
-  } = props;
+  const { earliestDate, latestDate, maxPrice, minPrice, values } = props;
 
   // Get x-axis labels
   const xConfig = getDateLabels(earliestDate, latestDate, 4);
@@ -57,12 +53,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
     isClicked?: boolean;
   }) {
     // Extract render variables
-    const {
-      canvasElement,
-      activeX,
-      activeY,
-      isClicked
-    } = renderVariables as any;
+    const { canvasElement, activeX, activeY } = renderVariables as any;
 
     // Fetch the desired canvas height and width
     const { height, width } = getParentDimensions(canvasElement);
@@ -90,15 +81,6 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
 
     // Get y-axis scale helpers
     const scalePriceY = getScaleMethod(yLabels[0], maxPrice, 0, graphDepth);
-
-    // Calculate average price y-coordinate
-    const averagePriceCanvasY = toCanvasY(scalePriceY(averagePrice));
-
-    // Determine baseline price y-coordinate
-    const minCanvasY = GRAPH_MARGIN_Y + 2 * SPACING_UNIT;
-    const maxCanvasY = GRAPH_MARGIN_Y + graphDepth - 2 * SPACING_UNIT;
-    const rawY = activeY && isClicked ? activeY : averagePriceCanvasY;
-    const baselineYCanvasY = clamp(rawY, minCanvasY, maxCanvasY);
 
     // Calculate primary line points (price vs. date)
     const points = values.map(value => {
@@ -140,33 +122,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
           canvasY: toCanvasY(0)
         }
       ],
-      getGradient(PRIMARY_BASE(0.4), PRIMARY_BASE(0)),
-      () => clipPath(context, points, width, baselineYCanvasY)
-    );
-
-    // Draw secondary block
-    fillPath(
-      context,
-      [
-        { canvasX: toCanvasX(0), canvasY: toCanvasY(graphDepth) },
-        ...points,
-        {
-          canvasX: toCanvasX(graphWidth),
-          canvasY: toCanvasY(graphDepth)
-        }
-      ],
-      getGradient(SECONDARY_BASE(0.4), SECONDARY_BASE(0)),
-      () => clipPath(context, points, width, baselineYCanvasY)
-    );
-
-    // Draw baseline line
-    drawLine(
-      context,
-      [
-        { canvasX: toCanvasX(0), canvasY: baselineYCanvasY },
-        { canvasX: toCanvasX(graphWidth), canvasY: baselineYCanvasY }
-      ],
-      PRIMARY_COLOR
+      getGradient(PRIMARY_BASE(0.4), PRIMARY_BASE(0))
     );
 
     // Draw primary line

@@ -46,8 +46,8 @@ export const drawYAxes = (
   labels.forEach(price => {
     const labelX = LABEL_MARGIN_X - 1.5 * SPACING_UNIT;
     const labelY = toCanvasX(price);
-    context.fillText(format(price), labelX, labelY + 3);
-    context.moveTo(LABEL_MARGIN_X, labelY);
+    context.fillText(format(price), labelX, labelY - SPACING_UNIT);
+    context.moveTo(0, labelY);
     context.lineTo(graphWidth, labelY);
   });
 
