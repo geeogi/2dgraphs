@@ -6,7 +6,12 @@ import {
   AxisLabel,
   RelativeGraphContainer
 } from "../../GraphContainer";
-import { ACTIVE_LEGEND, GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "../constants";
+import {
+  ACTIVE_LEGEND,
+  GRAPH_MARGIN_X,
+  GRAPH_MARGIN_Y,
+  SPACING_UNIT
+} from "../constants";
 import { dateToUnix, getDateLabels, getPriceLabels } from "../labelUtils";
 import { clamp, getScaleMethod } from "../numberUtils";
 import { getRenderMethod } from "./WebGLRenderMethod";
@@ -66,8 +71,9 @@ export const WebGL = (props: {
       const labelElement = document.getElementById(JSON.stringify(label));
       if (labelElement) {
         const yTopPercentage = 1 - (scalePriceY(label) + 1) / 2;
-        const yTop = yTopPercentage * (resolution[1] - margin[1]);
-        labelElement.style.top = Math.floor(yTop) + "px";
+        const yTop = yTopPercentage * (resolution[1] - 2 * margin[1]);
+        labelElement.style.top = Math.floor(margin[1] + yTop - 18) + "px";
+        labelElement.style.left = Math.floor(margin[0]) + "px";
       }
     });
 
@@ -76,9 +82,9 @@ export const WebGL = (props: {
       const labelElement = document.getElementById(JSON.stringify(label));
       if (labelElement) {
         const xLeftPercentage = (scaleUnixX(label / 1000) + 1) / 2;
-        const xLeft = xLeftPercentage * (resolution[0] - margin[0]);
-        labelElement.style.left = Math.floor(xLeft - 24) + "px";
-        labelElement.style.top = Math.floor(resolution[1]) + "px";
+        const xLeft = xLeftPercentage * (resolution[0] - 2 * margin[0]);
+        labelElement.style.left = Math.floor(xLeft - 12) + "px";
+        labelElement.style.top = Math.floor(resolution[1] - 20) + "px";
       }
     });
   };
@@ -124,7 +130,7 @@ export const WebGL = (props: {
             const clipSpaceX = (2 * activeX) / resolution[0] - 1;
 
             // Fetch nearest point to activeX
-            const [{ x, dateTime, price }] = points.sort((a, b) => {
+            const [{ x, y, dateTime, price }] = points.sort((a, b) => {
               return Math.abs(a.x - clipSpaceX) - Math.abs(b.x - clipSpaceX);
             });
 
@@ -137,12 +143,18 @@ export const WebGL = (props: {
               resolution[0] - ACTIVE_LEGEND_WIDTH
             );
 
+            // Scale y from [-1,1] clip space to screen resolution
+            const screenY = ((y + 1) / 2) * (resolution[1] - 2 * margin[1]);
+            const legendY = resolution[1] - (margin[1] + 2 * SPACING_UNIT);
+            const clippedY = legendY > screenY ? legendY : screenY;
+
             // Format display variables
             const displayPrice = Math.round(price);
             const displayDate = moment(dateTime).format("DD MMM YY");
 
             // Update DOM element
             activeLegendElement.style.left = clippedX + "px";
+            activeLegendElement.style.top = resolution[1] - clippedY + "px";
             activeLegendElement.textContent = `$${displayPrice} – ${displayDate}`;
             activeLegendElement.style.display = "block";
           } else {

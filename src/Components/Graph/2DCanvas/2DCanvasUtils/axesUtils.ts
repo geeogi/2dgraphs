@@ -2,7 +2,8 @@ import { BORDER_COLOR } from "../../../../Config/colors";
 import {
   GRAPH_MARGIN_Y,
   LABEL_MARGIN_X,
-  SPACING_UNIT
+  SPACING_UNIT,
+  GRAPH_MARGIN_X
 } from "../../constants";
 
 export const drawXAxes = (
@@ -38,16 +39,16 @@ export const drawYAxes = (
   format: (...args: any) => string,
   graphWidth: number
 ) => {
-  context.textAlign = "end";
+  context.textAlign = "start";
   context.font = "12px Arial";
   context.strokeStyle = BORDER_COLOR;
   context.beginPath();
 
   labels.forEach(price => {
-    const labelX = LABEL_MARGIN_X - 1.5 * SPACING_UNIT;
+    const labelX = LABEL_MARGIN_X;
     const labelY = toCanvasX(price);
     context.fillText(format(price), labelX, labelY - SPACING_UNIT);
-    context.moveTo(0, labelY);
+    context.moveTo(GRAPH_MARGIN_X, labelY);
     context.lineTo(graphWidth, labelY);
   });
 

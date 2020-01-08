@@ -51,7 +51,7 @@ export const getRenderMethod = (
 
   // Define x-axis coordinates
   const xAxis = xLabels.map(unix => [
-    { x: scaleUnixX(unix / 1000), y: -1.1 },
+    { x: scaleUnixX(unix / 1000), y: -1.05 },
     { x: scaleUnixX(unix / 1000), y: -1 }
   ]);
 
@@ -102,8 +102,8 @@ export const getRenderMethod = (
 
     // Convert px margin to [-1,1] clip space scale
     const scale: [number, number] = [
-      1 - margin[0] / resolution[0],
-      1 - margin[1] / resolution[1]
+      1 - (2 * margin[0]) / resolution[0],
+      1 - (2 * margin[1]) / resolution[1]
     ];
 
     // Draw the elements

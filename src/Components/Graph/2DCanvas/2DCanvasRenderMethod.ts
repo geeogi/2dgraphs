@@ -155,7 +155,11 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
       const legendBottomY = toCanvasY(graphDepth - 5 * SPACING_UNIT);
 
       const anchorY = canvasY < legendBottomY ? canvasY - SPACING_UNIT : 0;
-      const anchorX = clamp(canvasX, LABEL_MARGIN_X, width - LABEL_MARGIN_X);
+      const anchorX = clamp(
+        canvasX,
+        ACTIVE_LEGEND.WIDTH / 2,
+        width - ACTIVE_LEGEND.WIDTH / 2
+      );
 
       context.moveTo(anchorX - ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
       context.lineTo(anchorX - ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
