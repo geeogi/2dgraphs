@@ -1,16 +1,16 @@
 import moment from "moment";
 import React, { useEffect, useRef } from "react";
-import { getWebGLInteractivityHandlers } from "../../WebGL/eventUtils";
-import { CanvasGL } from "../Canvas";
+import { CanvasGL } from "../../Canvas";
 import {
   ActiveLegend,
   AxisLabel,
   RelativeGraphContainer
-} from "../GraphContainer";
-import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "./PeriodAverage/constants";
-import { dateToUnix, getDateLabels, getPriceLabels } from "./Utils/labelUtils";
-import { getScaleMethod, clamp } from "./Utils/numberUtils";
+} from "../../GraphContainer";
+import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "../constants";
+import { dateToUnix, getDateLabels, getPriceLabels } from "../labelUtils";
+import { clamp, getScaleMethod } from "../numberUtils";
 import { getRenderMethod } from "./WebGLRenderMethod";
+import { getWebGLInteractivityHandlers } from "./WebGLUtils/eventUtils";
 
 const ACTIVE_LEGEND_WIDTH = 160;
 const ACTIVE_LEGEND_ID = "active-legend";
@@ -99,7 +99,6 @@ export const WebGL = (props: {
           values
         },
         gl,
-        canvasElement,
         margin
       );
 

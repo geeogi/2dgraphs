@@ -8,20 +8,20 @@ import {
   PRIMARY_BASE,
   PRIMARY_COLOR,
   SECONDARY_BASE
-} from "../../../Data/colors";
-import { ACTIVE_LEGEND, SPACING_UNIT } from "../PeriodAverage/constants";
-import { getRetinaMethod } from "../Utils/canvasUtils";
-import { getParentDimensions } from "../Utils/domUtils";
+} from "../../../Config/colors";
+import { ACTIVE_LEGEND, SPACING_UNIT } from "../constants";
+import { getRetinaMethod } from "./2DCanvasUtils/canvasUtils";
+import { getParentDimensions } from "./2DCanvasUtils/domUtils";
 import {
   clipPath,
   drawLine,
   fillPath,
   getGradientMethod
-} from "../Utils/drawUtils";
-import { dateToUnix, getDateLabels, getPriceLabels } from "../Utils/labelUtils";
-import { clamp, getScaleMethod } from "../Utils/numberUtils";
-import { drawXAxes, drawYAxes } from "./../Utils/axesUtils";
-import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y, LABEL_MARGIN_X } from "./constants";
+} from "./2DCanvasUtils/drawUtils";
+import { dateToUnix, getDateLabels, getPriceLabels } from "../labelUtils";
+import { clamp, getScaleMethod } from "../numberUtils";
+import { drawXAxes, drawYAxes } from "./2DCanvasUtils/axesUtils";
+import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y, LABEL_MARGIN_X } from "../constants";
 
 interface Props {
   averagePrice: number;

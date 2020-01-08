@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { BACKGROUND_COLOR, BORDER_COLOR, CONTRAST_COLOR } from "../Data/colors";
+import { BACKGROUND_COLOR, BORDER_COLOR, CONTRAST_COLOR } from "../Config/colors";
 
 export const Button = styled.button`
   display: inline-block;

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { CONTRAST_COLOR } from "../Data/colors";
+import { CONTRAST_COLOR } from "../Config/colors";
 
 export const P = styled.p`
   color: ${CONTRAST_COLOR};

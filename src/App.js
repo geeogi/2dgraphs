@@ -1,7 +1,7 @@
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { Button } from "./Components/Button";
-import { PeriodAverage } from "./Components/Graph/PeriodAverage";
+import { PeriodAverage } from "./Components/Graph/2DCanvas";
 import { Graph, GraphContainer } from "./Components/GraphContainer";
 import { H1, H4 } from "./Components/H";
 import { Header } from "./Components/Header";

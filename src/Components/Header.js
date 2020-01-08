@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import { BORDER_COLOR } from "../Data/colors";
-import { MOBILE_SCREEN_WIDTH } from "../Data/constants";
+import { BORDER_COLOR } from "../Config/colors";
+import { MOBILE_SCREEN_WIDTH } from "../Config/constants";
 
 export const Header = styled.div`
   padding: 16px 32px;

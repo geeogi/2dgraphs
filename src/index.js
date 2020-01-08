@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { createGlobalStyle } from "styled-components";
 import App from "./App";
-import { BACKGROUND_COLOR } from "./Data/colors";
+import { BACKGROUND_COLOR } from "./Config/colors";
 
 const GlobalStyle = createGlobalStyle`
  body {

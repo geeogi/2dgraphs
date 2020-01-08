@@ -1,8 +1,8 @@
-import { resizeGlCanvas } from "../../WebGL/canvasUtils";
-import { getDrawAreaMethod } from "../../WebGL/drawArea";
-import { getDrawLinesMethod } from "../../WebGL/drawLines";
-import { getDrawPathMethod } from "../../WebGL/drawPath";
-import { getDrawPointMethod } from "../../WebGL/drawPoint";
+import { resizeGlCanvas } from "./WebGLUtils/canvasUtils";
+import { getDrawAreaMethod } from "./WebGLUtils/drawArea";
+import { getDrawLinesMethod } from "./WebGLUtils/drawLines";
+import { getDrawPathMethod } from "./WebGLUtils/drawPath";
+import { getDrawPointMethod } from "./WebGLUtils/drawPoint";
 
 export const getRenderMethod = (
   props: {
@@ -14,7 +14,6 @@ export const getRenderMethod = (
     yLabels: number[];
   },
   gl: WebGLRenderingContext,
-  canvasElement: HTMLCanvasElement,
   margin: [number, number]
 ) => {
   const {

@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useRef } from "react";
-import { Canvas } from "../Canvas";
-import { getPeriodAverageRenderMethod } from "./PeriodAverage/renderMethod";
-import { getInteractivityHandlers } from "./Utils/interactivityUtils";
+import { Canvas } from "../../Canvas";
+import { getPeriodAverageRenderMethod } from "./2DCanvasRenderMethod";
+import { getInteractivityHandlers } from "./2DCanvasUtils/eventUtils";
 
 const PeriodAverageBase = (props: {
   averagePrice: number;

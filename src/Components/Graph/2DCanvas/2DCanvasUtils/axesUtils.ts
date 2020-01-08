@@ -1,9 +1,9 @@
-import { BORDER_COLOR } from "../../../Data/colors";
+import { BORDER_COLOR } from "../../../../Config/colors";
 import {
   GRAPH_MARGIN_Y,
   LABEL_MARGIN_X,
   SPACING_UNIT
-} from "./../PeriodAverage/constants";
+} from "../../constants";
 
 export const drawXAxes = (
   context: CanvasRenderingContext2D,

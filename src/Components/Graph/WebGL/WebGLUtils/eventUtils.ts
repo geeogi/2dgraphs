@@ -1,7 +1,7 @@
 import {
   getCoordinatesOfMouseEvent,
   getCoordinatesOfTouchEvent
-} from "../Components/Graph/Utils/domUtils";
+} from "../../2DCanvas/2DCanvasUtils/domUtils";
 
 /**
  * Return event listeners which will call the render method with activeX,
