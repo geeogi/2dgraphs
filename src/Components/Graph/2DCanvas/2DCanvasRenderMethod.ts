@@ -71,7 +71,11 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
 
     // Get canvas util methods
     const scaleRetina = getRetinaMethod(context, canvasElement, width, height);
-    const getGradient = getGradientMethod(context, GRAPH_MARGIN_Y, graphDepth);
+    const getGradient = getGradientMethod(
+      context,
+      GRAPH_MARGIN_Y,
+      GRAPH_MARGIN_Y + graphDepth
+    );
 
     // Get x-axis scale helpers
     const unixMin = dateToUnix(earliestDate);
@@ -122,7 +126,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
           canvasY: toCanvasY(0)
         }
       ],
-      getGradient(PRIMARY_BASE(0.4), PRIMARY_BASE(0))
+      getGradient(PRIMARY_BASE(1), PRIMARY_BASE(0))
     );
 
     // Draw primary line

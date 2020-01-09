@@ -19,7 +19,6 @@ export const AxisLabel = styled.label`
   position: absolute;
   top: 0;
   left: 0;
-  padding: 0 4px;
   font-size: 12px;
 `;
 

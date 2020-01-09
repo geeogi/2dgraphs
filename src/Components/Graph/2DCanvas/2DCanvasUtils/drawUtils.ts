@@ -44,11 +44,9 @@ export const lineThroughPoints = (
  */
 export const getGradientMethod = (
   context: CanvasRenderingContext2D,
-  GRAPH_MARGIN_Y: number,
-  graphDepth: number
+  top: number,
+  bottom: number
 ) => (primaryColor: string, secondaryColor: string) => {
-  const top = GRAPH_MARGIN_Y;
-  const bottom = GRAPH_MARGIN_Y + graphDepth;
   const gradient = context.createLinearGradient(0, top, 0, bottom);
   gradient.addColorStop(0, primaryColor);
   gradient.addColorStop(1, secondaryColor);
@@ -98,7 +96,6 @@ export const fillPath = (
   context.beginPath();
   context.fillStyle = fillStyle;
 
-  
   if (clip) {
     clip();
   }
@@ -107,6 +104,5 @@ export const fillPath = (
   lineThroughPoints(context, pathPoints);
   context.fill();
 
-  
   context.restore();
 };

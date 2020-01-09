@@ -10,7 +10,8 @@ import {
   ACTIVE_LEGEND,
   GRAPH_MARGIN_X,
   GRAPH_MARGIN_Y,
-  SPACING_UNIT
+  SPACING_UNIT,
+  LABEL_MARGIN_X
 } from "../constants";
 import { dateToUnix, getDateLabels, getPriceLabels } from "../labelUtils";
 import { clamp, getScaleMethod } from "../numberUtils";
@@ -73,7 +74,7 @@ export const WebGL = (props: {
         const yTopPercentage = 1 - (scalePriceY(label) + 1) / 2;
         const yTop = yTopPercentage * (resolution[1] - 2 * margin[1]);
         labelElement.style.top = Math.floor(margin[1] + yTop - 18) + "px";
-        labelElement.style.left = Math.floor(margin[0]) + "px";
+        labelElement.style.left = Math.floor(LABEL_MARGIN_X) + "px";
       }
     });
 
@@ -138,7 +139,7 @@ export const WebGL = (props: {
             const screenX = ((x + 1) / 2) * (resolution[0] - 2 * margin[0]);
             const legendX = Math.floor(screenX) - ACTIVE_LEGEND_WIDTH / 2;
             const clippedX = clamp(
-              legendX,
+              margin[0] + legendX,
               0,
               resolution[0] - ACTIVE_LEGEND_WIDTH
             );
