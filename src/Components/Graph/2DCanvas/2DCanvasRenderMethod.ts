@@ -12,7 +12,6 @@ import {
   ACTIVE_LEGEND,
   GRAPH_MARGIN_X,
   GRAPH_MARGIN_Y,
-  LABEL_MARGIN_X,
   SPACING_UNIT
 } from "../constants";
 import { dateToUnix, getDateLabels, getPriceLabels } from "../labelUtils";
@@ -45,6 +44,22 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
   const yConfig = getPriceLabels(minPrice, maxPrice, 4);
   const { priceLabels: yLabels } = yConfig;
 
+  // Get x-axis scale helpers
+  const unixMin = dateToUnix(earliestDate);
+  const unixMax = dateToUnix(latestDate);
+  const scaleUnixX = getScaleMethod(unixMin, unixMax, 0, 1);
+  const scaleDateX = (date: string) => scaleUnixX(dateToUnix(date));
+
+  // Get y-axis scale helpers
+  const scalePriceY = getScaleMethod(yLabels[0], maxPrice, 0, 1);
+
+  // Calculate primary line points (price vs. date)
+  const points = values.map(value => {
+    const graphX = scaleDateX(value.dateTime);
+    const graphY = scalePriceY(value.price);
+    return { x: graphX, y: graphY, value };
+  });
+
   return function render(renderVariables?: {
     canvasElement?: HTMLCanvasElement;
     activeX?: number;
@@ -76,21 +91,12 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
       GRAPH_MARGIN_Y + graphDepth
     );
 
-    // Get x-axis scale helpers
-    const unixMin = dateToUnix(earliestDate);
-    const unixMax = dateToUnix(latestDate);
-    const scaleUnixX = getScaleMethod(unixMin, unixMax, 0, graphWidth);
-    const scaleDateX = (date: string) => scaleUnixX(dateToUnix(date));
-
-    // Get y-axis scale helpers
-    const scalePriceY = getScaleMethod(yLabels[0], maxPrice, 0, graphDepth);
-
-    // Calculate primary line points (price vs. date)
-    const points = values.map(value => {
-      const graphX = scaleDateX(value.dateTime);
-      const graphY = scalePriceY(value.price);
-      return { canvasX: toCanvasX(graphX), canvasY: toCanvasY(graphY), value };
-    });
+    // Scale points to screen resolution
+    const scaledPoints = points.map(point => ({
+      canvasX: toCanvasX(point.x * graphWidth),
+      canvasY: toCanvasY(point.y * graphDepth),
+      value: point.value
+    }));
 
     // Scale retina
     scaleRetina();
@@ -99,7 +105,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
     drawXAxes(
       context,
       xLabels,
-      unix => toCanvasX(scaleDateX(unix)),
+      unix => toCanvasX(scaleDateX(unix) * graphWidth),
       unix => moment(unix).format(xDisplayFormat),
       graphWidth,
       graphDepth
@@ -109,7 +115,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
     drawYAxes(
       context,
       yLabels,
-      price => toCanvasY(scalePriceY(price)),
+      price => toCanvasY(scalePriceY(price) * graphDepth),
       price => `$${Math.round(price)}`,
       graphWidth
     );
@@ -119,7 +125,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
       context,
       [
         { canvasX: toCanvasX(0), canvasY: toCanvasY(0) },
-        ...points,
+        ...scaledPoints,
         {
           canvasX: toCanvasX(graphWidth),
           canvasY: toCanvasY(0)
@@ -129,12 +135,12 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
     );
 
     // Draw primary line
-    drawLine(context, points, PRIMARY_COLOR);
+    drawLine(context, scaledPoints, PRIMARY_COLOR);
 
     // Draw active legend, if active
     if (activeX && activeY) {
       // Fetch nearest point to active coordinates
-      const [{ canvasX, canvasY, value }] = points.sort((a, b) => {
+      const [{ canvasX, canvasY, value }] = scaledPoints.sort((a, b) => {
         return Math.abs(a.canvasX - activeX) - Math.abs(b.canvasX - activeX);
       });
 
