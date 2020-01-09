@@ -1,17 +1,14 @@
 import moment from "moment";
 import React, { useEffect, useRef } from "react";
-import { CanvasGL } from "../../Canvas";
-import {
-  ActiveLegend,
-  AxisLabel,
-  RelativeGraphContainer
-} from "../../GraphContainer";
+import { Canvas } from "../../Canvas";
+import { ActiveLegend, AxisLabel } from "../../Graph";
+import { Div } from "../../Base/Div";
 import {
   ACTIVE_LEGEND,
   GRAPH_MARGIN_X,
   GRAPH_MARGIN_Y,
-  SPACING_UNIT,
-  LABEL_MARGIN_X
+  LABEL_MARGIN_X,
+  SPACING_UNIT
 } from "../constants";
 import { dateToUnix, getDateLabels, getPriceLabels } from "../labelUtils";
 import { clamp, getScaleMethod } from "../numberUtils";
@@ -21,8 +18,7 @@ import { getWebGLInteractivityHandlers } from "./WebGLUtils/eventUtils";
 const ACTIVE_LEGEND_WIDTH = ACTIVE_LEGEND.WIDTH;
 const ACTIVE_LEGEND_ID = "active-legend";
 
-export const WebGL = (props: {
-  averagePrice: number;
+export const LineGraphWebGL = (props: {
   earliestDate: string;
   latestDate: string;
   maxPrice: number;
@@ -217,8 +213,8 @@ export const WebGL = (props: {
   });
 
   return (
-    <RelativeGraphContainer>
-      <CanvasGL ref={canvasElementRef as any} />
+    <Div position="relative">
+      <Canvas ref={canvasElementRef as any} />
       {yLabels.map(label => (
         <AxisLabel id={JSON.stringify(label)}>${label}</AxisLabel>
       ))}
@@ -228,6 +224,6 @@ export const WebGL = (props: {
         </AxisLabel>
       ))}
       <ActiveLegend id={ACTIVE_LEGEND_ID} width={ACTIVE_LEGEND_WIDTH} />
-    </RelativeGraphContainer>
+    </Div>
   );
 };

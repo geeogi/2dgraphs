@@ -27,7 +27,6 @@ import {
 } from "./2DCanvasUtils/drawUtils";
 
 interface Props {
-  averagePrice: number;
   earliestDate: string;
   latestDate: string;
   maxPrice: number;

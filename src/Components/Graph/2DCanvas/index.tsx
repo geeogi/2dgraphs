@@ -1,17 +1,15 @@
-import React, { memo, useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { Canvas } from "../../Canvas";
 import { getPeriodAverageRenderMethod } from "./2DCanvasRenderMethod";
 import { getInteractivityHandlers } from "./2DCanvasUtils/eventUtils";
 
-const PeriodAverageBase = (props: {
-  averagePrice: number;
+export const LineGraph2DCanvas = (props: {
   earliestDate: string;
   latestDate: string;
   maxPrice: number;
   minPrice: number;
   values: { dateTime: string; price: number }[];
 }) => {
-
   // Fetch render method
   const renderMethod = getPeriodAverageRenderMethod(props);
 
@@ -44,16 +42,16 @@ const PeriodAverageBase = (props: {
   }, [callbackRenderMethod]);
 
   return (
-    <Canvas
-      ref={canvasElementRef as any}
-      onMouseDown={eventHandlers.handleMouseDown}
-      onMouseLeave={eventHandlers.handleMouseLeave}
-      onMouseMove={eventHandlers.handleMouseMove}
-      onTouchEnd={eventHandlers.handleTouchEnd}
-      onTouchMove={eventHandlers.handleTouchMove}
-      onTouchStart={eventHandlers.handleTouchStart}
-    />
+    <div>
+      <Canvas
+        ref={canvasElementRef as any}
+        onMouseDown={eventHandlers.handleMouseDown}
+        onMouseLeave={eventHandlers.handleMouseLeave}
+        onMouseMove={eventHandlers.handleMouseMove}
+        onTouchEnd={eventHandlers.handleTouchEnd}
+        onTouchMove={eventHandlers.handleTouchMove}
+        onTouchStart={eventHandlers.handleTouchStart}
+      />
+    </div>
   );
 };
-
-export const PeriodAverage = memo(PeriodAverageBase);

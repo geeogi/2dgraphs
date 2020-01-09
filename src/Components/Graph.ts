@@ -1,18 +1,9 @@
 import styled from "styled-components";
 import { BACKGROUND_COLOR, CONTRAST_COLOR } from "../Config/colors";
 
-export const GraphContainer = styled.div`
+export const GraphCard = styled.div`
   max-width: 1000px;
   margin: auto;
-`;
-
-export const Graph = styled.div`
-  height: 400px;
-  width: 100%;
-`;
-
-export const RelativeGraphContainer = styled.div`
-  position: relative;
 `;
 
 export const AxisLabel = styled.label`

@@ -1,33 +1,57 @@
 import { enableAttribute, initArrayBuffer, initProgram } from "./setupUtils";
 
-const glsl = (x: any) => x;
-
-export const getDrawPointMethod = (
+export const getDrawCircleMethod = (
   gl: WebGLRenderingContext,
   circle: { x: number; y: number; r: number },
-  rgba: string
+  color: number[],
+  edgeColor: number[]
 ) => {
-  const pointVShader = glsl`
+  const pointVShader = `
+    precision mediump float;
+    uniform float uSize; 
+    uniform float uEdgeSize; 
     uniform vec2 uScale; 
     uniform vec2 uTranslation; 
     attribute vec3 aVertex; 
-    varying vec2 center; 
     void main(void) { 
      gl_Position = vec4(aVertex, 1.0); 
      gl_Position.xy = gl_Position.xy + uTranslation; 
      gl_Position.xy = gl_Position.xy * uScale; 
-     gl_PointSize = 30.0; 
-     center = vec2(gl_Position); 
+     gl_PointSize = uSize + uEdgeSize + 1.0;
     }`;
 
-  const pointFShader = glsl`
+  const pointFShader = `
     precision mediump float;
-    varying vec2 center; 
+    uniform float uSize;
+    uniform float uEdgeSize;
+    uniform vec4 uEdgeColor; 
+    uniform vec4 uColor; 
     void main(void) { 
-    gl_FragColor = vec4(0,0,1.0,1.0); 
-    float distance = length(2.0 * gl_PointCoord - 1.0);
-    gl_FragColor.a = distance > 0.9 ? 0.0 : 1.0;
-    gl_FragColor = distance < 1.0 && distance > 0.9 ? vec4(1.0,1.0,1.0,1.0) : gl_FragColor;
+    // Calculate distance from center 
+    float distance = length(2.0 * gl_PointCoord - 1.0); 
+    
+    // Set base color
+    gl_FragColor = uColor; 
+    
+    // Calculate distance from edge
+    float sEdge = smoothstep(
+      uSize - uEdgeSize - 2.0,
+      uSize - uEdgeSize,
+      min(distance, 1.0) * (uSize + uEdgeSize)
+    );
+    
+    // Blend between edge and body colors
+    gl_FragColor = (uEdgeColor * sEdge) + ((1.0 - sEdge) * gl_FragColor);
+    
+    // Blend between edge and out colors (anti-aliasing)
+    gl_FragColor.a = gl_FragColor.a * (1.0 - smoothstep(
+      uSize - 2.0,
+      uSize,
+      min(distance, 1.0) * uSize
+    ));
+
+    // Discard fragments which lie outside of the circle
+    gl_FragColor.a = distance > 1.0 ? 0.0 : gl_FragColor.a;
     }`;
 
   // Create a shader program object to store the combined shader program
@@ -48,13 +72,24 @@ export const getDrawPointMethod = (
     enableAttribute(gl, pointProgram, point_buffer, "aVertex");
 
     // Enable uniforms
+    const uColor = gl.getUniformLocation(pointProgram, "uColor");
+    gl.uniform4fv(uColor, color);
+
+    const uEdgeColor = gl.getUniformLocation(pointProgram, "uEdgeColor");
+    gl.uniform4fv(uEdgeColor, edgeColor);
+
     const uScale = gl.getUniformLocation(pointProgram, "uScale");
     gl.uniform2fv(uScale, scale);
 
     const uTranslation = gl.getUniformLocation(pointProgram, "uTranslation");
     gl.uniform2fv(uTranslation, translation);
 
-    console.log(translation);
+    const uEdgeSize = gl.getUniformLocation(pointProgram, "uEdgeSize");
+    gl.uniform1f(uEdgeSize, 2);
+
+    const uSize = gl.getUniformLocation(pointProgram, "uSize");
+    gl.uniform1f(uSize, 25);
+
     // Draw the line
     gl.drawArrays(gl.POINTS, 0, 1);
   };

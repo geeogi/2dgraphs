@@ -7,7 +7,7 @@ import { resizeGlCanvas } from "./WebGLUtils/canvasUtils";
 import { getDrawAreaMethod } from "./WebGLUtils/drawArea";
 import { getDrawLinesMethod } from "./WebGLUtils/drawLines";
 import { getDrawPathMethod } from "./WebGLUtils/drawPath";
-import { getDrawPointMethod } from "./WebGLUtils/drawPoint";
+import { getDrawCircleMethod } from "./WebGLUtils/drawPoint";
 
 export const getRenderMethod = (
   props: {
@@ -79,10 +79,11 @@ export const getRenderMethod = (
     SECONDARY_COLOR_GL,
     "vertical"
   );
-  const drawActivePoint = getDrawPointMethod(
+  const drawActiveCircle = getDrawCircleMethod(
     gl,
     { x: 0, y: 0, r: 1 },
-    PRIMARY_COLOR_GL
+    [0, 0, 1, 1],
+    [1, 1, 1, 1]
   );
 
   /* WEBGL RENDER FUNCTION */
@@ -124,7 +125,7 @@ export const getRenderMethod = (
 
       // Draw the active elements
       drawYActiveAxis(resolution, scale, [x, 0]);
-      drawActivePoint(resolution, scale, [x, y]);
+      drawActiveCircle(resolution, scale, [x, y]);
     }
   };
 };

@@ -1,13 +1,13 @@
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { Button } from "./Components/Button";
-import { PeriodAverage } from "./Components/Graph/2DCanvas";
-import { Graph, GraphContainer } from "./Components/GraphContainer";
-import { H1, H4 } from "./Components/H";
-import { Header } from "./Components/Header";
-import { P } from "./Components/P";
-import { Row } from "./Components/Row";
-import { WebGL } from "./Components/Graph/WebGL";
+import { Button } from "./Components/Base/Button";
+import { LineGraph2DCanvas } from "./Components/Graph/2DCanvas";
+import { Graph, GraphCard } from "./Components/Graph";
+import { H1, H4 } from "./Components/Base/H";
+import { Header } from "./Components/Base/Header";
+import { P } from "./Components/Base/P";
+import { Row } from "./Components/Base/Row";
+import { LineGraphWebGL } from "./Components/Graph/WebGL";
 
 const currentMoment = () => moment("2019-12-27T00:00:00.0000000Z");
 
@@ -94,7 +94,7 @@ function App() {
         <H1>CoinTales</H1>
         <P>Mock data with throttled network speed</P>
       </Header>
-      <GraphContainer>
+      <GraphCard>
         <H4>Bitcoin (BTC): $7,200.44 USD</H4>
         <Row padding={"0 8px"}>
           {timeScales.map(timeScale => (
@@ -106,27 +106,21 @@ function App() {
             </Button>
           ))}
         </Row>
-        <Graph>
-          <PeriodAverage
-            values={values}
-            minPrice={minPrice}
-            maxPrice={maxPrice}
-            averagePrice={averagePrice}
-            earliestDate={earliestDate}
-            latestDate={latestDate}
-          />
-        </Graph>
-        <Graph>
-          <WebGL
-            values={values}
-            minPrice={minPrice}
-            maxPrice={maxPrice}
-            averagePrice={averagePrice}
-            earliestDate={earliestDate}
-            latestDate={latestDate}
-          />
-        </Graph>
-      </GraphContainer>
+        <LineGraph2DCanvas
+          values={values}
+          minPrice={minPrice}
+          maxPrice={maxPrice}
+          earliestDate={earliestDate}
+          latestDate={latestDate}
+        />
+        <LineGraphWebGL
+          values={values}
+          minPrice={minPrice}
+          maxPrice={maxPrice}
+          earliestDate={earliestDate}
+          latestDate={latestDate}
+        />
+      </GraphCard>
       <canvas id="my_Canvas" />
     </main>
   );
