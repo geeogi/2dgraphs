@@ -21,6 +21,7 @@ export const getRenderMethod = (
   gl: WebGLRenderingContext,
   margin: [number, number]
 ) => {
+  // Extract static render props
   const {
     scaleDateX,
     scalePriceY,
@@ -86,7 +87,7 @@ export const getRenderMethod = (
     [1, 1, 1, 1]
   );
 
-  /* WEBGL RENDER FUNCTION */
+  /* RETURN WEBGL RENDER FUNCTION */
   return (resolution: [number, number], activeX?: number, activeY?: number) => {
     // Resize canvas if necessary
     resizeGlCanvas(gl);
@@ -113,7 +114,7 @@ export const getRenderMethod = (
     drawPrimaryArea(resolution, scale);
     drawPrimaryPath(resolution, scale);
 
-    // Draw the active elements
+    // Draw the active elements if applicable
     if (activeX) {
       // Convert px to [-1,1] clip space
       const clipSpaceX = (2 * activeX) / resolution[0] - 1;

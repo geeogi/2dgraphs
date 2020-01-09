@@ -1,8 +1,8 @@
 import moment from "moment";
 import React, { useEffect, useRef } from "react";
+import { Div } from "../../Base/Div";
 import { Canvas } from "../../Canvas";
 import { ActiveLegend, AxisLabel } from "../../Graph";
-import { Div } from "../../Base/Div";
 import {
   ACTIVE_LEGEND,
   GRAPH_MARGIN_X,
@@ -28,7 +28,7 @@ export const LineGraphWebGL = (props: {
   const canvasElementRef = useRef<HTMLCanvasElement>();
   const margin: [number, number] = [GRAPH_MARGIN_X, GRAPH_MARGIN_Y];
 
-  // Extract props
+  // Extract graph props
   const { earliestDate, latestDate, maxPrice, minPrice, values } = props;
 
   // Get x-axis labels
@@ -86,6 +86,7 @@ export const LineGraphWebGL = (props: {
     });
   };
 
+  /* DRAW GRAPH AND ATTACH LISTENERS ON FIRST RENDER */
   useEffect(() => {
     const canvasElement = canvasElementRef && canvasElementRef.current;
     const gl = canvasElement && canvasElement.getContext("webgl");
@@ -120,9 +121,8 @@ export const LineGraphWebGL = (props: {
         const scaleWidthToPx = getScaleMethod(-1, 1, 0, resolution[0]);
         const scaleWidthToClipSpace = getScaleMethod(0, resolution[0], -1, 1);
         const scaleHeightToPx = getScaleMethod(-1, 1, 0, resolution[1]);
-        const scaleHeightToClipSpace = getScaleMethod(0, resolution[1], -1, 1);
 
-        // Call render method
+        // Call WebGL render method
         renderGLCanvas(resolution, activeX, activeY);
 
         // Show or hide active legend
@@ -156,7 +156,7 @@ export const LineGraphWebGL = (props: {
             const displayPrice = Math.round(price);
             const displayDate = moment(dateTime).format("DD MMM YY");
 
-            // Update DOM element
+            // Update active legend DOM element
             activeLegendElement.style.left = clippedLegendX + "px";
             activeLegendElement.style.top =
               resolution[1] - clippedLegendY + "px";
