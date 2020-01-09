@@ -120,6 +120,12 @@ export const WebGL = (props: {
           canvasElement.offsetHeight
         ];
 
+        // Get clip space scale helpers
+        const scaleWidthToPx = getScaleMethod(-1, 1, 0, resolution[0]);
+        const scaleWidthToClipSpace = getScaleMethod(0, resolution[0], -1, 1);
+        const scaleHeightToPx = getScaleMethod(-1, 1, 0, resolution[1]);
+        const scaleHeightToClipSpace = getScaleMethod(0, resolution[1], -1, 1);
+
         // Call render method
         renderGLCanvas(resolution, activeX, activeY);
 
@@ -128,7 +134,7 @@ export const WebGL = (props: {
         if (activeLegendElement) {
           if (activeX) {
             // Scale activeX to [-1,1] clip space
-            const clipSpaceX = (2 * activeX) / resolution[0] - 1;
+            const clipSpaceX = scaleWidthToClipSpace(activeX);
 
             // Fetch nearest point to activeX
             const [{ x, y, dateTime, price }] = points.sort((a, b) => {
@@ -136,26 +142,28 @@ export const WebGL = (props: {
             });
 
             // Scale x from [-1,1] clip space to screen resolution
-            const screenX = ((x + 1) / 2) * (resolution[0] - 2 * margin[0]);
-            const legendX = Math.floor(screenX) - ACTIVE_LEGEND_WIDTH / 2;
-            const clippedX = clamp(
+            const nearestX = scaleWidthToPx(x);
+            const legendX = Math.floor(nearestX) - ACTIVE_LEGEND_WIDTH / 2;
+            const clippedLegendX = clamp(
               margin[0] + legendX,
               0,
               resolution[0] - ACTIVE_LEGEND_WIDTH
             );
 
             // Scale y from [-1,1] clip space to screen resolution
-            const screenY = ((y + 1) / 2) * (resolution[1] - 2 * margin[1]);
+            const nearestY = scaleHeightToPx(y);
             const legendY = resolution[1] - (margin[1] + 2 * SPACING_UNIT);
-            const clippedY = legendY > screenY ? legendY : screenY;
+            const clippedLegendY =
+              legendY > nearestY ? legendY : nearestY - 9 * SPACING_UNIT;
 
             // Format display variables
             const displayPrice = Math.round(price);
             const displayDate = moment(dateTime).format("DD MMM YY");
 
             // Update DOM element
-            activeLegendElement.style.left = clippedX + "px";
-            activeLegendElement.style.top = resolution[1] - clippedY + "px";
+            activeLegendElement.style.left = clippedLegendX + "px";
+            activeLegendElement.style.top =
+              resolution[1] - clippedLegendY + "px";
             activeLegendElement.textContent = `$${displayPrice} – ${displayDate}`;
             activeLegendElement.style.display = "block";
           } else {
