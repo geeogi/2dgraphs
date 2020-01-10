@@ -15,7 +15,7 @@ export const PRIMARY_COLOR_ALPHA_RGB = opacity => `
         ${opacity})
 `;
 
-export const AXIS_COLOR_VEC = [0, 0, 0, 1];
+export const AXIS_COLOR_VEC = [0.8, 0.8, 0.8, 1];
 export const AXIS_COLOR_RGB = `
 rgb(${AXIS_COLOR_VEC[0] * 255}, 
     ${AXIS_COLOR_VEC[1] * 255}, 
