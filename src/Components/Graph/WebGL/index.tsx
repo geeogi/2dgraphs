@@ -75,6 +75,7 @@ export const LineGraphWebGL = (props: {
         const yTop = yTopPercentage * (resolution[1] - 2 * margin[1]);
         labelElement.style.top = Math.floor(margin[1] + yTop - 18) + "px";
         labelElement.style.left = Math.floor(LABEL_MARGIN_X) + "px";
+        labelElement.style.display = "block";
       }
     });
 
@@ -84,8 +85,9 @@ export const LineGraphWebGL = (props: {
       if (labelElement) {
         const xLeftPercentage = (xGridLines[index] + 1) / 2;
         const xLeft = xLeftPercentage * (resolution[0] - 2 * margin[0]);
-        labelElement.style.left = Math.floor(xLeft - 12) + "px";
-        labelElement.style.top = Math.floor(resolution[1] - 20) + "px";
+        labelElement.style.left = Math.floor(xLeft - 10) + "px";
+        labelElement.style.top = Math.floor(resolution[1] - 19) + "px";
+        labelElement.style.display = "block";
       }
     });
   };
@@ -213,14 +215,20 @@ export const LineGraphWebGL = (props: {
     <Div position="relative">
       <Canvas ref={canvasElementRef as any} />
       {priceLabels.map(label => (
-        <AxisLabel id={JSON.stringify(label)}>${label}</AxisLabel>
+        <AxisLabel id={JSON.stringify(label)} style={{ display: "none" }}>
+          ${label}
+        </AxisLabel>
       ))}
       {dateLabels.map(label => (
-        <AxisLabel id={JSON.stringify(label)}>
+        <AxisLabel id={JSON.stringify(label)} style={{ display: "none" }}>
           {moment(label).format(displayFormat)}
         </AxisLabel>
       ))}
-      <ActiveLegend id={ACTIVE_LEGEND_ID} width={ACTIVE_LEGEND_WIDTH} />
+      <ActiveLegend
+        id={ACTIVE_LEGEND_ID}
+        width={ACTIVE_LEGEND_WIDTH}
+        style={{ display: "none" }}
+      />
     </Div>
   );
 };

@@ -10,6 +10,7 @@ export const AxisLabel = styled.label`
   top: 0;
   left: 0;
   font-size: 12px;
+  font-family: Arial;
 `;
 
 interface ActiveLegendProps {
