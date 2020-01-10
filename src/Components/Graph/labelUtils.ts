@@ -1,7 +1,5 @@
 import moment from "moment";
 
-export const DATE_FORMAT = "D MMM";
-
 export const dateToUnix = (dateString: string) => moment(dateString).unix();
 
 const roundUpToNearest = (value: number, multiple: number) => {

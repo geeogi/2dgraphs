@@ -1,8 +1,8 @@
 import moment from "moment";
 import React, { useEffect, useRef } from "react";
 import { Div } from "../../Base/Div";
-import { Canvas } from "../../Canvas";
-import { ActiveLegend, AxisLabel } from "../../Graph";
+import { ActiveLegend, AxisLabel } from "../AxisLegend";
+import { Canvas } from "../Canvas";
 import {
   ACTIVE_LEGEND,
   GRAPH_MARGIN_X,

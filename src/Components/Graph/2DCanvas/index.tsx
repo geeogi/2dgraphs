@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef } from "react";
-import { Canvas } from "../../Canvas";
+import { Canvas } from "../Canvas";
 import { getPeriodAverageRenderMethod } from "./2DCanvasRenderMethod";
 import { getInteractivityHandlers } from "./2DCanvasUtils/eventUtils";
 

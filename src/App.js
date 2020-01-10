@@ -2,7 +2,7 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { Button } from "./Components/Base/Button";
 import { LineGraph2DCanvas } from "./Components/Graph/2DCanvas";
-import { Graph, GraphCard } from "./Components/Graph";
+import { Graph, GraphCard } from "./Components/Base/GraphCard";
 import { H1, H4 } from "./Components/Base/H";
 import { Header } from "./Components/Base/Header";
 import { P } from "./Components/Base/P";
