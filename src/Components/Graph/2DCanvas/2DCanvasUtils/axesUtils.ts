@@ -1,4 +1,4 @@
-import { BORDER_COLOR } from "../../../../Config/colors";
+import { AXIS_COLOR_RGB } from "../../../../Config/colors";
 import {
   GRAPH_MARGIN_Y,
   LABEL_MARGIN_X,
@@ -16,7 +16,7 @@ export const drawXAxes = (
 ) => {
   context.textAlign = "center";
   context.font = "12px Arial";
-  context.strokeStyle = BORDER_COLOR;
+  context.strokeStyle = AXIS_COLOR_RGB;
   context.beginPath();
 
   labels.forEach(label => {
@@ -41,7 +41,7 @@ export const drawYAxes = (
 ) => {
   context.textAlign = "start";
   context.font = "12px Arial";
-  context.strokeStyle = BORDER_COLOR;
+  context.strokeStyle = AXIS_COLOR_RGB;
   context.beginPath();
 
   labels.forEach(price => {

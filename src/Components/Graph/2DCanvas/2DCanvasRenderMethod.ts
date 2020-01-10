@@ -1,12 +1,12 @@
 import moment from "moment";
 import {
-  BACKGROUND_COLOR,
-  DARK_BACKGROUND_COLOR,
-  DARK_BORDER_COLOR,
-  DARK_CONTRAST_COLOR,
-  PRIMARY_BASE,
-  PRIMARY_COLOR,
-  SECONDARY_COLOR
+  ACTIVE_HANDLE_BODY_RGB,
+  ACTIVE_HANDLE_BORDER_RGB,
+  ACTIVE_LEGEND_BACKGROUND_RGB,
+  ACTIVE_LEGEND_TEXT_RGB,
+  ACTIVE_LINE_RGB,
+  PRIMARY_COLOR_ALPHA_RGB,
+  PRIMARY_COLOR_RGB
 } from "../../../Config/colors";
 import {
   ACTIVE_LEGEND,
@@ -60,6 +60,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
     return { x: graphX, y: graphY, value };
   });
 
+  /* RETURN 2D CANVAS RENDER FUNCTION */
   return function render(renderVariables?: {
     canvasElement?: HTMLCanvasElement;
     activeX?: number;
@@ -131,11 +132,11 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
           canvasY: toCanvasY(0)
         }
       ],
-      getGradient(PRIMARY_BASE(1), PRIMARY_BASE(0))
+      getGradient(PRIMARY_COLOR_ALPHA_RGB(1), PRIMARY_COLOR_ALPHA_RGB(0))
     );
 
     // Draw primary line
-    drawLine(context, scaledPoints, PRIMARY_COLOR);
+    drawLine(context, scaledPoints, PRIMARY_COLOR_RGB);
 
     // Draw active legend, if active
     if (activeX && activeY) {
@@ -144,20 +145,19 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
         return Math.abs(a.canvasX - activeX) - Math.abs(b.canvasX - activeX);
       });
 
-      // Draw dashed active line
+      // Draw active line
       drawLine(
         context,
         [
           { canvasX, canvasY: toCanvasY(graphDepth) },
           { canvasX, canvasY: toCanvasY(0) }
         ],
-        SECONDARY_COLOR,
+        ACTIVE_LINE_RGB,
         1
       );
 
       // Draw active legend body
-      context.strokeStyle = DARK_BORDER_COLOR;
-      context.fillStyle = DARK_BACKGROUND_COLOR;
+      context.fillStyle = ACTIVE_LEGEND_BACKGROUND_RGB;
       context.beginPath();
 
       const legendTopY = toCanvasY(graphDepth - 2 * SPACING_UNIT);
@@ -181,19 +181,18 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
         anchorY + legendBottomY
       );
       context.lineTo(anchorX + ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
-      context.stroke();
       context.fill();
 
       // Draw active legend circular handle
-      context.fillStyle = PRIMARY_COLOR;
-      context.strokeStyle = BACKGROUND_COLOR;
+      context.fillStyle = ACTIVE_HANDLE_BODY_RGB;
+      context.strokeStyle = ACTIVE_HANDLE_BORDER_RGB;
       context.beginPath();
       context.arc(canvasX, canvasY, 6, 0, 2 * Math.PI);
       context.fill();
       context.stroke();
 
       // Draw active legend text
-      context.fillStyle = DARK_CONTRAST_COLOR;
+      context.fillStyle = ACTIVE_LEGEND_TEXT_RGB;
       context.textAlign = "center";
       const priceLabel = Math.round(value.price);
       const dateLabel = moment(value.dateTime).format("DD MMM YY");

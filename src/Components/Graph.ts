@@ -1,5 +1,8 @@
 import styled from "styled-components";
-import { BACKGROUND_COLOR, CONTRAST_COLOR } from "../Config/colors";
+import {
+  ACTIVE_LEGEND_BACKGROUND_RGB,
+  ACTIVE_LEGEND_TEXT_RGB
+} from "../Config/colors";
 
 export const GraphCard = styled.div`
   max-width: 1000px;
@@ -19,8 +22,8 @@ interface ActiveLegendProps {
 
 export const ActiveLegend = styled.div<ActiveLegendProps>`
   width: ${props => `${props.width}px`};
-  background: ${CONTRAST_COLOR};
-  color: ${BACKGROUND_COLOR};
+  background: ${ACTIVE_LEGEND_BACKGROUND_RGB};
+  color: ${ACTIVE_LEGEND_TEXT_RGB};
   position: absolute;
   top: 0;
   left: 0;

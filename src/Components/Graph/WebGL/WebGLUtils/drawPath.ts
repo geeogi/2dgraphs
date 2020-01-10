@@ -3,7 +3,7 @@ import { enableAttribute, initArrayBuffer, initProgram } from "./setupUtils";
 export const getDrawPathMethod = (
   gl: WebGLRenderingContext,
   pathPoints: { x: number; y: number; z?: number }[],
-  rgba: string
+  color: number[]
 ) => {
   const lineVShader =
     "uniform vec2 uResolution;" +
@@ -25,7 +25,12 @@ export const getDrawPathMethod = (
     " gl_Position.xy = gl_Position.xy * uMargin;" +
     "}";
 
-  const lineFShader = `void main(void) { gl_FragColor = vec4${rgba}; }`;
+  const lineFShader = `
+    precision mediump float;
+    uniform vec4 uColor; 
+    void main(void) { 
+      gl_FragColor = uColor; 
+    }`;
 
   // Create a shader program object to store the combined shader program
   const lineProgram = initProgram(gl, lineVShader, lineFShader);
@@ -82,6 +87,9 @@ export const getDrawPathMethod = (
 
     const marginResolution = gl.getUniformLocation(lineProgram, "uMargin");
     gl.uniform2fv(marginResolution, margin);
+
+    const colorUniform = gl.getUniformLocation(lineProgram, "uColor");
+    gl.uniform4fv(colorUniform, color);
 
     // Draw the line
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, pathPoints.length * 2);

@@ -31,24 +31,28 @@ export const LineGraphWebGL = (props: {
   // Extract graph props
   const { earliestDate, latestDate, maxPrice, minPrice, values } = props;
 
-  // Get x-axis labels
+  // Configure x-axis labels
   const xConfig = getDateLabels(earliestDate, latestDate, 4);
-  const { dateLabels: xLabels, displayFormat } = xConfig;
+  const { dateLabels, displayFormat } = xConfig;
 
-  // Get y-axis labels
+  // Configure y-axis labels
   const yConfig = getPriceLabels(minPrice, maxPrice, 4);
-  const { priceLabels: yLabels } = yConfig;
+  const { priceLabels } = yConfig;
 
-  // Get x-axis scale helpers
+  // Configure x-axis scale helpers
   const unixMin = dateToUnix(earliestDate);
   const unixMax = dateToUnix(latestDate);
   const scaleUnixX = getScaleMethod(unixMin, unixMax, -1, 1);
   const scaleDateX = (date: string) => scaleUnixX(dateToUnix(date));
 
-  // Get y-axis scale helpers
-  const scalePriceY = getScaleMethod(yLabels[0], maxPrice, -1, 1);
+  // Configure y-axis scale helpers
+  const scalePriceY = getScaleMethod(priceLabels[0], maxPrice, -1, 1);
 
-  // Calculate point coordinates for each value
+  // Configure axis grid lines in [-1,1] clip space
+  const xGridLines = dateLabels.map(label => scaleUnixX(label / 1000));
+  const yGridLines = priceLabels.map(label => scalePriceY(label));
+
+  // Calculate point coordinates [-1,1] for each value
   const points = values.map(value => ({
     x: scaleDateX(value.dateTime),
     y: scalePriceY(value.price),
@@ -64,10 +68,10 @@ export const LineGraphWebGL = (props: {
     ];
 
     // y-axis
-    yLabels.forEach(label => {
+    priceLabels.forEach((label, index) => {
       const labelElement = document.getElementById(JSON.stringify(label));
       if (labelElement) {
-        const yTopPercentage = 1 - (scalePriceY(label) + 1) / 2;
+        const yTopPercentage = 1 - (yGridLines[index] + 1) / 2;
         const yTop = yTopPercentage * (resolution[1] - 2 * margin[1]);
         labelElement.style.top = Math.floor(margin[1] + yTop - 18) + "px";
         labelElement.style.left = Math.floor(LABEL_MARGIN_X) + "px";
@@ -75,10 +79,10 @@ export const LineGraphWebGL = (props: {
     });
 
     // x-axis
-    xLabels.forEach(label => {
+    dateLabels.forEach((label, index) => {
       const labelElement = document.getElementById(JSON.stringify(label));
       if (labelElement) {
-        const xLeftPercentage = (scaleUnixX(label / 1000) + 1) / 2;
+        const xLeftPercentage = (xGridLines[index] + 1) / 2;
         const xLeft = xLeftPercentage * (resolution[0] - 2 * margin[0]);
         labelElement.style.left = Math.floor(xLeft - 12) + "px";
         labelElement.style.top = Math.floor(resolution[1] - 20) + "px";
@@ -95,12 +99,9 @@ export const LineGraphWebGL = (props: {
       // Initialize GL render method
       const renderGLCanvas = getRenderMethod(
         {
-          scaleDateX,
-          scaleUnixX,
-          scalePriceY,
-          xLabels,
-          yLabels,
-          values
+          xGridLines,
+          yGridLines,
+          points
         },
         gl,
         margin
@@ -109,57 +110,59 @@ export const LineGraphWebGL = (props: {
       // Define full render method
       const renderGraph = (args?: { activeX?: number; activeY?: number }) => {
         // Extract render args
-        const { activeX, activeY } = args || {};
+        const { activeX } = args || {};
 
-        // Calculate resolution
+        // Calculate canvas resolution
         const resolution: [number, number] = [
           canvasElement.offsetWidth,
           canvasElement.offsetHeight
         ];
 
-        // Get clip space scale helpers
-        const scaleWidthToPx = getScaleMethod(-1, 1, 0, resolution[0]);
-        const scaleWidthToClipSpace = getScaleMethod(0, resolution[0], -1, 1);
-        const scaleHeightToPx = getScaleMethod(-1, 1, 0, resolution[1]);
+        // Calculate graph width and height in px
+        const graphWidth = resolution[0] - 2 * margin[0];
+        const graphHeight = resolution[1] - 2 * margin[1];
+
+        // Scale activeX to [-1,1] clip space
+        const clipSpaceActiveX = activeX
+          ? ((activeX - margin[0]) / graphWidth) * 2 - 1
+          : undefined;
 
         // Call WebGL render method
-        renderGLCanvas(resolution, activeX, activeY);
+        renderGLCanvas(resolution, clipSpaceActiveX);
 
         // Show or hide active legend
         const activeLegendElement = document.getElementById(ACTIVE_LEGEND_ID);
         if (activeLegendElement) {
-          if (activeX) {
-            // Scale activeX to [-1,1] clip space
-            const clipSpaceX = scaleWidthToClipSpace(activeX);
-
+          if (activeX && clipSpaceActiveX) {
             // Fetch nearest point to activeX
             const [{ x, y, dateTime, price }] = points.sort((a, b) => {
-              return Math.abs(a.x - clipSpaceX) - Math.abs(b.x - clipSpaceX);
+              return (
+                Math.abs(a.x - clipSpaceActiveX) -
+                Math.abs(b.x - clipSpaceActiveX)
+              );
             });
 
             // Scale x from [-1,1] clip space to screen resolution
-            const nearestX = scaleWidthToPx(x);
-            const legendX = Math.floor(nearestX) - ACTIVE_LEGEND_WIDTH / 2;
-            const clippedLegendX = clamp(
-              margin[0] + legendX,
-              0,
-              resolution[0] - ACTIVE_LEGEND_WIDTH
-            );
+            const nearXGraphX = margin[0] + ((x + 1) / 2) * graphWidth;
+            const rawLegendX = nearXGraphX - ACTIVE_LEGEND_WIDTH / 2;
+            const legendLeftMax = 0;
+            const legendRightMax = resolution[0] - ACTIVE_LEGEND_WIDTH;
+            const legendX = clamp(rawLegendX, legendLeftMax, legendRightMax);
 
             // Scale y from [-1,1] clip space to screen resolution
-            const nearestY = scaleHeightToPx(y);
-            const legendY = resolution[1] - (margin[1] + 2 * SPACING_UNIT);
-            const clippedLegendY =
-              legendY > nearestY ? legendY : nearestY - 9 * SPACING_UNIT;
+            const nearYGraphY = margin[1] + ((y + 1) / 2) * graphHeight;
+            const baseLegendY = resolution[1] - (margin[1] + 2 * SPACING_UNIT);
+            const altLegendY = nearYGraphY - 5 * SPACING_UNIT;
+            const useBase = baseLegendY > nearYGraphY;
+            const legendY = useBase ? baseLegendY : altLegendY;
 
             // Format display variables
             const displayPrice = Math.round(price);
             const displayDate = moment(dateTime).format("DD MMM YY");
 
             // Update active legend DOM element
-            activeLegendElement.style.left = clippedLegendX + "px";
-            activeLegendElement.style.top =
-              resolution[1] - clippedLegendY + "px";
+            activeLegendElement.style.left = legendX + "px";
+            activeLegendElement.style.top = resolution[1] - legendY + "px";
             activeLegendElement.textContent = `$${displayPrice} – ${displayDate}`;
             activeLegendElement.style.display = "block";
           } else {
@@ -180,18 +183,14 @@ export const LineGraphWebGL = (props: {
       // Fetch interactivity event listeners
       const {
         handleMouseDown,
-        handleMouseLeave,
         handleMouseMove,
-        handleTouchEnd,
         handleTouchMove,
         handleTouchStart
       } = getWebGLInteractivityHandlers(renderGraph);
 
       // Attach interactivity event listeners
       canvasElement.addEventListener("mousedown", handleMouseDown);
-      canvasElement.addEventListener("mouseleave", handleMouseLeave);
       canvasElement.addEventListener("mousemove", handleMouseMove);
-      canvasElement.addEventListener("touchend", handleTouchEnd);
       canvasElement.addEventListener("touchmove", handleTouchMove);
       canvasElement.addEventListener("touchstart", handleTouchStart);
 
@@ -203,9 +202,7 @@ export const LineGraphWebGL = (props: {
       return () => {
         window.removeEventListener("resize", onResize);
         canvasElement.removeEventListener("mousedown", handleMouseDown);
-        canvasElement.removeEventListener("mouseleave", handleMouseLeave);
         canvasElement.removeEventListener("mousemove", handleMouseMove);
-        canvasElement.removeEventListener("touchend", handleTouchEnd);
         canvasElement.removeEventListener("touchmove", handleTouchMove);
         canvasElement.removeEventListener("touchstart", handleTouchStart);
       };
@@ -215,10 +212,10 @@ export const LineGraphWebGL = (props: {
   return (
     <Div position="relative">
       <Canvas ref={canvasElementRef as any} />
-      {yLabels.map(label => (
+      {priceLabels.map(label => (
         <AxisLabel id={JSON.stringify(label)}>${label}</AxisLabel>
       ))}
-      {xLabels.map(label => (
+      {dateLabels.map(label => (
         <AxisLabel id={JSON.stringify(label)}>
           {moment(label).format(displayFormat)}
         </AxisLabel>

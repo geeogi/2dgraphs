@@ -1,7 +1,9 @@
 import {
-  BORDER_COLOR_GL,
-  PRIMARY_COLOR_GL,
-  SECONDARY_COLOR_GL
+  ACTIVE_HANDLE_BODY_VEC,
+  ACTIVE_HANDLE_BORDER_VEC,
+  ACTIVE_LINE_VEC,
+  AXIS_COLOR_VEC,
+  PRIMARY_COLOR_VEC
 } from "../../../Config/colors";
 import { resizeGlCanvas } from "./WebGLUtils/canvasUtils";
 import { getDrawAreaMethod } from "./WebGLUtils/drawArea";
@@ -11,49 +13,44 @@ import { getDrawCircleMethod } from "./WebGLUtils/drawPoint";
 
 export const getRenderMethod = (
   props: {
-    scaleDateX: (date: string) => number;
-    scalePriceY: (price: number) => number;
-    scaleUnixX: (dateToUnix: number) => number;
-    values: { dateTime: string; price: number }[];
-    xLabels: number[];
-    yLabels: number[];
+    points: {
+      x: number;
+      y: number;
+      price: number;
+      dateTime: string;
+    }[];
+    xGridLines: number[];
+    yGridLines: number[];
   },
   gl: WebGLRenderingContext,
   margin: [number, number]
 ) => {
   // Extract static render props
-  const {
-    scaleDateX,
-    scalePriceY,
-    scaleUnixX,
-    values,
-    xLabels,
-    yLabels
-  } = props;
+  const { points, xGridLines, yGridLines } = props;
 
   // Initialize canvas coordinates
   const linePoints: { x: number; y: number }[] = [];
   const areaPoints: { x: number; y: number }[] = [];
 
   // Define primary line and area coordinates
-  values.forEach(value => {
-    const x = scaleDateX(value.dateTime);
-    const y = scalePriceY(value.price);
+  points.forEach(value => {
+    const x = value.x;
+    const y = value.y;
     linePoints.push({ x, y });
     areaPoints.push({ x, y });
     areaPoints.push({ x, y: -1 });
   });
 
   // Define y-axis coordinates
-  const yAxis = yLabels.map(price => [
-    { x: -1, y: scalePriceY(price) },
-    { x: 1, y: scalePriceY(price) }
+  const yAxis = yGridLines.map(y => [
+    { x: -1, y },
+    { x: 1, y }
   ]);
 
   // Define x-axis coordinates
-  const xAxis = xLabels.map(unix => [
-    { x: scaleUnixX(unix / 1000), y: -1.05 },
-    { x: scaleUnixX(unix / 1000), y: -1 }
+  const xAxis = xGridLines.map(x => [
+    { x, y: -1.05 },
+    { x, y: -1 }
   ]);
 
   // Define active axis coordinates
@@ -62,29 +59,27 @@ export const getRenderMethod = (
     { x: 0, y: -1 }
   ];
 
+  // Define active circle coordinates
+  const activeCircle = { x: 0, y: 0, r: 1 };
+
   // Define primary drawing methods
-  const drawPrimaryPath = getDrawPathMethod(gl, linePoints, PRIMARY_COLOR_GL);
-  const drawPrimaryArea = getDrawAreaMethod(gl, areaPoints, PRIMARY_COLOR_GL);
-  const drawYAxis = getDrawLinesMethod(
-    gl,
-    yAxis,
-    BORDER_COLOR_GL,
-    "horizontal"
-  );
-  const drawXAxis = getDrawLinesMethod(gl, xAxis, BORDER_COLOR_GL, "vertical");
+  const drawPrimaryPath = getDrawPathMethod(gl, linePoints, PRIMARY_COLOR_VEC);
+  const drawPrimaryArea = getDrawAreaMethod(gl, areaPoints, PRIMARY_COLOR_VEC);
+  const drawYAxis = getDrawLinesMethod(gl, yAxis, AXIS_COLOR_VEC, "horizontal");
+  const drawXAxis = getDrawLinesMethod(gl, xAxis, AXIS_COLOR_VEC, "vertical");
 
   // Define active drawing methods
   const drawYActiveAxis = getDrawLinesMethod(
     gl,
     [activeYAxis],
-    SECONDARY_COLOR_GL,
+    ACTIVE_LINE_VEC,
     "vertical"
   );
   const drawActiveCircle = getDrawCircleMethod(
     gl,
-    { x: 0, y: 0, r: 1 },
-    [0, 0, 1, 1],
-    [1, 1, 1, 1]
+    activeCircle,
+    ACTIVE_HANDLE_BODY_VEC,
+    ACTIVE_HANDLE_BORDER_VEC
   );
 
   /* RETURN WEBGL RENDER FUNCTION */
@@ -115,13 +110,10 @@ export const getRenderMethod = (
     drawPrimaryPath(resolution, scale);
 
     // Draw the active elements if applicable
-    if (activeX) {
-      // Convert px to [-1,1] clip space
-      const clipSpaceX = (2 * activeX) / resolution[0] - 1;
-
+    if (typeof activeX === "number") {
       // Fetch nearest point to active coordinates
       const [{ x, y }] = linePoints.sort((a, b) => {
-        return Math.abs(a.x - clipSpaceX) - Math.abs(b.x - clipSpaceX);
+        return Math.abs(a.x - activeX) - Math.abs(b.x - activeX);
       });
 
       // Draw the active elements

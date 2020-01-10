@@ -3,7 +3,7 @@ import { enableAttribute, initArrayBuffer, initProgram } from "./setupUtils";
 export const getDrawAreaMethod = (
   gl: WebGLRenderingContext,
   areaPoints: { x: number; y: number; z?: number }[],
-  rgba: string
+  color: number[]
 ) => {
   // Vertex shader source code
   var areaVShader =
@@ -18,9 +18,11 @@ export const getDrawAreaMethod = (
 
   // Fragment shader source code
   var areaFShader =
+    "precision mediump float;" +
+    "uniform vec4 uColor;" +
     "varying mediump float vY;" +
     "void main(void) {" +
-    ` gl_FragColor = vec4${rgba};` +
+    ` gl_FragColor = uColor;` +
     " gl_FragColor.a = gl_FragColor.a * ((vY+1.0)/2.0);" +
     "}";
 
@@ -46,6 +48,9 @@ export const getDrawAreaMethod = (
     // Enable uniforms
     const marginResolution = gl.getUniformLocation(areaProgram, "uMargin");
     gl.uniform2fv(marginResolution, margin);
+
+    const colorUniform = gl.getUniformLocation(areaProgram, "uColor");
+    gl.uniform4fv(colorUniform, color);
 
     /*============ Drawing the area =============*/
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, areaPoints.length);

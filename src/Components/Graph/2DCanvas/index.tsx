@@ -46,9 +46,7 @@ export const LineGraph2DCanvas = (props: {
       <Canvas
         ref={canvasElementRef as any}
         onMouseDown={eventHandlers.handleMouseDown}
-        onMouseLeave={eventHandlers.handleMouseLeave}
         onMouseMove={eventHandlers.handleMouseMove}
-        onTouchEnd={eventHandlers.handleTouchEnd}
         onTouchMove={eventHandlers.handleTouchMove}
         onTouchStart={eventHandlers.handleTouchStart}
       />

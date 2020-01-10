@@ -3,7 +3,7 @@ import { enableAttribute, initArrayBuffer, initProgram } from "./setupUtils";
 export const getDrawLinesMethod = (
   gl: WebGLRenderingContext,
   lines: { x: number; y: number; z?: number }[][],
-  rgba: string,
+  color: number[],
   mode: "horizontal" | "vertical"
 ) => {
   const lineVShader =
@@ -19,7 +19,12 @@ export const getDrawLinesMethod = (
     " gl_Position.xy = gl_Position.xy * uScale;" +
     "}";
 
-  const lineFShader = `void main(void) { gl_FragColor = vec4${rgba}; }`;
+  const lineFShader = `
+    precision mediump float;
+    uniform vec4 uColor; 
+    void main(void) { 
+      gl_FragColor = uColor; 
+    }`;
 
   // Create a shader program object to store the combined shader program
   const lineProgram = initProgram(gl, lineVShader, lineFShader);
@@ -79,6 +84,9 @@ export const getDrawLinesMethod = (
 
     const uTranslation = gl.getUniformLocation(lineProgram, "uTranslation");
     gl.uniform2fv(uTranslation, translation);
+
+    const colorUniform = gl.getUniformLocation(lineProgram, "uColor");
+    gl.uniform4fv(colorUniform, color);
 
     // Draw the line
     gl.drawArrays(gl.TRIANGLES, 0, lines.length * 6);
