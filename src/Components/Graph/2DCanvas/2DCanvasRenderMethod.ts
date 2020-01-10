@@ -132,7 +132,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
           canvasY: toCanvasY(0)
         }
       ],
-      getGradient(PRIMARY_COLOR_ALPHA_RGB(1), PRIMARY_COLOR_ALPHA_RGB(0))
+      getGradient(PRIMARY_COLOR_ALPHA_RGB(0.6), PRIMARY_COLOR_ALPHA_RGB(0))
     );
 
     // Draw primary line
