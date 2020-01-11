@@ -64,10 +64,7 @@ export const getDrawCircleMethod = (
 
   // Setup and cache the program and uniform locations
   if (!pointProgram) {
-    // Create a shader program object to store the combined shader program
     pointProgram = initProgram(gl, pointVShader, pointFShader);
-
-    // Fetch uniform locations
     uColor = gl.getUniformLocation(pointProgram, "uColor");
     uEdgeColor = gl.getUniformLocation(pointProgram, "uEdgeColor");
     uScale = gl.getUniformLocation(pointProgram, "uScale");

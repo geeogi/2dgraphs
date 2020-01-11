@@ -32,8 +32,7 @@ export const LineGraphWebGL = (props: {
   const { earliestDate, latestDate, maxPrice, minPrice, values } = props;
 
   // Configure x-axis labels
-  const xConfig = getDateLabels(earliestDate, latestDate, 4);
-  const { dateLabels } = xConfig;
+  const dateLabels = getDateLabels(earliestDate, latestDate, 4);
 
   // Configure y-axis labels
   const yConfig = getPriceLabels(minPrice, maxPrice, 4);

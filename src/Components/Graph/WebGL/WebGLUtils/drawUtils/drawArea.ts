@@ -10,7 +10,7 @@ export const getDrawAreaMethod = (
   color: number[]
 ) => {
   // Vertex shader source code
-  var areaVShader =
+  const areaVShader =
     "uniform vec2 uMargin;" +
     "attribute vec3 aVertex;" +
     "varying mediump float vY;" +
@@ -21,7 +21,7 @@ export const getDrawAreaMethod = (
     "}";
 
   // Fragment shader source code
-  var areaFShader =
+  const areaFShader =
     "precision mediump float;" +
     "uniform vec4 uColor;" +
     "varying mediump float vY;" +
@@ -33,8 +33,6 @@ export const getDrawAreaMethod = (
   // Setup and cache the program and uniform locations
   if (!areaProgram) {
     areaProgram = initProgram(gl, areaVShader, areaFShader);
-
-    // Fetch uniform locations
     marginResolution = gl.getUniformLocation(areaProgram, "uMargin");
     colorUniform = gl.getUniformLocation(areaProgram, "uColor");
   }
@@ -47,7 +45,7 @@ export const getDrawAreaMethod = (
   });
 
   /*======= Storing the geometry ======*/
-  var fillAreaVertices_buffer = initArrayBuffer(gl, fillAreaVertices);
+  const fillAreaVertices_buffer = initArrayBuffer(gl, fillAreaVertices);
 
   return (resolution: [number, number], margin: [number, number]) => {
     // Use the combined shader program object

@@ -34,10 +34,7 @@ export const getDrawLinesMethod = (
 
   // Setup and cache the program and uniform locations
   if (!lineProgram) {
-    // Create a shader program object to store the combined shader program
     lineProgram = initProgram(gl, lineVShader, lineFShader);
-
-    // Fetch uniform locations
     uResolution = gl.getUniformLocation(lineProgram, "uResolution");
     uScale = gl.getUniformLocation(lineProgram, "uScale");
     uTranslation = gl.getUniformLocation(lineProgram, "uTranslation");

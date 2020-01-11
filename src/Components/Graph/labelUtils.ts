@@ -124,5 +124,5 @@ export const getDateLabels = (
     dateLabels = tryLabels("day", 1);
   }
 
-  return { dateLabels, displayFormat };
+  return dateLabels;
 };

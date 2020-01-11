@@ -39,10 +39,7 @@ export const getDrawPathMethod = (
 
   // Setup and cache the program and uniform locations
   if (!lineProgram) {
-    // Create a shader program object to store the combined shader program
     lineProgram = initProgram(gl, lineVShader, lineFShader);
-
-    // Fetch uniform locations
     resolutionUniform = gl.getUniformLocation(lineProgram, "uResolution");
     marginResolution = gl.getUniformLocation(lineProgram, "uMargin");
     colorUniform = gl.getUniformLocation(lineProgram, "uColor");
