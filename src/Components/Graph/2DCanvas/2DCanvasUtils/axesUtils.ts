@@ -50,7 +50,7 @@ export const drawYAxes = (
     const labelY = toCanvasX(price);
     context.fillText(format(price), labelX, labelY - SPACING_UNIT);
     context.moveTo(GRAPH_MARGIN_X, labelY);
-    context.lineTo(graphWidth, labelY);
+    context.lineTo(GRAPH_MARGIN_X + graphWidth, labelY);
   });
 
   context.stroke();

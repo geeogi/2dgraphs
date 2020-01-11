@@ -11,7 +11,7 @@ import { LineGraphWebGL } from "./Components/Graph/WebGL";
 
 function App() {
   const [graphToDisplay, setGraphToDisplay] = useState("webgl");
-  const [startFrom, setStartFrom] = useState(0);
+  const [noOfDataPoints, setNoOfDataPoints] = useState(400);
 
   // Parse values
   const values = PRICE_DATA.map(value => ({
@@ -20,13 +20,10 @@ function App() {
   }));
 
   // Calculate number of available data points
-  const numberOfAvailableDataPoints = values.length;
+  const noOfAvailableDataPoints = values.length;
 
   // Splice values
-  values.splice(0, startFrom);
-
-  // Calculate number of active data points
-  const numberOfDataPoints = values.length;
+  values.splice(0, noOfAvailableDataPoints - noOfDataPoints);
 
   // Calculate min, max and average price
   const minPrice = Math.min(...values.map(value => value.price));
@@ -62,12 +59,12 @@ function App() {
         <Row>
           <input
             type="range"
-            min="0"
-            max={numberOfAvailableDataPoints - 10}
-            value={startFrom}
-            onChange={e => setStartFrom(e.target.value)}
+            min={10}
+            max={noOfAvailableDataPoints}
+            value={noOfDataPoints}
+            onChange={e => setNoOfDataPoints(e.target.value)}
           ></input>
-          <P>Number of data points: {numberOfDataPoints}</P>
+          <P>{noOfDataPoints}</P>
         </Row>
         {graphToDisplay === "2dcanvas" && (
           <LineGraph2DCanvas
