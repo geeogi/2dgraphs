@@ -22,7 +22,7 @@ function App() {
   // Calculate number of available data points
   const noOfAvailableDataPoints = values.length;
 
-  // Splice values
+  // Reduce array to desired number of data points
   values.splice(0, noOfAvailableDataPoints - noOfDataPoints);
 
   // Calculate min, max and average price
