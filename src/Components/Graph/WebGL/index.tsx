@@ -33,7 +33,7 @@ export const LineGraphWebGL = (props: {
 
   // Configure x-axis labels
   const xConfig = getDateLabels(earliestDate, latestDate, 4);
-  const { dateLabels, displayFormat } = xConfig;
+  const { dateLabels } = xConfig;
 
   // Configure y-axis labels
   const yConfig = getPriceLabels(minPrice, maxPrice, 4);
@@ -49,7 +49,7 @@ export const LineGraphWebGL = (props: {
   const scalePriceY = getScaleMethod(priceLabels[0], maxPrice, -1, 1);
 
   // Configure axis grid lines in [-1,1] clip space
-  const xGridLines = dateLabels.map(label => scaleUnixX(label / 1000));
+  const xGridLines = dateLabels.map(({ unix }) => scaleUnixX(unix / 1000));
   const yGridLines = priceLabels.map(label => scalePriceY(label));
 
   // Calculate point coordinates [-1,1] for each value
@@ -80,8 +80,8 @@ export const LineGraphWebGL = (props: {
     });
 
     // x-axis
-    dateLabels.forEach((label, index) => {
-      const labelElement = document.getElementById(JSON.stringify(label));
+    dateLabels.forEach(({ label }, index) => {
+      const labelElement = document.getElementById(label);
       if (labelElement) {
         const xLeftPercentage = (xGridLines[index] + 1) / 2;
         const xLeft = xLeftPercentage * (resolution[0] - 2 * margin[0]);
@@ -92,7 +92,7 @@ export const LineGraphWebGL = (props: {
     });
   };
 
-  /* DRAW GRAPH AND ATTACH LISTENERS ON FIRST RENDER */
+  /* DRAW GRAPH AND ATTACH EVENT LISTENERS ON FIRST RENDER */
   useEffect(() => {
     const canvasElement = canvasElementRef && canvasElementRef.current;
     const gl = canvasElement && canvasElement.getContext("webgl");
@@ -223,13 +223,9 @@ export const LineGraphWebGL = (props: {
           ${label}
         </AxisLabel>
       ))}
-      {dateLabels.map(label => (
-        <AxisLabel
-          id={JSON.stringify(label)}
-          key={JSON.stringify(label)}
-          style={{ display: "none" }}
-        >
-          {moment(label).format(displayFormat)}
+      {dateLabels.map(({ label }) => (
+        <AxisLabel id={label} key={label} style={{ display: "none" }}>
+          {label}
         </AxisLabel>
       ))}
       <ActiveLegend

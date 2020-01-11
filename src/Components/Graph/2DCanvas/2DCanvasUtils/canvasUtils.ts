@@ -13,9 +13,16 @@ export const getRetinaMethod = (
   canvasHeight: number
 ) => () => {
   const canvasResolutionScale = window.devicePixelRatio;
-  canvasElement.style.width = canvasWidth + "px";
-  canvasElement.style.height = canvasHeight + "px";
-  canvasElement.width = canvasWidth * canvasResolutionScale;
-  canvasElement.height = canvasHeight * canvasResolutionScale;
-  canvasContext.scale(canvasResolutionScale, canvasResolutionScale);
+  const displayWidth = canvasWidth * canvasResolutionScale;
+  const displayHeight = canvasHeight * canvasResolutionScale;
+  if (
+    canvasElement.width !== displayWidth ||
+    canvasElement.height !== displayHeight
+  ) {
+    canvasElement.style.width = canvasWidth + "px";
+    canvasElement.style.height = canvasHeight + "px";
+    canvasElement.width = canvasWidth * canvasResolutionScale;
+    canvasElement.height = canvasHeight * canvasResolutionScale;
+    canvasContext.scale(canvasResolutionScale, canvasResolutionScale);
+  }
 };

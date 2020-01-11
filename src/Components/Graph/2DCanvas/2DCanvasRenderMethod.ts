@@ -74,7 +74,10 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
     const { height, width } = getParentDimensions(canvasElement);
 
     // Fetch the canvas context
-    const context = canvasElement.getContext("2d");
+    const context: CanvasRenderingContext2D = canvasElement.getContext("2d");
+
+    // Clear graph
+    context.clearRect(0, 0, width, height);
 
     // Calculate graph dimensions
     const graphDepth = height - 2 * GRAPH_MARGIN_Y;
@@ -107,7 +110,6 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
       context,
       xLabels,
       unix => toCanvasX(scaleDateX(unix) * graphWidth),
-      unix => moment(unix).format(xDisplayFormat),
       graphWidth,
       graphDepth
     );

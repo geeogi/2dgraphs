@@ -1,6 +1,7 @@
 import moment from "moment";
 
-export const dateToUnix = (dateString: string) => new Date(dateString).getTime() / 1000;
+export const dateToUnix = (dateString: string) =>
+  new Date(dateString).getTime() / 1000;
 
 const roundUpToNearest = (value: number, multiple: number) => {
   return Math.ceil(value / multiple) * multiple;
@@ -40,27 +41,30 @@ export const getDateLabels = (
   latestDate: string,
   minNumberOfLabels: number
 ) => {
-  let dateLabels: number[] = [];
+  let dateLabels: { unix: number; label: string }[] = [];
   let displayFormat = "MMM 'YY";
 
   const tryLabels = (period: any, amount: number) => {
-    const labelArray: any[] = [];
+    const labelArray: { unix: number; label: string }[] = [];
     let momentToAdd = moment(earliestDate)
       .startOf(period)
       .add(1, period);
     while (momentToAdd.isBefore(moment(latestDate))) {
-      labelArray.push(momentToAdd.unix() * 1000);
+      labelArray.push({
+        unix: momentToAdd.unix() * 1000,
+        label: momentToAdd.format(displayFormat)
+      });
       momentToAdd = momentToAdd.add(amount, period);
     }
     return labelArray;
   };
-   // 10 year intervals
-   if (dateLabels.length < minNumberOfLabels) {
+  // 10 year intervals
+  if (dateLabels.length < minNumberOfLabels) {
     dateLabels = tryLabels("year", 10);
   }
 
-   // 5 year intervals
-   if (dateLabels.length < minNumberOfLabels) {
+  // 5 year intervals
+  if (dateLabels.length < minNumberOfLabels) {
     dateLabels = tryLabels("year", 5);
   }
 
