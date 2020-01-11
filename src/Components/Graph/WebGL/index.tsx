@@ -1,5 +1,5 @@
 import moment from "moment";
-import React, { useEffect, useRef, memo } from "react";
+import React, { useEffect, useRef } from "react";
 import { Div } from "../../Base/Div";
 import { ActiveLegend, AxisLabel } from "../AxisLegend";
 import { Canvas } from "../Canvas";
@@ -18,7 +18,7 @@ import { getWebGLInteractivityHandlers } from "./WebGLUtils/eventUtils";
 const ACTIVE_LEGEND_WIDTH = ACTIVE_LEGEND.WIDTH;
 const ACTIVE_LEGEND_ID = "active-legend";
 
-const RawLineGraphWebGL = (props: {
+export const LineGraphWebGL = (props: {
   earliestDate: string;
   latestDate: string;
   maxPrice: number;
@@ -240,5 +240,3 @@ const RawLineGraphWebGL = (props: {
     </Div>
   );
 };
-
-export const LineGraphWebGL = memo(RawLineGraphWebGL);
