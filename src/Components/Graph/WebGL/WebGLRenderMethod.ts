@@ -6,10 +6,10 @@ import {
   PRIMARY_COLOR_VEC
 } from "../../../Config/colors";
 import { resizeGlCanvas } from "./WebGLUtils/canvasUtils";
-import { getDrawAreaMethod } from "./WebGLUtils/drawArea";
-import { getDrawLinesMethod } from "./WebGLUtils/drawLines";
-import { getDrawPathMethod } from "./WebGLUtils/drawPath";
-import { getDrawCircleMethod } from "./WebGLUtils/drawPoint";
+import { getDrawAreaMethod } from "./WebGLUtils/drawUtils/drawArea";
+import { getDrawLinesMethod } from "./WebGLUtils/drawUtils/drawLines";
+import { getDrawPathMethod } from "./WebGLUtils/drawUtils/drawPath";
+import { getDrawCircleMethod } from "./WebGLUtils/drawUtils/drawPoint";
 
 export const getRenderMethod = (
   props: {

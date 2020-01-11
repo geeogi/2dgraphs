@@ -1,4 +1,10 @@
-import { enableAttribute, initArrayBuffer, initProgram } from "./setupUtils";
+import { enableAttribute, initArrayBuffer, initProgram } from "../setupUtils";
+
+let lineProgram: WebGLProgram;
+let uResolution: WebGLUniformLocation | null;
+let uScale: WebGLUniformLocation | null;
+let uTranslation: WebGLUniformLocation | null;
+let colorUniform: WebGLUniformLocation | null;
 
 export const getDrawLinesMethod = (
   gl: WebGLRenderingContext,
@@ -26,8 +32,17 @@ export const getDrawLinesMethod = (
       gl_FragColor = uColor; 
     }`;
 
-  // Create a shader program object to store the combined shader program
-  const lineProgram = initProgram(gl, lineVShader, lineFShader);
+  // Setup and cache the program and uniform locations
+  if (!lineProgram) {
+    // Create a shader program object to store the combined shader program
+    lineProgram = initProgram(gl, lineVShader, lineFShader);
+
+    // Fetch uniform locations
+    uResolution = gl.getUniformLocation(lineProgram, "uResolution");
+    uScale = gl.getUniformLocation(lineProgram, "uScale");
+    uTranslation = gl.getUniformLocation(lineProgram, "uTranslation");
+    colorUniform = gl.getUniformLocation(lineProgram, "uColor");
+  }
 
   // Calculate geometry
   const lineVertices: number[] = [];
@@ -76,16 +91,9 @@ export const getDrawLinesMethod = (
     enableAttribute(gl, lineProgram, direction_buffer, "aDirection");
 
     // Enable uniforms
-    const uResolution = gl.getUniformLocation(lineProgram, "uResolution");
     gl.uniform2fv(uResolution, resolution);
-
-    const uScale = gl.getUniformLocation(lineProgram, "uScale");
     gl.uniform2fv(uScale, scale);
-
-    const uTranslation = gl.getUniformLocation(lineProgram, "uTranslation");
     gl.uniform2fv(uTranslation, translation);
-
-    const colorUniform = gl.getUniformLocation(lineProgram, "uColor");
     gl.uniform4fv(colorUniform, color);
 
     // Draw the line

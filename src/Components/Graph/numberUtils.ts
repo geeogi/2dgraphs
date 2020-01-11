@@ -26,8 +26,8 @@ export const getScaleMethod = (
   const secondaryValueRange = maxSecondaryValue - minSecondaryValue;
 
   return (primaryValue: number) => {
-    const normalPrimaryValue = primaryValue - minPrimaryValue;
-    const primaryPercentage = normalPrimaryValue / primaryValueRange;
+    const normalizedPrimaryValue = primaryValue - minPrimaryValue;
+    const primaryPercentage = normalizedPrimaryValue / primaryValueRange;
     return minSecondaryValue + primaryPercentage * secondaryValueRange;
   };
 };

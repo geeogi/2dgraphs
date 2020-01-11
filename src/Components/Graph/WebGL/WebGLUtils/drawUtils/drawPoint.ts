@@ -1,4 +1,12 @@
-import { enableAttribute, initArrayBuffer, initProgram } from "./setupUtils";
+import { enableAttribute, initArrayBuffer, initProgram } from "../setupUtils";
+
+let pointProgram: WebGLProgram;
+let uColor: WebGLUniformLocation | null;
+let uEdgeColor: WebGLUniformLocation | null;
+let uScale: WebGLUniformLocation | null;
+let uTranslation: WebGLUniformLocation | null;
+let uEdgeSize: WebGLUniformLocation | null;
+let uSize: WebGLUniformLocation | null;
 
 export const getDrawCircleMethod = (
   gl: WebGLRenderingContext,
@@ -54,8 +62,19 @@ export const getDrawCircleMethod = (
     gl_FragColor.a = distance > 1.0 ? 0.0 : gl_FragColor.a;
     }`;
 
-  // Create a shader program object to store the combined shader program
-  const pointProgram = initProgram(gl, pointVShader, pointFShader);
+  // Setup and cache the program and uniform locations
+  if (!pointProgram) {
+    // Create a shader program object to store the combined shader program
+    pointProgram = initProgram(gl, pointVShader, pointFShader);
+
+    // Fetch uniform locations
+    uColor = gl.getUniformLocation(pointProgram, "uColor");
+    uEdgeColor = gl.getUniformLocation(pointProgram, "uEdgeColor");
+    uScale = gl.getUniformLocation(pointProgram, "uScale");
+    uTranslation = gl.getUniformLocation(pointProgram, "uTranslation");
+    uEdgeSize = gl.getUniformLocation(pointProgram, "uEdgeSize");
+    uSize = gl.getUniformLocation(pointProgram, "uSize");
+  }
 
   // Upload buffers to GLSL
   const point_buffer = initArrayBuffer(gl, [circle.x, circle.y, 0]);
@@ -72,22 +91,11 @@ export const getDrawCircleMethod = (
     enableAttribute(gl, pointProgram, point_buffer, "aVertex");
 
     // Enable uniforms
-    const uColor = gl.getUniformLocation(pointProgram, "uColor");
     gl.uniform4fv(uColor, color);
-
-    const uEdgeColor = gl.getUniformLocation(pointProgram, "uEdgeColor");
     gl.uniform4fv(uEdgeColor, edgeColor);
-
-    const uScale = gl.getUniformLocation(pointProgram, "uScale");
     gl.uniform2fv(uScale, scale);
-
-    const uTranslation = gl.getUniformLocation(pointProgram, "uTranslation");
     gl.uniform2fv(uTranslation, translation);
-
-    const uEdgeSize = gl.getUniformLocation(pointProgram, "uEdgeSize");
     gl.uniform1f(uEdgeSize, 2);
-
-    const uSize = gl.getUniformLocation(pointProgram, "uSize");
     gl.uniform1f(uSize, 25);
 
     // Draw the line

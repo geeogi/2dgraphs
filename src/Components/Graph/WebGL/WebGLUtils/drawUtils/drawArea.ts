@@ -1,4 +1,8 @@
-import { enableAttribute, initArrayBuffer, initProgram } from "./setupUtils";
+import { enableAttribute, initArrayBuffer, initProgram } from "../setupUtils";
+
+let areaProgram: WebGLProgram;
+let marginResolution: WebGLUniformLocation | null;
+let colorUniform: WebGLUniformLocation | null;
 
 export const getDrawAreaMethod = (
   gl: WebGLRenderingContext,
@@ -26,7 +30,14 @@ export const getDrawAreaMethod = (
     " gl_FragColor.a = gl_FragColor.a * ((vY+1.0)/2.0);" +
     "}";
 
-  const areaProgram = initProgram(gl, areaVShader, areaFShader);
+  // Setup and cache the program and uniform locations
+  if (!areaProgram) {
+    areaProgram = initProgram(gl, areaVShader, areaFShader);
+
+    // Fetch uniform locations
+    marginResolution = gl.getUniformLocation(areaProgram, "uMargin");
+    colorUniform = gl.getUniformLocation(areaProgram, "uColor");
+  }
 
   /*======= Defining the geometry ======*/
   const fillAreaVertices: number[] = [];
@@ -46,10 +57,7 @@ export const getDrawAreaMethod = (
     enableAttribute(gl, areaProgram, fillAreaVertices_buffer, "aVertex");
 
     // Enable uniforms
-    const marginResolution = gl.getUniformLocation(areaProgram, "uMargin");
     gl.uniform2fv(marginResolution, margin);
-
-    const colorUniform = gl.getUniformLocation(areaProgram, "uColor");
     gl.uniform4fv(colorUniform, color);
 
     /*============ Drawing the area =============*/

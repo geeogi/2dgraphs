@@ -1,6 +1,6 @@
 import moment from "moment";
 
-export const dateToUnix = (dateString: string) => moment(dateString).unix();
+export const dateToUnix = (dateString: string) => new Date(dateString).getTime() / 1000;
 
 const roundUpToNearest = (value: number, multiple: number) => {
   return Math.ceil(value / multiple) * multiple;
