@@ -10,8 +10,8 @@ export const H4 = styled.h4`
 
 export const H3 = styled.h3`
   color: ${CONTRAST_COLOR};
-  padding: 0 8px;
-  margin: 0;
+  margin-bottom: 8px;
+  margin-top: 16px;
 `;
 
 export const H1 = styled.h1`

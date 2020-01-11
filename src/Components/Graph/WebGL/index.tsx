@@ -1,5 +1,5 @@
 import moment from "moment";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, memo } from "react";
 import { Div } from "../../Base/Div";
 import { ActiveLegend, AxisLabel } from "../AxisLegend";
 import { Canvas } from "../Canvas";
@@ -18,7 +18,7 @@ import { getWebGLInteractivityHandlers } from "./WebGLUtils/eventUtils";
 const ACTIVE_LEGEND_WIDTH = ACTIVE_LEGEND.WIDTH;
 const ACTIVE_LEGEND_ID = "active-legend";
 
-export const LineGraphWebGL = (props: {
+const RawLineGraphWebGL = (props: {
   earliestDate: string;
   latestDate: string;
   maxPrice: number;
@@ -215,12 +215,20 @@ export const LineGraphWebGL = (props: {
     <Div position="relative">
       <Canvas ref={canvasElementRef as any} />
       {priceLabels.map(label => (
-        <AxisLabel id={JSON.stringify(label)} style={{ display: "none" }}>
+        <AxisLabel
+          id={JSON.stringify(label)}
+          key={JSON.stringify(label)}
+          style={{ display: "none" }}
+        >
           ${label}
         </AxisLabel>
       ))}
       {dateLabels.map(label => (
-        <AxisLabel id={JSON.stringify(label)} style={{ display: "none" }}>
+        <AxisLabel
+          id={JSON.stringify(label)}
+          key={JSON.stringify(label)}
+          style={{ display: "none" }}
+        >
           {moment(label).format(displayFormat)}
         </AxisLabel>
       ))}
@@ -232,3 +240,5 @@ export const LineGraphWebGL = (props: {
     </Div>
   );
 };
+
+export const LineGraphWebGL = memo(RawLineGraphWebGL);

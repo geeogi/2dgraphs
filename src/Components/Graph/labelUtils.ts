@@ -54,6 +54,25 @@ export const getDateLabels = (
     }
     return labelArray;
   };
+   // 10 year intervals
+   if (dateLabels.length < minNumberOfLabels) {
+    dateLabels = tryLabels("year", 10);
+  }
+
+   // 5 year intervals
+   if (dateLabels.length < minNumberOfLabels) {
+    dateLabels = tryLabels("year", 5);
+  }
+
+  // 2 year intervals
+  if (dateLabels.length < minNumberOfLabels) {
+    dateLabels = tryLabels("year", 2);
+  }
+
+  // 1 year intervals
+  if (dateLabels.length < minNumberOfLabels) {
+    dateLabels = tryLabels("year", 1);
+  }
 
   // 6 month intervals
   if (dateLabels.length < minNumberOfLabels) {
