@@ -2,6 +2,6 @@ import styled from "styled-components";
 
 export const Row = styled.div`
   display: flex;
-  padding: ${props => props.padding};
-  text-align: ${props => (props.textAlignCenter ? "center" : "none")};
+  padding-left: 16px;
+  text-align: ${props => props.textAlign};
 `;

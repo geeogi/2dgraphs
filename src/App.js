@@ -62,6 +62,7 @@ function App() {
             min={10}
             max={noOfAvailableDataPoints}
             value={noOfDataPoints}
+            step={1}
             onChange={e => setNoOfDataPoints(e.target.value)}
           ></input>
           <P>{noOfDataPoints}</P>

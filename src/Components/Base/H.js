@@ -12,6 +12,7 @@ export const H3 = styled.h3`
   color: ${CONTRAST_COLOR};
   margin-bottom: 8px;
   margin-top: 16px;
+  padding-left: 16px;
 `;
 
 export const H1 = styled.h1`

@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 interface Div {
-  position: string;
+  position?: string;
 }
 
 export const Div = styled.div<Div>`
