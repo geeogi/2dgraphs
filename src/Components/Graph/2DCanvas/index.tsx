@@ -3,11 +3,6 @@ import { getInteractivityHandlers } from "./2DCanvasUtils/eventUtils";
 
 export const drawGraph2DCanvas = (props: {
   canvasElement: HTMLCanvasElement;
-  positionLabels: (canvas: HTMLCanvasElement) => void;
-  positionActiveLegend: (
-    canvas: HTMLCanvasElement,
-    activeX: number | undefined
-  ) => void;
   points: {
     x: number;
     y: number;
@@ -16,6 +11,11 @@ export const drawGraph2DCanvas = (props: {
   }[];
   xGridLines: number[];
   yGridLines: number[];
+  onRender: (canvas: HTMLCanvasElement) => void;
+  onInteraction: (
+    canvas: HTMLCanvasElement,
+    activeX: number | undefined
+  ) => void;
 }) => {
   // Fetch render method
   const renderMethod = getPeriodAverageRenderMethod(props);
@@ -26,12 +26,12 @@ export const drawGraph2DCanvas = (props: {
   // Define resize method
   const onResize = () => {
     renderMethod({ canvasElement });
-    props.positionLabels(canvasElement);
+    props.onRender(canvasElement);
   };
 
   // Render on mount
   renderMethod({ canvasElement });
-  props.positionLabels(canvasElement);
+  props.onRender(canvasElement);
 
   // Attach resize listener
   window.addEventListener("resize", onResize);

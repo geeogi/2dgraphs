@@ -1,18 +1,21 @@
 import React, { useEffect } from "react";
+import {
+  ActiveCircle,
+  ActiveLegend,
+  ActiveLine,
+  ACTIVE_CIRCLE_ID,
+  ACTIVE_LEGEND_ID,
+  ACTIVE_LINE_ID
+} from "./Components/Base/AxisLegend";
 import { Button } from "./Components/Base/Button";
+import { Canvas } from "./Components/Base/Canvas";
 import { Div } from "./Components/Base/Div";
 import { GraphCard } from "./Components/Base/GraphCard";
 import { H1, H3 } from "./Components/Base/H";
 import { Header } from "./Components/Base/Header";
 import { P } from "./Components/Base/P";
 import { Row } from "./Components/Base/Row";
-import { ActiveLegend } from "./Components/Base/AxisLegend";
-import { Canvas } from "./Components/Base/Canvas";
-import { ACTIVE_LEGEND } from "./Components/Graph/Universal/constants";
-import { drawGraph } from "./draw";
-
-const ACTIVE_LEGEND_WIDTH = ACTIVE_LEGEND.WIDTH;
-const ACTIVE_LEGEND_ID = "active-legend";
+import { drawGraph } from "./drawGraph";
 
 function App() {
   // Draw graph when Canvas element is loaded
@@ -48,11 +51,9 @@ function App() {
         <div>
           <Div position="relative">
             <Canvas />
-            <ActiveLegend
-              id={ACTIVE_LEGEND_ID}
-              width={ACTIVE_LEGEND_WIDTH}
-              style={{ display: "none" }}
-            />
+            <ActiveLegend id={ACTIVE_LEGEND_ID} />
+            <ActiveCircle id={ACTIVE_CIRCLE_ID} />
+            <ActiveLine id={ACTIVE_LINE_ID} />
           </Div>
         </div>
       </GraphCard>

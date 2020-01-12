@@ -12,8 +12,8 @@ export const drawGraphWebGL = (props: {
     price: any;
     dateTime: any;
   }[];
-  positionLabels: (canvas: HTMLCanvasElement) => void;
-  positionActiveLegend: (
+  onRender: (canvas: HTMLCanvasElement) => void;
+  onInteraction: (
     canvas: HTMLCanvasElement,
     activeX: number | undefined
   ) => void;
@@ -21,14 +21,7 @@ export const drawGraphWebGL = (props: {
   const margin: [number, number] = [GRAPH_MARGIN_X, GRAPH_MARGIN_Y];
 
   // Extract graph props
-  const {
-    canvasElement,
-    xGridLines,
-    yGridLines,
-    points,
-    positionLabels,
-    positionActiveLegend
-  } = props;
+  const { canvasElement, xGridLines, yGridLines, points } = props;
 
   const gl: WebGLRenderingContext | null = canvasElement.getContext("webgl");
 
@@ -58,25 +51,17 @@ export const drawGraphWebGL = (props: {
       canvasElement.offsetHeight
     ];
 
-    // Calculate graph width in px
-    const graphWidth = resolution[0] - 2 * margin[0];
-
     // Position active legend
-    positionActiveLegend(canvasElement, activeX);
-
-    // Scale activeX to [-1,1] clip space
-    const clipSpaceActiveX = activeX
-      ? ((activeX - margin[0]) / graphWidth) * 2 - 1
-      : undefined;
+    props.onInteraction(canvasElement, activeX);
 
     // Call WebGL render method
-    renderGLCanvas(resolution, clipSpaceActiveX);
+    renderGLCanvas(resolution);
   };
 
   // Define resize handler
   const onResize = () => {
     renderGraph();
-    positionLabels(canvasElement);
+    props.onRender(canvasElement);
   };
 
   // Attach event listener to render on resize event
@@ -96,9 +81,9 @@ export const drawGraphWebGL = (props: {
   canvasElement.addEventListener("touchmove", handleTouchMove);
   canvasElement.addEventListener("touchstart", handleTouchStart);
 
-  // Render and position labels on page load
+  // Render on page load
   renderGraph();
-  positionLabels(canvasElement);
+  props.onRender(canvasElement);
 
   // Return cleanup method
   return () => {

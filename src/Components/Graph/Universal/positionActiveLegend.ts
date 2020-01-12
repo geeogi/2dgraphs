@@ -1,12 +1,13 @@
 import moment from "moment";
 import {
-  ACTIVE_LEGEND,
-  SPACING_UNIT
-} from "./constants";
+  ACTIVE_LEGEND_ID,
+  ACTIVE_LEGEND_WIDTH,
+  ACTIVE_CIRCLE_WIDTH,
+  ACTIVE_LINE_ID
+} from "../../Base/AxisLegend";
+import { ACTIVE_CIRCLE_ID } from "./../../Base/AxisLegend";
+import { SPACING_UNIT } from "./constants";
 import { clamp } from "./numberUtils";
-
-const ACTIVE_LEGEND_WIDTH = ACTIVE_LEGEND.WIDTH;
-const ACTIVE_LEGEND_ID = "active-legend";
 
 export const positionActiveLegend = (
   canvasElement: HTMLCanvasElement,
@@ -22,14 +23,21 @@ export const positionActiveLegend = (
   // Calculate graph width and height in px
   const graphWidth = resolution[0] - 2 * margin[0];
   const graphHeight = resolution[1] - 2 * margin[1];
-  // Show or hide active legend
+
+  // Fetch active elements
   const activeLegendElement = document.getElementById(ACTIVE_LEGEND_ID);
-  if (activeLegendElement) {
+  const activeCircleElement = document.getElementById(ACTIVE_CIRCLE_ID);
+  const activeLineElement = document.getElementById(ACTIVE_LINE_ID);
+
+  // Show or hide active legend
+  if (activeLegendElement && activeCircleElement && activeLineElement) {
     if (activeX && activeX > -1) {
       // Scale activeX to [-1,1] clip space
       const clipSpaceActiveX = activeX
         ? ((activeX - margin[0]) / graphWidth) * 2 - 1
         : undefined;
+
+      // Position elements
       if (clipSpaceActiveX) {
         // Fetch nearest point to activeX
         const [{ x, y, dateTime, price }] = [...points].sort((a, b) => {
@@ -61,9 +69,21 @@ export const positionActiveLegend = (
         activeLegendElement.style.top = resolution[1] - legendY + "px";
         activeLegendElement.textContent = `$${displayPrice} – ${displayDate}`;
         activeLegendElement.style.display = "block";
+
+        // Update active circle DOM element
+        const d = ACTIVE_CIRCLE_WIDTH / 2;
+        activeCircleElement.style.left = nearXGraphX - d + "px";
+        activeCircleElement.style.top = resolution[1] - nearYGraphY - d + "px";
+        activeCircleElement.style.display = "block";
+
+        // Update active line DOM element
+        activeLineElement.style.left = nearXGraphX + "px";
+        activeLineElement.style.display = "block";
       }
     } else {
       activeLegendElement.style.display = "none";
+      activeCircleElement.style.display = "none";
+      activeLineElement.style.display = "none";
     }
   }
 };

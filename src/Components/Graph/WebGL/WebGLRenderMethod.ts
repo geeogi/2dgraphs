@@ -1,15 +1,8 @@
-import {
-  ACTIVE_HANDLE_BODY_VEC,
-  ACTIVE_HANDLE_BORDER_VEC,
-  ACTIVE_LINE_VEC,
-  AXIS_COLOR_VEC,
-  PRIMARY_COLOR_VEC
-} from "../../../Config/colors";
+import { AXIS_COLOR_VEC, PRIMARY_COLOR_VEC } from "../../../Config/colors";
 import { resizeGlCanvas } from "./WebGLUtils/canvasUtils";
 import { getDrawAreaMethod } from "./WebGLUtils/drawUtils/drawArea";
 import { getDrawLinesMethod } from "./WebGLUtils/drawUtils/drawLines";
 import { getDrawPathMethod } from "./WebGLUtils/drawUtils/drawPath";
-import { getDrawCircleMethod } from "./WebGLUtils/drawUtils/drawPoint";
 
 export const getRenderMethod = (
   props: {
@@ -53,37 +46,14 @@ export const getRenderMethod = (
     { x, y: -1 }
   ]);
 
-  // Define active axis coordinates
-  const activeYAxis = [
-    { x: 0, y: 1 },
-    { x: 0, y: -1 }
-  ];
-
-  // Define active circle coordinates
-  const activeCircle = { x: 0, y: 0, r: 1 };
-
   // Define primary drawing methods
   const drawPrimaryPath = getDrawPathMethod(gl, linePoints, PRIMARY_COLOR_VEC);
   const drawPrimaryArea = getDrawAreaMethod(gl, areaPoints, PRIMARY_COLOR_VEC);
   const drawYAxis = getDrawLinesMethod(gl, yAxis, AXIS_COLOR_VEC, "horizontal");
   const drawXAxis = getDrawLinesMethod(gl, xAxis, AXIS_COLOR_VEC, "vertical");
 
-  // Define active drawing methods
-  const drawYActiveAxis = getDrawLinesMethod(
-    gl,
-    [activeYAxis],
-    ACTIVE_LINE_VEC,
-    "vertical"
-  );
-  const drawActiveCircle = getDrawCircleMethod(
-    gl,
-    activeCircle,
-    ACTIVE_HANDLE_BODY_VEC,
-    ACTIVE_HANDLE_BORDER_VEC
-  );
-
   /* RETURN WEBGL RENDER FUNCTION */
-  return (resolution: [number, number], activeX?: number, activeY?: number) => {
+  return (resolution: [number, number]) => {
     // Resize canvas if necessary
     resizeGlCanvas(gl);
 
@@ -108,17 +78,5 @@ export const getRenderMethod = (
     drawXAxis(resolution, scale);
     drawPrimaryArea(resolution, scale);
     drawPrimaryPath(resolution, scale);
-
-    // Draw the active elements if applicable
-    if (typeof activeX === "number") {
-      // Fetch nearest point to active coordinates
-      const [{ x, y }] = linePoints.sort((a, b) => {
-        return Math.abs(a.x - activeX) - Math.abs(b.x - activeX);
-      });
-
-      // Draw the active elements
-      drawYActiveAxis(resolution, scale, [x, 0]);
-      drawActiveCircle(resolution, scale, [x, y]);
-    }
   };
 };

@@ -5,14 +5,22 @@ import { positionLabels } from "./Components/Graph/Universal/positionLabels";
 import { setupValues } from "./Components/Graph/Universal/setupValues";
 import { drawGraphWebGL } from "./Components/Graph/WebGL";
 
-// Parse JSON values
+const CANVAS_STYLE = [
+  "user-select: none",
+  "touch-action: none",
+  "display: block",
+  "width: 100%",
+  "height: 400px"
+].join(";");
+
+// Parse values from JSON file
 const values: { dateTime: string; price: number }[] = PRICE_DATA.map(value => ({
   dateTime: value.date,
   price: value["price(USD)"]
 }));
 
 // Declare render variables
-let noOfDataPoints = 400;
+let currentNoOfDataPoints = 400;
 let currentGraphType: string = "2dcanvas";
 
 // Cache cleanup function to be called if graph is re-rendered
@@ -20,7 +28,7 @@ let cleanup: () => void;
 
 /* MAIN DRAWING METHOD */
 export const drawGraph = (
-  newNoOfDataPoints: number = noOfDataPoints,
+  noOfDataPoints: number = currentNoOfDataPoints,
   graphType: string = currentGraphType
 ) => {
   // Fetch canvas element
@@ -29,10 +37,7 @@ export const drawGraph = (
   // Replace canvas element if graph type has changed
   if (graphType !== currentGraphType) {
     const newCanvasElement = document.createElement("canvas");
-    newCanvasElement.setAttribute(
-      "style",
-      "user-select: none; touch-action: none; display: block; width: 100%; height: 400px;"
-    );
+    newCanvasElement.setAttribute("style", CANVAS_STYLE);
     canvas.insertAdjacentElement("afterend", newCanvasElement);
     canvas.remove();
     canvas = newCanvasElement;
@@ -40,7 +45,7 @@ export const drawGraph = (
 
   // Update render variables cache
   currentGraphType = graphType;
-  noOfDataPoints = newNoOfDataPoints;
+  currentNoOfDataPoints = noOfDataPoints;
 
   // Calculate graph coordinates, grid lines and label values
   const {
@@ -50,7 +55,7 @@ export const drawGraph = (
     yGridLines,
     points,
     margin
-  } = setupValues([...values], newNoOfDataPoints);
+  } = setupValues([...values], noOfDataPoints);
 
   // Call clean up function if applicable
   if (cleanup) {
@@ -60,13 +65,13 @@ export const drawGraph = (
   // Decide which drawing method to use
   const draw = graphType === "webgl" ? drawGraphWebGL : drawGraph2DCanvas;
 
-  // Draw the canvas
+  // Draw the graph
   cleanup = draw({
     canvasElement: canvas,
     points,
     xGridLines,
     yGridLines,
-    positionLabels: (canvasElement: HTMLCanvasElement) => {
+    onRender: (canvasElement: HTMLCanvasElement) => {
       positionLabels(
         canvasElement,
         dateLabels,
@@ -76,7 +81,7 @@ export const drawGraph = (
         margin
       );
     },
-    positionActiveLegend: (
+    onInteraction: (
       canvasElement: HTMLCanvasElement,
       activeX: number | undefined
     ) => {

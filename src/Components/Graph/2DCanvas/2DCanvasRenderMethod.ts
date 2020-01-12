@@ -24,14 +24,14 @@ interface Props {
   }[];
   xGridLines: number[];
   yGridLines: number[];
-  positionActiveLegend: (
+  onInteraction: (
     canvas: HTMLCanvasElement,
     activeX: number | undefined
   ) => void;
 }
 
 export const getPeriodAverageRenderMethod = (props: Props) => {
-  const { points, xGridLines, yGridLines, positionActiveLegend } = props;
+  const { points, xGridLines, yGridLines } = props;
 
   /* RETURN 2D CANVAS RENDER FUNCTION */
   return function render(renderVariables?: {
@@ -114,33 +114,6 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
     drawLine(context, scaledPoints, PRIMARY_COLOR_RGB);
 
     // Position active legend
-    positionActiveLegend(canvasElement, activeX);
-
-    // Draw active line
-    if (typeof activeX === "number") {
-      // Fetch nearest point to active coordinates
-      const [{ canvasX, canvasY }] = scaledPoints.sort((a, b) => {
-        return Math.abs(a.canvasX - activeX) - Math.abs(b.canvasX - activeX);
-      });
-
-      // Draw line
-      drawLine(
-        context,
-        [
-          { canvasX, canvasY: toCanvasY(graphDepth) },
-          { canvasX, canvasY: toCanvasY(0) }
-        ],
-        ACTIVE_LINE_RGB,
-        1
-      );
-
-      // Draw legend circular handle
-      context.fillStyle = ACTIVE_HANDLE_BODY_RGB;
-      context.strokeStyle = ACTIVE_HANDLE_BORDER_RGB;
-      context.beginPath();
-      context.arc(canvasX, canvasY, 6, 0, 2 * Math.PI);
-      context.fill();
-      context.stroke();
-    }
+    props.onInteraction(canvasElement, activeX);
   };
 };
