@@ -1,12 +1,8 @@
-import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "../constants";
-import {
-  dateToUnix,
-  getDateLabels,
-  getPriceLabels
-} from "./../../../Components/Graph/labelUtils";
-import { getScaleMethod } from "./../../../Components/Graph/numberUtils";
+import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "./constants";
+import { dateToUnix, getDateLabels, getPriceLabels } from "./labelUtils";
+import { getScaleMethod } from "./numberUtils";
 
-export const calculateGraphValues = (
+export const setupValues = (
   values: { dateTime: string; price: number }[],
   noOfDataPoints: number
 ) => {

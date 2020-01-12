@@ -4,15 +4,6 @@ import {
   ACTIVE_LEGEND_TEXT_RGB
 } from "../../Config/colors";
 
-export const AxisLabel = styled.label`
-  position: absolute;
-  pointer-events: none;
-  top: 0;
-  left: 0;
-  font-size: 12px;
-  font-family: Arial;
-`;
-
 interface ActiveLegendProps {
   width: number;
 }

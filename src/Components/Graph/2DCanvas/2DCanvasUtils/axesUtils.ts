@@ -4,7 +4,7 @@ import {
   GRAPH_MARGIN_Y,
   LABEL_MARGIN_X,
   SPACING_UNIT
-} from "../../constants";
+} from "../../Universal/constants";
 
 export const drawXAxes = (
   context: CanvasRenderingContext2D,

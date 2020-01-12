@@ -2,7 +2,7 @@ import PRICE_DATA from "./allTime.json";
 import { drawGraph2DCanvas } from "./Components/Graph/2DCanvas";
 import { positionActiveLegend } from "./Components/Graph/Universal/positionActiveLegend";
 import { positionLabels } from "./Components/Graph/Universal/positionLabels";
-import { calculateGraphValues } from "./Components/Graph/Universal/setup";
+import { setupValues } from "./Components/Graph/Universal/setupValues";
 import { drawGraphWebGL } from "./Components/Graph/WebGL";
 
 // Parse JSON values
@@ -52,7 +52,7 @@ export const triggerDraw = (
     yGridLines,
     points,
     margin
-  } = calculateGraphValues([...values], newNoOfDataPoints);
+  } = setupValues([...values], newNoOfDataPoints);
 
   // Call clean up function if applicable
   if (cleanup) {

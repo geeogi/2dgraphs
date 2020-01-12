@@ -6,9 +6,9 @@ import { H1, H3 } from "./Components/Base/H";
 import { Header } from "./Components/Base/Header";
 import { P } from "./Components/Base/P";
 import { Row } from "./Components/Base/Row";
-import { ActiveLegend } from "./Components/Graph/AxisLegend";
-import { Canvas } from "./Components/Graph/Canvas";
-import { ACTIVE_LEGEND } from "./Components/Graph/constants";
+import { ActiveLegend } from "./Components/Base/AxisLegend";
+import { Canvas } from "./Components/Base/Canvas";
+import { ACTIVE_LEGEND } from "./Components/Graph/Universal/constants";
 import { triggerDraw } from "./draw";
 
 const ACTIVE_LEGEND_WIDTH = ACTIVE_LEGEND.WIDTH;

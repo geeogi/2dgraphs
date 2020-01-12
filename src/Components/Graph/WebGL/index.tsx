@@ -1,4 +1,4 @@
-import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "../constants";
+import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "../Universal/constants";
 import { getRenderMethod } from "./WebGLRenderMethod";
 import { getWebGLInteractivityHandlers } from "./WebGLUtils/eventUtils";
 
@@ -47,7 +47,7 @@ export const drawGraphWebGL = (props: {
     margin
   );
 
-  // Define full render method
+  // Define method to be run on each render
   const renderGraph = (args?: { activeX?: number; activeY?: number }) => {
     // Extract render args
     const { activeX } = args || {};
@@ -58,7 +58,7 @@ export const drawGraphWebGL = (props: {
       canvasElement.offsetHeight
     ];
 
-    // Calculate graph width and height in px
+    // Calculate graph width in px
     const graphWidth = resolution[0] - 2 * margin[0];
 
     // Position active legend

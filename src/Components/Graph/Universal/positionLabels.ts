@@ -1,4 +1,4 @@
-import { LABEL_MARGIN_X } from "./../../../Components/Graph/constants";
+import { LABEL_MARGIN_X } from "./constants";
 
 const existingLabelIds: string[] = [];
 

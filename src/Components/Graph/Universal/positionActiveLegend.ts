@@ -2,8 +2,8 @@ import moment from "moment";
 import {
   ACTIVE_LEGEND,
   SPACING_UNIT
-} from "./../../../Components/Graph/constants";
-import { clamp } from "./../../../Components/Graph/numberUtils";
+} from "./constants";
+import { clamp } from "./numberUtils";
 
 const ACTIVE_LEGEND_WIDTH = ACTIVE_LEGEND.WIDTH;
 const ACTIVE_LEGEND_ID = "active-legend";
