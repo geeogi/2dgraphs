@@ -1,20 +1,11 @@
-import moment from "moment";
 import {
   ACTIVE_HANDLE_BODY_RGB,
   ACTIVE_HANDLE_BORDER_RGB,
-  ACTIVE_LEGEND_BACKGROUND_RGB,
-  ACTIVE_LEGEND_TEXT_RGB,
   ACTIVE_LINE_RGB,
   PRIMARY_COLOR_ALPHA_RGB,
   PRIMARY_COLOR_RGB
 } from "../../../Config/colors";
-import {
-  ACTIVE_LEGEND,
-  GRAPH_MARGIN_X,
-  GRAPH_MARGIN_Y,
-  SPACING_UNIT
-} from "../constants";
-import { clamp } from "../numberUtils";
+import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "../constants";
 import { drawXAxes, drawYAxes } from "./2DCanvasUtils/axesUtils";
 import { getRetinaMethod } from "./2DCanvasUtils/canvasUtils";
 import { getParentDimensions } from "./2DCanvasUtils/domUtils";
@@ -25,13 +16,6 @@ import {
 } from "./2DCanvasUtils/drawUtils";
 
 interface Props {
-  earliestDate: string;
-  latestDate: string;
-  maxPrice: number;
-  minPrice: number;
-  values: { dateTime: string; price: number }[];
-  dateLabels: { label: string; unix: number }[];
-  priceLabels: number[];
   points: {
     x: number;
     y: number;
@@ -40,7 +24,10 @@ interface Props {
   }[];
   xGridLines: number[];
   yGridLines: number[];
-  positionActiveLegend: (canvas: HTMLCanvasElement, activeX: number) => void;
+  positionActiveLegend: (
+    canvas: HTMLCanvasElement,
+    activeX: number | undefined
+  ) => void;
 }
 
 export const getPeriodAverageRenderMethod = (props: Props) => {
@@ -54,7 +41,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
     isClicked?: boolean;
   }) {
     // Extract render variables
-    const { canvasElement, activeX, activeY } = renderVariables as any;
+    const { canvasElement, activeX } = renderVariables as any;
 
     // Fetch the desired canvas height and width
     const { height, width } = getParentDimensions(canvasElement);
@@ -126,14 +113,17 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
     // Draw primary line
     drawLine(context, scaledPoints, PRIMARY_COLOR_RGB);
 
-    // Draw active legend, if active
-    if (activeX && activeY) {
+    // Position active legend
+    positionActiveLegend(canvasElement, activeX);
+
+    // Draw active line
+    if (typeof activeX === "number") {
       // Fetch nearest point to active coordinates
       const [{ canvasX, canvasY }] = scaledPoints.sort((a, b) => {
         return Math.abs(a.canvasX - activeX) - Math.abs(b.canvasX - activeX);
       });
 
-      // Draw active line
+      // Draw line
       drawLine(
         context,
         [
@@ -144,15 +134,13 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
         1
       );
 
-      // Draw active legend circular handle
+      // Draw legend circular handle
       context.fillStyle = ACTIVE_HANDLE_BODY_RGB;
       context.strokeStyle = ACTIVE_HANDLE_BORDER_RGB;
       context.beginPath();
       context.arc(canvasX, canvasY, 6, 0, 2 * Math.PI);
       context.fill();
       context.stroke();
-
-      positionActiveLegend(canvasElement, activeX);
     }
   };
 };

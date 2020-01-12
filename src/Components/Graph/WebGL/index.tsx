@@ -1,26 +1,9 @@
-import moment from "moment";
-import {
-  ACTIVE_LEGEND,
-  GRAPH_MARGIN_X,
-  GRAPH_MARGIN_Y,
-  SPACING_UNIT
-} from "../constants";
-import { clamp } from "../numberUtils";
+import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "../constants";
 import { getRenderMethod } from "./WebGLRenderMethod";
 import { getWebGLInteractivityHandlers } from "./WebGLUtils/eventUtils";
 
-const ACTIVE_LEGEND_WIDTH = ACTIVE_LEGEND.WIDTH;
-const ACTIVE_LEGEND_ID = "active-legend";
-
 export const drawGraphWebGL = (props: {
-  earliestDate: string;
-  latestDate: string;
-  maxPrice: number;
-  minPrice: number;
-  values: { dateTime: string; price: number }[];
-  canvasId: string;
-  dateLabels: { label: string; unix: number }[];
-  priceLabels: number[];
+  canvasElement: HTMLCanvasElement;
   xGridLines: number[];
   yGridLines: number[];
   points: {
@@ -30,12 +13,16 @@ export const drawGraphWebGL = (props: {
     dateTime: any;
   }[];
   positionLabels: (canvas: HTMLCanvasElement) => void;
-  positionActiveLegend: (canvas: HTMLCanvasElement, activeX: number) => void;
+  positionActiveLegend: (
+    canvas: HTMLCanvasElement,
+    activeX: number | undefined
+  ) => void;
 }) => {
   const margin: [number, number] = [GRAPH_MARGIN_X, GRAPH_MARGIN_Y];
 
   // Extract graph props
   const {
+    canvasElement,
     xGridLines,
     yGridLines,
     points,
@@ -43,11 +30,11 @@ export const drawGraphWebGL = (props: {
     positionActiveLegend
   } = props;
 
-  const canvasElement: HTMLCanvasElement = document.getElementById(
-    props.canvasId
-  ) as any;
-  const gl: WebGLRenderingContext =
-    canvasElement && (canvasElement.getContext("webgl") as any);
+  const gl: WebGLRenderingContext | null = canvasElement.getContext("webgl");
+
+  if (!gl) {
+    throw new Error("Could not get WebGL context");
+  }
 
   // Initialize GL render method
   const renderGLCanvas = getRenderMethod(
@@ -73,16 +60,14 @@ export const drawGraphWebGL = (props: {
 
     // Calculate graph width and height in px
     const graphWidth = resolution[0] - 2 * margin[0];
-    const graphHeight = resolution[1] - 2 * margin[1];
+
+    // Position active legend
+    positionActiveLegend(canvasElement, activeX);
 
     // Scale activeX to [-1,1] clip space
     const clipSpaceActiveX = activeX
       ? ((activeX - margin[0]) / graphWidth) * 2 - 1
       : undefined;
-
-    if (activeX) {
-      positionActiveLegend(canvasElement, activeX);
-    }
 
     // Call WebGL render method
     renderGLCanvas(resolution, clipSpaceActiveX);
@@ -91,7 +76,7 @@ export const drawGraphWebGL = (props: {
   // Define resize handler
   const onResize = () => {
     renderGraph();
-    positionLabels(canvasElement); // Labels need repositioning on resize
+    positionLabels(canvasElement);
   };
 
   // Attach event listener to render on resize event

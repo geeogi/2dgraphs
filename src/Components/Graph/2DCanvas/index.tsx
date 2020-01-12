@@ -2,16 +2,12 @@ import { getPeriodAverageRenderMethod } from "./2DCanvasRenderMethod";
 import { getInteractivityHandlers } from "./2DCanvasUtils/eventUtils";
 
 export const drawGraph2DCanvas = (props: {
-  earliestDate: string;
-  latestDate: string;
-  maxPrice: number;
-  minPrice: number;
-  values: { dateTime: string; price: number }[];
-  canvasId: string;
-  dateLabels: { label: string; unix: number }[];
-  priceLabels: number[];
+  canvasElement: HTMLCanvasElement;
   positionLabels: (canvas: HTMLCanvasElement) => void;
-  positionActiveLegend: (canvas: HTMLCanvasElement, activeX: number) => void;
+  positionActiveLegend: (
+    canvas: HTMLCanvasElement,
+    activeX: number | undefined
+  ) => void;
   points: {
     x: number;
     y: number;
@@ -24,10 +20,8 @@ export const drawGraph2DCanvas = (props: {
   // Fetch render method
   const renderMethod = getPeriodAverageRenderMethod(props);
 
-  // Define rendering React effect
-  const canvasElement: HTMLCanvasElement = document.getElementById(
-    props.canvasId
-  ) as any;
+  // Extract props
+  const { canvasElement } = props;
 
   // Define resize method
   const onResize = () => {
