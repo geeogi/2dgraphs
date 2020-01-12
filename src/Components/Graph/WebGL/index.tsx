@@ -25,6 +25,7 @@ export const drawGraphWebGL = (props: {
 
   // Initialize GL render method
   const renderGLCanvas = getRenderMethod(
+    canvasElement,
     {
       xGridLines,
       yGridLines,

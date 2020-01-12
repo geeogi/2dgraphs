@@ -1,19 +1,19 @@
-export const resizeGlCanvas = (gl: any) => {
+export const resizeGlCanvas = (gl: any, canvasElement: HTMLCanvasElement) => {
   var realToCSSPixels = window.devicePixelRatio;
 
   // Lookup the size the browser is displaying the canvas in CSS pixels
   // and compute a size needed to make our drawing buffer match it in
   // device pixels.
-  var displayWidth = Math.floor(gl.canvas.clientWidth * realToCSSPixels);
-  var displayHeight = Math.floor(gl.canvas.clientHeight * realToCSSPixels);
+  var displayWidth = Math.floor(canvasElement.clientWidth * realToCSSPixels);
+  var displayHeight = Math.floor(canvasElement.clientHeight * realToCSSPixels);
 
   // Check if the canvas is not the same size.
-  if (gl.canvas.width !== displayWidth || gl.canvas.height !== displayHeight) {
+  if (canvasElement.width !== displayWidth || canvasElement.height !== displayHeight) {
     // Make the canvas the same size
-    gl.canvas.width = displayWidth;
-    gl.canvas.height = displayHeight;
+    // canvasElement.width = displayWidth;
+    // canvasElement.height = displayHeight;
 
     // Set the GL view port
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    gl.viewport(0, 0, canvasElement.width, canvasElement.height); // Remove?
   }
 };

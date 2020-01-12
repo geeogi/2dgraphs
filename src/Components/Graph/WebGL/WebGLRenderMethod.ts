@@ -5,6 +5,7 @@ import { getDrawLinesMethod } from "./WebGLUtils/drawUtils/drawLines";
 import { getDrawPathMethod } from "./WebGLUtils/drawUtils/drawPath";
 
 export const getRenderMethod = (
+  canvasElement: HTMLCanvasElement,
   props: {
     points: {
       x: number;
@@ -55,7 +56,7 @@ export const getRenderMethod = (
   /* RETURN WEBGL RENDER FUNCTION */
   return (resolution: [number, number]) => {
     // Resize canvas if necessary
-    resizeGlCanvas(gl);
+    resizeGlCanvas(gl, canvasElement);
 
     // Clear the canvas
     gl.clearColor(0, 0, 0, 0);
