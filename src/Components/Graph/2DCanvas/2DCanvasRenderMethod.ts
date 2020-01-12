@@ -14,8 +14,7 @@ import {
   GRAPH_MARGIN_Y,
   SPACING_UNIT
 } from "../constants";
-import { dateToUnix, getDateLabels, getPriceLabels } from "../labelUtils";
-import { clamp, getScaleMethod } from "../numberUtils";
+import { clamp } from "../numberUtils";
 import { drawXAxes, drawYAxes } from "./2DCanvasUtils/axesUtils";
 import { getRetinaMethod } from "./2DCanvasUtils/canvasUtils";
 import { getParentDimensions } from "./2DCanvasUtils/domUtils";
@@ -31,33 +30,21 @@ interface Props {
   maxPrice: number;
   minPrice: number;
   values: { dateTime: string; price: number }[];
+  dateLabels: { label: string; unix: number }[];
+  priceLabels: number[];
+  points: {
+    x: number;
+    y: number;
+    price: any;
+    dateTime: any;
+  }[];
+  xGridLines: number[];
+  yGridLines: number[];
+  positionActiveLegend: (canvas: HTMLCanvasElement, activeX: number) => void;
 }
 
 export const getPeriodAverageRenderMethod = (props: Props) => {
-  const { earliestDate, latestDate, maxPrice, minPrice, values } = props;
-
-  // Get x-axis labels
-  const xLabels = getDateLabels(earliestDate, latestDate, 4);
-
-  // Get y-axis labels
-  const yConfig = getPriceLabels(minPrice, maxPrice, 4);
-  const { priceLabels: yLabels } = yConfig;
-
-  // Get x-axis scale helpers
-  const unixMin = dateToUnix(earliestDate);
-  const unixMax = dateToUnix(latestDate);
-  const scaleUnixX = getScaleMethod(unixMin, unixMax, 0, 1);
-  const scaleDateX = (date: string) => scaleUnixX(dateToUnix(date));
-
-  // Get y-axis scale helpers
-  const scalePriceY = getScaleMethod(yLabels[0], maxPrice, 0, 1);
-
-  // Calculate primary line points (price vs. date)
-  const points = values.map(value => {
-    const graphX = scaleDateX(value.dateTime);
-    const graphY = scalePriceY(value.price);
-    return { x: graphX, y: graphY, value };
-  });
+  const { points, xGridLines, yGridLines, positionActiveLegend } = props;
 
   /* RETURN 2D CANVAS RENDER FUNCTION */
   return function render(renderVariables?: {
@@ -96,9 +83,10 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
 
     // Scale points to screen resolution
     const scaledPoints = points.map(point => ({
-      canvasX: toCanvasX(point.x * graphWidth),
-      canvasY: toCanvasY(point.y * graphDepth),
-      value: point.value
+      canvasX: toCanvasX(((point.x + 1) / 2) * graphWidth),
+      canvasY: toCanvasY(((point.y + 1) / 2) * graphDepth),
+      dateTime: point.dateTime,
+      price: point.price
     }));
 
     // Scale retina
@@ -107,8 +95,8 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
     // Draw x-axis
     drawXAxes(
       context,
-      xLabels,
-      unix => toCanvasX(scaleDateX(unix) * graphWidth),
+      xGridLines,
+      clipSpace => toCanvasX(((clipSpace + 1) / 2) * graphWidth),
       graphWidth,
       graphDepth
     );
@@ -116,9 +104,8 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
     // Draw y-axis
     drawYAxes(
       context,
-      yLabels,
-      price => toCanvasY(scalePriceY(price) * graphDepth),
-      price => `$${Math.round(price)}`,
+      yGridLines,
+      clipSpace => toCanvasY(((clipSpace + 1) / 2) * graphDepth),
       graphWidth
     );
 
@@ -142,7 +129,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
     // Draw active legend, if active
     if (activeX && activeY) {
       // Fetch nearest point to active coordinates
-      const [{ canvasX, canvasY, value }] = scaledPoints.sort((a, b) => {
+      const [{ canvasX, canvasY }] = scaledPoints.sort((a, b) => {
         return Math.abs(a.canvasX - activeX) - Math.abs(b.canvasX - activeX);
       });
 
@@ -157,33 +144,6 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
         1
       );
 
-      // Draw active legend body
-      context.fillStyle = ACTIVE_LEGEND_BACKGROUND_RGB;
-      context.beginPath();
-
-      const legendTopY = toCanvasY(graphDepth - 2 * SPACING_UNIT);
-      const legendBottomY = toCanvasY(graphDepth - 5 * SPACING_UNIT);
-
-      const anchorY = canvasY < legendBottomY ? canvasY - SPACING_UNIT : 0;
-      const anchorX = clamp(
-        canvasX,
-        ACTIVE_LEGEND.WIDTH / 2,
-        width - ACTIVE_LEGEND.WIDTH / 2
-      );
-
-      context.moveTo(anchorX - ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
-      context.lineTo(anchorX - ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
-      context.lineTo(
-        anchorX - ACTIVE_LEGEND.WIDTH / 2,
-        anchorY + legendBottomY
-      );
-      context.lineTo(
-        anchorX + ACTIVE_LEGEND.WIDTH / 2,
-        anchorY + legendBottomY
-      );
-      context.lineTo(anchorX + ACTIVE_LEGEND.WIDTH / 2, anchorY + legendTopY);
-      context.fill();
-
       // Draw active legend circular handle
       context.fillStyle = ACTIVE_HANDLE_BODY_RGB;
       context.strokeStyle = ACTIVE_HANDLE_BORDER_RGB;
@@ -192,13 +152,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
       context.fill();
       context.stroke();
 
-      // Draw active legend text
-      context.fillStyle = ACTIVE_LEGEND_TEXT_RGB;
-      context.textAlign = "center";
-      const priceLabel = Math.round(value.price);
-      const dateLabel = moment(value.dateTime).format("DD MMM YY");
-      const label = `$${priceLabel} – ${dateLabel}`;
-      context.fillText(label, anchorX, anchorY + legendBottomY - SPACING_UNIT);
+      positionActiveLegend(canvasElement, activeX);
     }
   };
 };
