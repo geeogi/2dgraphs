@@ -19,14 +19,12 @@ let currentGraphType: string = "2dcanvas";
 let cleanup: () => void;
 
 /* MAIN DRAWING METHOD */
-export const triggerDraw = (
+export const drawGraph = (
   newNoOfDataPoints: number = noOfDataPoints,
   graphType: string = currentGraphType
 ) => {
   // Fetch canvas element
-  let canvasElement: HTMLCanvasElement = document.getElementsByTagName(
-    "canvas"
-  )[0];
+  let canvas: HTMLCanvasElement = document.getElementsByTagName("canvas")[0];
 
   // Replace canvas element if graph type has changed
   if (graphType !== currentGraphType) {
@@ -35,9 +33,9 @@ export const triggerDraw = (
       "style",
       "user-select: none; touch-action: none; display: block; width: 100%; height: 400px;"
     );
-    canvasElement.insertAdjacentElement("afterend", newCanvasElement);
-    canvasElement.remove();
-    canvasElement = newCanvasElement;
+    canvas.insertAdjacentElement("afterend", newCanvasElement);
+    canvas.remove();
+    canvas = newCanvasElement;
   }
 
   // Update render variables cache
@@ -64,7 +62,7 @@ export const triggerDraw = (
 
   // Draw the canvas
   cleanup = draw({
-    canvasElement,
+    canvasElement: canvas,
     points,
     xGridLines,
     yGridLines,

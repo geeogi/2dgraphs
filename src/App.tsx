@@ -9,15 +9,15 @@ import { Row } from "./Components/Base/Row";
 import { ActiveLegend } from "./Components/Base/AxisLegend";
 import { Canvas } from "./Components/Base/Canvas";
 import { ACTIVE_LEGEND } from "./Components/Graph/Universal/constants";
-import { triggerDraw } from "./draw";
+import { drawGraph } from "./draw";
 
 const ACTIVE_LEGEND_WIDTH = ACTIVE_LEGEND.WIDTH;
 const ACTIVE_LEGEND_ID = "active-legend";
 
 function App() {
-  // Render on first load
+  // Draw graph when Canvas element is loaded
   useEffect(() => {
-    triggerDraw();
+    drawGraph();
   });
 
   return (
@@ -29,10 +29,10 @@ function App() {
       <GraphCard>
         <H3>Render method:</H3>
         <Row>
-          <Button onClick={() => triggerDraw(undefined, "2dcanvas")}>
+          <Button onClick={() => drawGraph(undefined, "2dcanvas")}>
             2D Canvas
           </Button>
-          <Button onClick={() => triggerDraw(undefined, "webgl")}>WebGL</Button>
+          <Button onClick={() => drawGraph(undefined, "webgl")}>WebGL</Button>
         </Row>
         <H3>Data points:</H3>
         <Row>
@@ -42,7 +42,7 @@ function App() {
             max={3000}
             defaultValue={400}
             step={1}
-            onChange={e => triggerDraw(e.target.value as any)}
+            onChange={e => drawGraph(e.target.value as any)}
           ></input>
         </Row>
         <div>
