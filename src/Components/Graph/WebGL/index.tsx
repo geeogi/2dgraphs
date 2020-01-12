@@ -1,6 +1,5 @@
 import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "../Universal/constants";
 import { getRenderMethod } from "./WebGLRenderMethod";
-import { getWebGLInteractivityHandlers } from "./WebGLUtils/eventUtils";
 
 export const drawGraphWebGL = (props: {
   canvasElement: HTMLCanvasElement;
@@ -12,11 +11,6 @@ export const drawGraphWebGL = (props: {
     price: any;
     dateTime: any;
   }[];
-  onRender: (canvas: HTMLCanvasElement) => void;
-  onInteraction: (
-    canvas: HTMLCanvasElement,
-    activeX: number | undefined
-  ) => void;
 }) => {
   const margin: [number, number] = [GRAPH_MARGIN_X, GRAPH_MARGIN_Y];
 
@@ -40,57 +34,12 @@ export const drawGraphWebGL = (props: {
     margin
   );
 
-  // Define method to be run on each render
-  const renderGraph = (args?: { activeX?: number; activeY?: number }) => {
-    // Extract render args
-    const { activeX } = args || {};
+  // Calculate canvas resolution
+  const resolution: [number, number] = [
+    canvasElement.offsetWidth,
+    canvasElement.offsetHeight
+  ];
 
-    // Calculate canvas resolution
-    const resolution: [number, number] = [
-      canvasElement.offsetWidth,
-      canvasElement.offsetHeight
-    ];
-
-    // Position active legend
-    props.onInteraction(canvasElement, activeX);
-
-    // Call WebGL render method
-    renderGLCanvas(resolution);
-  };
-
-  // Define resize handler
-  const onResize = () => {
-    renderGraph();
-    props.onRender(canvasElement);
-  };
-
-  // Attach event listener to render on resize event
-  window.addEventListener("resize", onResize);
-
-  // Fetch interactivity event listeners
-  const {
-    handleMouseDown,
-    handleMouseMove,
-    handleTouchMove,
-    handleTouchStart
-  } = getWebGLInteractivityHandlers(renderGraph);
-
-  // Attach interactivity event listeners
-  canvasElement.addEventListener("mousedown", handleMouseDown);
-  canvasElement.addEventListener("mousemove", handleMouseMove);
-  canvasElement.addEventListener("touchmove", handleTouchMove);
-  canvasElement.addEventListener("touchstart", handleTouchStart);
-
-  // Render on page load
-  renderGraph();
-  props.onRender(canvasElement);
-
-  // Return cleanup method
-  return () => {
-    window.removeEventListener("resize", onResize);
-    canvasElement.removeEventListener("mousedown", handleMouseDown);
-    canvasElement.removeEventListener("mousemove", handleMouseMove);
-    canvasElement.removeEventListener("touchmove", handleTouchMove);
-    canvasElement.removeEventListener("touchstart", handleTouchStart);
-  };
+  // Call WebGL render method
+  renderGLCanvas(resolution);
 };

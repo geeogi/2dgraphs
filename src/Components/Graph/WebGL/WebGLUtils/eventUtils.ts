@@ -6,10 +6,10 @@ import {
 /**
  * Return event listeners which will call the render method with activeX,
  * activeY and isClicked whenever any of these values change
- * @param renderMethod
+ * @param callback
  */
 export const getWebGLInteractivityHandlers = (
-  renderMethod: (args?: {
+  callback: (args: {
     activeX?: number;
     activeY?: number;
     isClicked?: boolean;
@@ -19,7 +19,7 @@ export const getWebGLInteractivityHandlers = (
 
   const handleMouseMove = (e: any) => {
     const { x, y } = getCoordinatesOfMouseEvent(e);
-    renderMethod({
+    callback({
       activeX: x,
       activeY: y,
       isClicked
@@ -27,14 +27,14 @@ export const getWebGLInteractivityHandlers = (
   };
 
   const handleMouseLeave = (e: any) => {
-    renderMethod();
+    callback({});
   };
 
   const handleMouseDown = (e: any) => {
     isClicked = true;
 
     const { x, y } = getCoordinatesOfMouseEvent(e);
-    renderMethod({
+    callback({
       activeX: x,
       activeY: y,
       isClicked
@@ -44,7 +44,7 @@ export const getWebGLInteractivityHandlers = (
       isClicked = false;
 
       const { x, y } = getCoordinatesOfMouseEvent(e);
-      renderMethod({
+      callback({
         activeX: x,
         activeY: y,
         isClicked
@@ -56,7 +56,7 @@ export const getWebGLInteractivityHandlers = (
 
   const handleTouchStart = (e: any) => {
     const { x, y } = getCoordinatesOfTouchEvent(e);
-    renderMethod({
+    callback({
       activeX: x,
       activeY: y,
       isClicked
@@ -66,7 +66,7 @@ export const getWebGLInteractivityHandlers = (
   const handleTouchMove = handleTouchStart;
 
   const handleTouchEnd = (e: any) => {
-    renderMethod();
+    callback({});
   };
 
   return {

@@ -1,9 +1,8 @@
 import PRICE_DATA from "./allTime.json";
-import { drawGraph2DCanvas } from "./Components/Graph/2DCanvas";
 import { positionActiveLegend } from "./Components/Graph/Universal/positionActiveLegend";
 import { positionLabels } from "./Components/Graph/Universal/positionLabels";
 import { setupValues } from "./Components/Graph/Universal/setupValues";
-import { drawGraphWebGL } from "./Components/Graph/WebGL";
+import { getWebGLInteractivityHandlers } from "./Components/Graph/WebGL/WebGLUtils/eventUtils";
 
 const CANVAS_STYLE = [
   "user-select: none",
@@ -21,7 +20,7 @@ const values: { dateTime: string; price: number }[] = PRICE_DATA.map(value => ({
 
 // Declare render variables
 let currentNoOfDataPoints = 400;
-let currentGraphType: string = "2dcanvas";
+let currentDrawingMethod: any;
 
 // Cache cleanup function to be called if graph is re-rendered
 let cleanup: () => void;
@@ -29,13 +28,18 @@ let cleanup: () => void;
 /* MAIN DRAWING METHOD */
 export const drawGraph = (
   noOfDataPoints: number = currentNoOfDataPoints,
-  graphType: string = currentGraphType
+  drawingMethod: (args: {
+    canvasElement: HTMLCanvasElement;
+    points: { x: number; y: number; price: number; dateTime: string }[];
+    xGridLines: number[];
+    yGridLines: number[];
+  }) => void = currentDrawingMethod
 ) => {
   // Fetch canvas element
   let canvas: HTMLCanvasElement = document.getElementsByTagName("canvas")[0];
 
-  // Replace canvas element if graph type has changed
-  if (graphType !== currentGraphType) {
+  // Replace canvas element if drawing method has changed
+  if (drawingMethod !== currentDrawingMethod) {
     const newCanvasElement = document.createElement("canvas");
     newCanvasElement.setAttribute("style", CANVAS_STYLE);
     canvas.insertAdjacentElement("afterend", newCanvasElement);
@@ -44,8 +48,8 @@ export const drawGraph = (
   }
 
   // Update render variables cache
-  currentGraphType = graphType;
   currentNoOfDataPoints = noOfDataPoints;
+  currentDrawingMethod = drawingMethod;
 
   // Calculate graph coordinates, grid lines and label values
   const {
@@ -55,37 +59,65 @@ export const drawGraph = (
     yGridLines,
     points,
     margin
-  } = setupValues([...values], noOfDataPoints);
+  } = setupValues([...values], currentNoOfDataPoints);
 
   // Call clean up function if applicable
   if (cleanup) {
     cleanup();
   }
 
-  // Decide which drawing method to use
-  const draw = graphType === "webgl" ? drawGraphWebGL : drawGraph2DCanvas;
+  // Draw the graph
+  const onDraw = () => {
+    drawingMethod({
+      canvasElement: canvas,
+      points,
+      xGridLines,
+      yGridLines
+    });
+    positionLabels(
+      canvas,
+      dateLabels,
+      priceLabels,
+      xGridLines,
+      yGridLines,
+      margin
+    );
+    onInteraction({});
+  };
+
+  // Define method to be called on graph interaction
+  const onInteraction = (args: {
+    activeX?: number;
+    activeY?: number;
+    isClicked?: boolean;
+  }) => {
+    positionActiveLegend(canvas, args.activeX, margin, points);
+  };
+
+  // Fetch interactivity event listeners
+  const {
+    handleMouseDown,
+    handleMouseMove,
+    handleTouchMove,
+    handleTouchStart
+  } = getWebGLInteractivityHandlers(onInteraction);
+
+  // Attach interactivity event listeners
+  window.addEventListener("resize", onDraw);
+  canvas.addEventListener("mousedown", handleMouseDown);
+  canvas.addEventListener("mousemove", handleMouseMove);
+  canvas.addEventListener("touchmove", handleTouchMove);
+  canvas.addEventListener("touchstart", handleTouchStart);
+
+  // Set cleanup method
+  cleanup = () => {
+    window.removeEventListener("resize", onDraw);
+    canvas.removeEventListener("mousedown", handleMouseDown);
+    canvas.removeEventListener("mousemove", handleMouseMove);
+    canvas.removeEventListener("touchmove", handleTouchMove);
+    canvas.removeEventListener("touchstart", handleTouchStart);
+  };
 
   // Draw the graph
-  cleanup = draw({
-    canvasElement: canvas,
-    points,
-    xGridLines,
-    yGridLines,
-    onRender: (canvasElement: HTMLCanvasElement) => {
-      positionLabels(
-        canvasElement,
-        dateLabels,
-        priceLabels,
-        xGridLines,
-        yGridLines,
-        margin
-      );
-    },
-    onInteraction: (
-      canvasElement: HTMLCanvasElement,
-      activeX: number | undefined
-    ) => {
-      positionActiveLegend(canvasElement, activeX, margin, points);
-    }
-  });
+  onDraw();
 };

@@ -13,6 +13,8 @@ export const ACTIVE_CIRCLE_ID = "active-circle";
 export const ACTIVE_LINE_ID = "active-line";
 
 export const ActiveLegend = styled.div`
+  user-select: none;
+  touch-action: none;
   width: ${ACTIVE_LEGEND_WIDTH}px;
   background: ${ACTIVE_LEGEND_BACKGROUND_RGB};
   color: ${ACTIVE_LEGEND_TEXT_RGB};
@@ -26,6 +28,8 @@ export const ActiveLegend = styled.div`
 `;
 
 export const ActiveCircle = styled.div`
+  user-select: none;
+  touch-action: none;
   position: absolute;
   top: 0;
   left: 0;
@@ -38,6 +42,8 @@ export const ActiveCircle = styled.div`
 `;
 
 export const ActiveLine = styled.div`
+  user-select: none;
+  touch-action: none;
   position: absolute;
   top: 0;
   left: 0;

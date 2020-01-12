@@ -15,12 +15,14 @@ import { H1, H3 } from "./Components/Base/H";
 import { Header } from "./Components/Base/Header";
 import { P } from "./Components/Base/P";
 import { Row } from "./Components/Base/Row";
+import { drawGraph2DCanvas } from "./Components/Graph/2DCanvas";
+import { drawGraphWebGL } from "./Components/Graph/WebGL";
 import { drawGraph } from "./drawGraph";
 
 function App() {
   // Draw graph when Canvas element is loaded
   useEffect(() => {
-    drawGraph();
+    drawGraph(500, drawGraph2DCanvas);
   });
 
   return (
@@ -32,10 +34,12 @@ function App() {
       <GraphCard>
         <H3>Render method:</H3>
         <Row>
-          <Button onClick={() => drawGraph(undefined, "2dcanvas")}>
+          <Button onClick={() => drawGraph(undefined, drawGraph2DCanvas)}>
             2D Canvas
           </Button>
-          <Button onClick={() => drawGraph(undefined, "webgl")}>WebGL</Button>
+          <Button onClick={() => drawGraph(undefined, drawGraphWebGL)}>
+            WebGL
+          </Button>
         </Row>
         <H3>Data points:</H3>
         <Row>

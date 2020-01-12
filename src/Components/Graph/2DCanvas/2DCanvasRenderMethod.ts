@@ -24,10 +24,6 @@ interface Props {
   }[];
   xGridLines: number[];
   yGridLines: number[];
-  onInteraction: (
-    canvas: HTMLCanvasElement,
-    activeX: number | undefined
-  ) => void;
 }
 
 export const getPeriodAverageRenderMethod = (props: Props) => {
@@ -41,7 +37,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
     isClicked?: boolean;
   }) {
     // Extract render variables
-    const { canvasElement, activeX } = renderVariables as any;
+    const { canvasElement } = renderVariables as any;
 
     // Fetch the desired canvas height and width
     const { height, width } = getParentDimensions(canvasElement);
@@ -112,8 +108,5 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
 
     // Draw primary line
     drawLine(context, scaledPoints, PRIMARY_COLOR_RGB);
-
-    // Position active legend
-    props.onInteraction(canvasElement, activeX);
   };
 };
