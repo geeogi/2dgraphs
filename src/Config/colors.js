@@ -2,18 +2,10 @@ export const BORDER_COLOR = "rgb(230,230,230)";
 export const BACKGROUND_COLOR = "#fafafa";
 export const CONTRAST_COLOR = "#333";
 
-export const PRIMARY_COLOR_VEC = [0, 0, 1, 1];
-export const PRIMARY_COLOR_RGB = `
-        rgb(${PRIMARY_COLOR_VEC[0] * 255}, 
-            ${PRIMARY_COLOR_VEC[1] * 255}, 
-            ${PRIMARY_COLOR_VEC[2] * 255})
-    `;
-export const PRIMARY_COLOR_ALPHA_RGB = opacity => `
-    rgba(${PRIMARY_COLOR_VEC[0] * 255}, 
-        ${PRIMARY_COLOR_VEC[1] * 255}, 
-        ${PRIMARY_COLOR_VEC[2] * 255},
-        ${opacity})
-`;
+export const PRIMARY_COLOR_WEBGL = [0, 0, 1, 1];
+export const PRIMARY_COLOR_2D_CANVAS = "rgb(255, 0, 255)";
+
+export const PRIMARY_COLOR_ALPHA_RGB = opacity => `rgba(255, 0, 255, ${opacity})`;
 
 export const AXIS_COLOR_VEC = [0.8, 0.8, 0.8, 1];
 export const AXIS_COLOR_RGB = `

@@ -1,16 +1,8 @@
 import PRICE_DATA from "./allTime.json";
+import { getGraphConfig } from "./Components/Graph/Universal/getGraphConfig";
 import { positionActiveLegend } from "./Components/Graph/Universal/positionActiveLegend";
 import { positionLabels } from "./Components/Graph/Universal/positionLabels";
-import { initGraphValues } from "./Components/Graph/Universal/initGraphValues";
 import { getWebGLInteractivityHandlers } from "./Components/Graph/WebGL/WebGLUtils/eventUtils";
-
-const CANVAS_STYLE = [
-  "user-select: none",
-  "touch-action: none",
-  "display: block",
-  "width: 100%",
-  "height: 400px"
-].join(";");
 
 // Parse values from JSON file
 const values: { dateTime: string; price: number }[] = PRICE_DATA.map(value => ({
@@ -18,40 +10,44 @@ const values: { dateTime: string; price: number }[] = PRICE_DATA.map(value => ({
   price: value["price(USD)"]
 }));
 
-// Declare render variables
-let currentNoOfDataPoints = 400;
-let currentDrawingMethod: any;
+// Render variable cache
+let previousCanvasId: string;
+let previousDrawingMethod: (args: {
+  canvasElement: HTMLCanvasElement;
+  points: { x: number; y: number; price: number; dateTime: string }[];
+  xGridLines: number[];
+  yGridLines: number[];
+}) => () => void;
+let previousNoOfDataPoints: number = 400;
 
 // Cache cleanup function to be called if graph is re-rendered
 let cleanup: () => void;
 
-/* MAIN DRAWING METHOD */
 export const drawGraph = (
-  noOfDataPoints: number = currentNoOfDataPoints,
+  canvasId: string,
   drawingMethod: (args: {
     canvasElement: HTMLCanvasElement;
     points: { x: number; y: number; price: number; dateTime: string }[];
     xGridLines: number[];
     yGridLines: number[];
-  }) => () => void = currentDrawingMethod
+  }) => () => void,
+  noOfDataPoints: number = previousNoOfDataPoints
 ) => {
-  // Fetch canvas element
-  let canvas: HTMLCanvasElement = document.getElementsByTagName("canvas")[0];
-
-  // Replace canvas element if drawing method has changed
-  if (drawingMethod !== currentDrawingMethod) {
-    const newCanvasElement = document.createElement("canvas");
-    newCanvasElement.setAttribute("style", CANVAS_STYLE);
-    canvas.insertAdjacentElement("afterend", newCanvasElement);
-    canvas.remove();
-    canvas = newCanvasElement;
+  // Hide previous canvas if the canvasId has changed
+  if (canvasId !== previousCanvasId) {
+    const previousCanvas = document.getElementById(previousCanvasId);
+    if (previousCanvas) {
+      previousCanvas.setAttribute("style", "display: none;");
+    }
   }
 
-  // Update render variables cache
-  currentNoOfDataPoints = noOfDataPoints;
-  currentDrawingMethod = drawingMethod;
+  // Fetch canvas element
+  const canvas: HTMLCanvasElement = document.getElementById(canvasId) as any;
 
-  // Calculate graph coordinates, grid lines and label values
+  // Show canvas
+  canvas.setAttribute("style", "display: block;");
+
+  // Get graph configuration
   const {
     priceLabels,
     dateLabels,
@@ -59,7 +55,7 @@ export const drawGraph = (
     yGridLines,
     points,
     margin
-  } = initGraphValues([...values], currentNoOfDataPoints);
+  } = getGraphConfig([...values], noOfDataPoints);
 
   // Call clean up function if applicable
   if (cleanup) {
@@ -71,9 +67,7 @@ export const drawGraph = (
     activeX?: number;
     activeY?: number;
     isClicked?: boolean;
-  }) => {
-    positionActiveLegend(canvas, args.activeX, margin, points);
-  };
+  }) => positionActiveLegend(canvas, args.activeX, margin, points);
 
   // Draw the graph
   const onGraphResize = drawingMethod({
@@ -118,14 +112,14 @@ export const drawGraph = (
     );
   };
 
-  // Attach interactivity event listeners
+  // Attach event listeners
   window.addEventListener("resize", onResize);
   canvas.addEventListener("mousedown", handleMouseDown);
   canvas.addEventListener("mousemove", handleMouseMove);
   canvas.addEventListener("touchmove", handleTouchMove);
   canvas.addEventListener("touchstart", handleTouchStart);
 
-  // Cache cleanup method to be called before next render
+  // Remove event listeners during cleanup
   cleanup = () => {
     window.removeEventListener("resize", onResize);
     canvas.removeEventListener("mousedown", handleMouseDown);
@@ -133,4 +127,13 @@ export const drawGraph = (
     canvas.removeEventListener("touchmove", handleTouchMove);
     canvas.removeEventListener("touchstart", handleTouchStart);
   };
+
+  // Cache render variables
+  previousNoOfDataPoints = noOfDataPoints;
+  previousDrawingMethod = drawingMethod;
+  previousCanvasId = canvasId;
+};
+
+export const setDataPoints = (noOfDataPoints: number) => {
+  drawGraph(previousCanvasId, previousDrawingMethod, noOfDataPoints);
 };

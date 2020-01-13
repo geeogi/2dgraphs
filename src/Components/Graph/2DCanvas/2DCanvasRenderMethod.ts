@@ -1,6 +1,6 @@
 import {
   PRIMARY_COLOR_ALPHA_RGB,
-  PRIMARY_COLOR_RGB
+  PRIMARY_COLOR_2D_CANVAS
 } from "../../../Config/colors";
 import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "../Universal/constants";
 import { drawXAxes, drawYAxes } from "./2DCanvasUtils/axesUtils";
@@ -93,6 +93,6 @@ export const get2DCanvasLineGraphRenderMethod = (props: {
     );
 
     // Draw primary line
-    drawLine(ctx, scaledPoints, PRIMARY_COLOR_RGB);
+    drawLine(ctx, scaledPoints, PRIMARY_COLOR_2D_CANVAS);
   };
 };

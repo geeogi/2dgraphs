@@ -13,7 +13,6 @@ export const ACTIVE_CIRCLE_ID = "active-circle";
 export const ACTIVE_LINE_ID = "active-line";
 
 export const ActiveLegend = styled.div`
-  display: none;
   user-select: none;
   touch-action: none;
   width: ${ACTIVE_LEGEND_WIDTH}px;
@@ -29,7 +28,6 @@ export const ActiveLegend = styled.div`
 `;
 
 export const ActiveCircle = styled.div`
-  display: none;
   user-select: none;
   touch-action: none;
   position: absolute;
@@ -44,7 +42,6 @@ export const ActiveCircle = styled.div`
 `;
 
 export const ActiveLine = styled.div`
-  display: none;
   user-select: none;
   touch-action: none;
   position: absolute;

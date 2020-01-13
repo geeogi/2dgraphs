@@ -9,7 +9,6 @@ import {
 } from "./Components/Base/AxisLegend";
 import { Button } from "./Components/Base/Button";
 import { Canvas } from "./Components/Base/Canvas";
-import { Div } from "./Components/Base/Div";
 import { GraphCard } from "./Components/Base/GraphCard";
 import { H1, H3 } from "./Components/Base/H";
 import { Header } from "./Components/Base/Header";
@@ -17,13 +16,22 @@ import { P } from "./Components/Base/P";
 import { Row } from "./Components/Base/Row";
 import { drawGraph2DCanvas } from "./Components/Graph/2DCanvas";
 import { drawGraphWebGL } from "./Components/Graph/WebGL";
-import { drawGraph } from "./drawGraph";
+import { drawGraph, setDataPoints } from "./drawGraph";
 
 function App() {
   // Draw graph when Canvas element is loaded
   useEffect(() => {
-    drawGraph(500, drawGraph2DCanvas);
+    drawGraph("line-graph-2d-canvas", drawGraph2DCanvas);
   });
+
+  // Method to update data points and re-render graph
+  const updateDataPoints = (newNoOfDataPoints: number) => {
+    const dataPointsEl = document.getElementById("data-points-preview");
+    if (dataPointsEl) {
+      dataPointsEl.innerText = newNoOfDataPoints.toString();
+    }
+    setDataPoints(newNoOfDataPoints);
+  };
 
   return (
     <main>
@@ -34,31 +42,39 @@ function App() {
       <GraphCard>
         <H3>Render method:</H3>
         <Row>
-          <Button onClick={() => drawGraph(undefined, drawGraph2DCanvas)}>
+          <Button
+            onClick={() => drawGraph("line-graph-2d-canvas", drawGraph2DCanvas)}
+          >
             2D Canvas
           </Button>
-          <Button onClick={() => drawGraph(undefined, drawGraphWebGL)}>
+          <Button onClick={() => drawGraph("line-graph-webgl", drawGraphWebGL)}>
             WebGL
           </Button>
         </Row>
         <H3>Data points:</H3>
         <Row>
-          <input
-            type="range"
-            min={5}
-            max={3000}
-            defaultValue={400}
-            step={1}
-            onChange={e => drawGraph(e.target.value as any)}
-          ></input>
+          <form name="dataPoints">
+            <input
+              name="dataPointsInputName"
+              id="dataPointsInputId"
+              type="range"
+              min={5}
+              max={3000}
+              defaultValue={400}
+              step={1}
+              onChange={e => updateDataPoints(e.target.value as any)}
+            />
+            <p id="data-points-preview">400</p>
+          </form>
         </Row>
         <div>
-          <Div position="relative">
-            <Canvas />
-            <ActiveLegend id={ACTIVE_LEGEND_ID} />
-            <ActiveCircle id={ACTIVE_CIRCLE_ID} />
-            <ActiveLine id={ACTIVE_LINE_ID} />
-          </Div>
+          <div style={{ position: "relative" }}>
+            <Canvas id="line-graph-2d-canvas" style={{ display: "none" }} />
+            <Canvas id="line-graph-webgl" style={{ display: "none" }} />
+            <ActiveLegend id={ACTIVE_LEGEND_ID} style={{ display: "none" }} />
+            <ActiveCircle id={ACTIVE_CIRCLE_ID} style={{ display: "none" }} />
+            <ActiveLine id={ACTIVE_LINE_ID} style={{ display: "none" }} />
+          </div>
         </div>
       </GraphCard>
     </main>
