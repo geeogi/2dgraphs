@@ -9,7 +9,9 @@
     "moment": "^2.24.0",
     "typescript": "^3.7.4"
   },
-  "scripts": {},
+  "scripts": {
+    "build": "tsc index.ts --esModuleInterop --resolveJsonModule"
+  },
   "eslintConfig": {
     "extends": "react-app"
   },

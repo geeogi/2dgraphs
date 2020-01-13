@@ -1,8 +1,8 @@
-import PRICE_DATA from "./allTime.json";
-import { getGraphConfig } from "./Graph/Universal/getGraphConfig";
-import { positionActiveLegend } from "./Graph/Universal/positionActiveLegend";
-import { positionLabels } from "./Graph/Universal/positionLabels";
-import { getWebGLInteractivityHandlers } from "./Graph/WebGL/WebGLUtils/eventUtils";
+import PRICE_DATA from "./src/example.json";
+import { getGraphConfig } from "./src/Graph/Universal/getGraphConfig";
+import { positionActiveLegend } from "./src/Graph/Universal/positionActiveLegend";
+import { positionLabels } from "./src/Graph/Universal/positionLabels";
+import { getWebGLInteractivityHandlers } from "./src/Graph/WebGL/WebGLUtils/eventUtils";
 
 // Parse values from JSON file
 const values: { dateTime: string; price: number }[] = PRICE_DATA.map(value => ({
