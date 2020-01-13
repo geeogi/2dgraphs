@@ -1,8 +1,12 @@
 import PRICE_DATA from "./src/example.json";
+import { drawGraph2DCanvas } from "./src/Graph/2DCanvas/index";
 import { getGraphConfig } from "./src/Graph/Universal/getGraphConfig";
 import { positionActiveLegend } from "./src/Graph/Universal/positionActiveLegend";
 import { positionLabels } from "./src/Graph/Universal/positionLabels";
+import { drawGraphWebGL } from "./src/Graph/WebGL/index";
 import { getWebGLInteractivityHandlers } from "./src/Graph/WebGL/WebGLUtils/eventUtils";
+
+console.log(drawGraphWebGL, drawGraph2DCanvas);
 
 // Parse values from JSON file
 const values: { dateTime: string; price: number }[] = PRICE_DATA.map(value => ({
