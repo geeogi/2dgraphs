@@ -4,25 +4,12 @@
   "private": true,
   "dependencies": {
     "@types/debounce": "^1.2.0",
-    "@types/jest": "^24.0.23",
     "@types/node": "^12.12.14",
-    "@types/react": "^16.9.15",
-    "@types/react-dom": "^16.9.4",
-    "@types/styled-components": "^4.4.1",
     "debounce": "^1.2.0",
     "moment": "^2.24.0",
-    "react": "^16.11.0",
-    "react-dom": "^16.11.0",
-    "react-scripts": "3.2.0",
-    "styled-components": "^4.4.1",
-    "typescript": "^3.7.3"
+    "typescript": "^3.7.4"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
+  "scripts": {},
   "eslintConfig": {
     "extends": "react-app"
   },
