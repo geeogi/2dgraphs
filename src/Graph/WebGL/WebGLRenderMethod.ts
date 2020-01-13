@@ -1,4 +1,4 @@
-import { AXIS_COLOR_VEC, PRIMARY_COLOR_WEBGL } from "../../../Config/colors";
+import { AXIS_COLOR_VEC, PRIMARY_COLOR_WEBGL } from "../../Config/colors";
 import { getDrawAreaMethod } from "./WebGLUtils/drawUtils/drawArea";
 import { getDrawLinesMethod } from "./WebGLUtils/drawUtils/drawLines";
 import { getDrawPathMethod } from "./WebGLUtils/drawUtils/drawPath";

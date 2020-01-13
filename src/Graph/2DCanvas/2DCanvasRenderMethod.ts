@@ -1,7 +1,7 @@
 import {
   PRIMARY_COLOR_ALPHA_2D_CANVAS,
   PRIMARY_COLOR_2D_CANVAS
-} from "../../../Config/colors";
+} from "../../Config/colors";
 import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "../Universal/constants";
 import { drawXAxes, drawYAxes } from "./2DCanvasUtils/axesUtils";
 import { getRetinaMethod } from "./2DCanvasUtils/canvasUtils";

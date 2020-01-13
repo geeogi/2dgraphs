@@ -1,10 +1,5 @@
-import { AXIS_COLOR_RGB, CONTRAST_COLOR } from "../../../../Config/colors";
-import {
-  GRAPH_MARGIN_X,
-  GRAPH_MARGIN_Y,
-  LABEL_MARGIN_X,
-  SPACING_UNIT
-} from "../../Universal/constants";
+import { AXIS_COLOR_RGB, CONTRAST_COLOR } from "../../../Config/colors";
+import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y, LABEL_MARGIN_X, SPACING_UNIT } from "../../Universal/constants";
 
 export const drawXAxes = (
   context: CanvasRenderingContext2D,

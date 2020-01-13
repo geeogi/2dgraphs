@@ -1,8 +1,8 @@
 import PRICE_DATA from "./allTime.json";
-import { getGraphConfig } from "./Components/Graph/Universal/getGraphConfig";
-import { positionActiveLegend } from "./Components/Graph/Universal/positionActiveLegend";
-import { positionLabels } from "./Components/Graph/Universal/positionLabels";
-import { getWebGLInteractivityHandlers } from "./Components/Graph/WebGL/WebGLUtils/eventUtils";
+import { getGraphConfig } from "./Graph/Universal/getGraphConfig";
+import { positionActiveLegend } from "./Graph/Universal/positionActiveLegend";
+import { positionLabels } from "./Graph/Universal/positionLabels";
+import { getWebGLInteractivityHandlers } from "./Graph/WebGL/WebGLUtils/eventUtils";
 
 // Parse values from JSON file
 const values: { dateTime: string; price: number }[] = PRICE_DATA.map(value => ({
@@ -134,6 +134,11 @@ export const drawGraph = (
   previousCanvasId = canvasId;
 };
 
-export const setDataPoints = (noOfDataPoints: number) => {
-  drawGraph(previousCanvasId, previousDrawingMethod, noOfDataPoints);
+// Method to update data points and re-render graph
+export const updateDataPoints = (newNoOfDataPoints: number) => {
+  const dataPointsEl = document.getElementById("data-points-preview");
+  if (dataPointsEl) {
+    dataPointsEl.innerText = newNoOfDataPoints.toString();
+  }
+  drawGraph(previousCanvasId, previousDrawingMethod, newNoOfDataPoints);
 };

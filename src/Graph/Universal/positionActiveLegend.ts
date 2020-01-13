@@ -1,13 +1,9 @@
 import moment from "moment";
-import {
-  ACTIVE_LEGEND_ID,
-  ACTIVE_LEGEND_WIDTH,
-  ACTIVE_CIRCLE_WIDTH,
-  ACTIVE_LINE_ID
-} from "../../Base/AxisLegend";
-import { ACTIVE_CIRCLE_ID } from "./../../Base/AxisLegend";
 import { SPACING_UNIT } from "./constants";
 import { clamp } from "./numberUtils";
+
+const ACTIVE_LEGEND_WIDTH = 120;
+const ACTIVE_CIRCLE_WIDTH = 10;
 
 export const positionActiveLegend = (
   canvasElement: HTMLCanvasElement,
@@ -25,9 +21,9 @@ export const positionActiveLegend = (
   const graphHeight = resolution[1] - 2 * margin[1];
 
   // Fetch active elements
-  const activeLegendElement = document.getElementById(ACTIVE_LEGEND_ID);
-  const activeCircleElement = document.getElementById(ACTIVE_CIRCLE_ID);
-  const activeLineElement = document.getElementById(ACTIVE_LINE_ID);
+  const activeLegendElement = document.getElementById("active-legend");
+  const activeCircleElement = document.getElementById("active-circle");
+  const activeLineElement = document.getElementById("active-line");
 
   // Show or hide active legend
   if (activeLegendElement && activeCircleElement && activeLineElement) {
