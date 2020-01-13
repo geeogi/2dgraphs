@@ -1,5 +1,5 @@
 import {
-  PRIMARY_COLOR_ALPHA_RGB,
+  PRIMARY_COLOR_ALPHA_2D_CANVAS,
   PRIMARY_COLOR_2D_CANVAS
 } from "../../../Config/colors";
 import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "../Universal/constants";
@@ -89,7 +89,10 @@ export const get2DCanvasLineGraphRenderMethod = (props: {
           canvasY: toCanvasY(0)
         }
       ],
-      getGradient(PRIMARY_COLOR_ALPHA_RGB(0.6), PRIMARY_COLOR_ALPHA_RGB(0))
+      getGradient(
+        PRIMARY_COLOR_ALPHA_2D_CANVAS(0.6),
+        PRIMARY_COLOR_ALPHA_2D_CANVAS(0)
+      )
     );
 
     // Draw primary line

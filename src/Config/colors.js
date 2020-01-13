@@ -3,9 +3,10 @@ export const BACKGROUND_COLOR = "#fafafa";
 export const CONTRAST_COLOR = "#333";
 
 export const PRIMARY_COLOR_WEBGL = [0, 0, 1, 1];
-export const PRIMARY_COLOR_2D_CANVAS = "rgb(255, 0, 255)";
 
-export const PRIMARY_COLOR_ALPHA_RGB = opacity => `rgba(255, 0, 255, ${opacity})`;
+export const PRIMARY_COLOR_2D_CANVAS = "rgb(255, 0, 255)";
+export const PRIMARY_COLOR_ALPHA_2D_CANVAS = opacity =>
+  `rgba(255, 0, 255, ${opacity})`;
 
 export const AXIS_COLOR_VEC = [0.8, 0.8, 0.8, 1];
 export const AXIS_COLOR_RGB = `
