@@ -1,6 +1,11 @@
+import { debounce } from "debounce";
 import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "../Universal/constants";
-import { getRenderMethod } from "./WebGLRenderMethod";
+import { getWebGLLineGraphRenderMethod } from "./WebGLRenderMethod";
+import { resizeGlCanvas } from "./WebGLUtils/canvasUtils";
 
+const margin: [number, number] = [GRAPH_MARGIN_X, GRAPH_MARGIN_Y];
+
+// To be called when the graph is first rendered and each time the data changes
 export const drawGraphWebGL = (props: {
   canvasElement: HTMLCanvasElement;
   xGridLines: number[];
@@ -12,35 +17,35 @@ export const drawGraphWebGL = (props: {
     dateTime: any;
   }[];
 }) => {
-  const margin: [number, number] = [GRAPH_MARGIN_X, GRAPH_MARGIN_Y];
-
   // Extract graph props
   const { canvasElement, xGridLines, yGridLines, points } = props;
 
+  // Fetch WebGL context
   const gl: WebGLRenderingContext | null = canvasElement.getContext("webgl");
 
   if (!gl) {
     throw new Error("Could not get WebGL context");
   }
 
-  // Initialize GL render method
-  const renderGLCanvas = getRenderMethod(
+  // Initialize render method
+  const renderGLLineGraph = getWebGLLineGraphRenderMethod(
     canvasElement,
-    {
-      xGridLines,
-      yGridLines,
-      points
-    },
     gl,
+    xGridLines,
+    yGridLines,
+    points,
     margin
   );
 
-  // Calculate canvas resolution
-  const resolution: [number, number] = [
-    canvasElement.offsetWidth,
-    canvasElement.offsetHeight
-  ];
+  // Resize GL Canvas
+  resizeGlCanvas(gl, canvasElement);
 
   // Call WebGL render method
-  renderGLCanvas(resolution);
+  renderGLLineGraph();
+
+  // Return debounced resize handler (resizing WebGl canvas is slow ~20ms)
+  return debounce(() => {
+    resizeGlCanvas(gl, canvasElement);
+    renderGLLineGraph();
+  }, 100);
 };

@@ -1,27 +1,21 @@
 import { AXIS_COLOR_VEC, PRIMARY_COLOR_VEC } from "../../../Config/colors";
-import { resizeGlCanvas } from "./WebGLUtils/canvasUtils";
 import { getDrawAreaMethod } from "./WebGLUtils/drawUtils/drawArea";
 import { getDrawLinesMethod } from "./WebGLUtils/drawUtils/drawLines";
 import { getDrawPathMethod } from "./WebGLUtils/drawUtils/drawPath";
 
-export const getRenderMethod = (
+export const getWebGLLineGraphRenderMethod = (
   canvasElement: HTMLCanvasElement,
-  props: {
-    points: {
-      x: number;
-      y: number;
-      price: number;
-      dateTime: string;
-    }[];
-    xGridLines: number[];
-    yGridLines: number[];
-  },
   gl: WebGLRenderingContext,
+  xGridLines: number[],
+  yGridLines: number[],
+  points: {
+    x: number;
+    y: number;
+    price: number;
+    dateTime: string;
+  }[],
   margin: [number, number]
 ) => {
-  // Extract static render props
-  const { points, xGridLines, yGridLines } = props;
-
   // Initialize canvas coordinates
   const linePoints: { x: number; y: number }[] = [];
   const areaPoints: { x: number; y: number }[] = [];
@@ -54,9 +48,12 @@ export const getRenderMethod = (
   const drawXAxis = getDrawLinesMethod(gl, xAxis, AXIS_COLOR_VEC, "vertical");
 
   /* RETURN WEBGL RENDER FUNCTION */
-  return (resolution: [number, number]) => {
-    // Resize canvas if necessary
-    resizeGlCanvas(gl, canvasElement);
+  return function renderWebGlLineGraph() {
+    // Fetch canvas resolution
+    const resolution: [number, number] = [
+      canvasElement.offsetWidth,
+      canvasElement.offsetHeight
+    ];
 
     // Clear the canvas
     gl.clearColor(0, 0, 0, 0);

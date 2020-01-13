@@ -1,22 +1,39 @@
-import { getPeriodAverageRenderMethod } from "./2DCanvasRenderMethod";
+import { get2DCanvasLineGraphRenderMethod } from "./2DCanvasRenderMethod";
 
+// To be called when the graph is first rendered and each time the data changes
 export const drawGraph2DCanvas = (props: {
   canvasElement: HTMLCanvasElement;
+  xGridLines: number[];
+  yGridLines: number[];
   points: {
     x: number;
     y: number;
     price: number;
     dateTime: string;
   }[];
-  xGridLines: number[];
-  yGridLines: number[];
 }) => {
-  // Fetch render method
-  const renderMethod = getPeriodAverageRenderMethod(props);
-
   // Extract props
-  const { canvasElement } = props;
+  const { canvasElement, points, xGridLines, yGridLines } = props;
 
-  // Render on mount
-  renderMethod({ canvasElement });
+  // Fetch the canvas context
+  const ctx: CanvasRenderingContext2D | null = canvasElement.getContext("2d");
+
+  if (!ctx) {
+    throw new Error("Could not retrieve 2D canvas context");
+  }
+
+  // Initialize render method
+  const render2DCanvasLineGraph = get2DCanvasLineGraphRenderMethod({
+    canvasElement,
+    ctx,
+    xGridLines,
+    yGridLines,
+    points
+  });
+
+  // Render
+  render2DCanvasLineGraph();
+
+  // Return resize handler
+  return () => render2DCanvasLineGraph();
 };

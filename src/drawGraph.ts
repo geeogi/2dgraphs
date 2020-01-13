@@ -33,7 +33,7 @@ export const drawGraph = (
     points: { x: number; y: number; price: number; dateTime: string }[];
     xGridLines: number[];
     yGridLines: number[];
-  }) => void = currentDrawingMethod
+  }) => () => void = currentDrawingMethod
 ) => {
   // Fetch canvas element
   let canvas: HTMLCanvasElement = document.getElementsByTagName("canvas")[0];
@@ -66,25 +66,6 @@ export const drawGraph = (
     cleanup();
   }
 
-  // Draw the graph
-  const onDraw = () => {
-    drawingMethod({
-      canvasElement: canvas,
-      points,
-      xGridLines,
-      yGridLines
-    });
-    positionLabels(
-      canvas,
-      dateLabels,
-      priceLabels,
-      xGridLines,
-      yGridLines,
-      margin
-    );
-    onInteraction({});
-  };
-
   // Define method to be called on graph interaction
   const onInteraction = (args: {
     activeX?: number;
@@ -94,6 +75,27 @@ export const drawGraph = (
     positionActiveLegend(canvas, args.activeX, margin, points);
   };
 
+  // Draw the graph
+  const onGraphResize = drawingMethod({
+    canvasElement: canvas,
+    points,
+    xGridLines,
+    yGridLines
+  });
+
+  // Position graph labels
+  positionLabels(
+    canvas,
+    dateLabels,
+    priceLabels,
+    xGridLines,
+    yGridLines,
+    margin
+  );
+
+  // Clear interactive legend
+  onInteraction({});
+
   // Fetch interactivity event listeners
   const {
     handleMouseDown,
@@ -102,22 +104,33 @@ export const drawGraph = (
     handleTouchStart
   } = getWebGLInteractivityHandlers(onInteraction);
 
+  // Define resize handler
+  const onResize = () => {
+    onInteraction({});
+    onGraphResize();
+    positionLabels(
+      canvas,
+      dateLabels,
+      priceLabels,
+      xGridLines,
+      yGridLines,
+      margin
+    );
+  };
+
   // Attach interactivity event listeners
-  window.addEventListener("resize", onDraw);
+  window.addEventListener("resize", onResize);
   canvas.addEventListener("mousedown", handleMouseDown);
   canvas.addEventListener("mousemove", handleMouseMove);
   canvas.addEventListener("touchmove", handleTouchMove);
   canvas.addEventListener("touchstart", handleTouchStart);
 
-  // Set cleanup method
+  // Cache cleanup method to be called before next render
   cleanup = () => {
-    window.removeEventListener("resize", onDraw);
+    window.removeEventListener("resize", onResize);
     canvas.removeEventListener("mousedown", handleMouseDown);
     canvas.removeEventListener("mousemove", handleMouseMove);
     canvas.removeEventListener("touchmove", handleTouchMove);
     canvas.removeEventListener("touchstart", handleTouchStart);
   };
-
-  // Draw the graph
-  onDraw();
 };

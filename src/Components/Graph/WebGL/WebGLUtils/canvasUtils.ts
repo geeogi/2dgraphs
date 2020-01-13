@@ -10,10 +10,10 @@ export const resizeGlCanvas = (gl: any, canvasElement: HTMLCanvasElement) => {
   // Check if the canvas is not the same size.
   if (canvasElement.width !== displayWidth || canvasElement.height !== displayHeight) {
     // Make the canvas the same size
-    // canvasElement.width = displayWidth;
-    // canvasElement.height = displayHeight;
+    canvasElement.width = displayWidth;
+    canvasElement.height = displayHeight;
 
     // Set the GL view port
-    gl.viewport(0, 0, canvasElement.width, canvasElement.height); // Remove?
+    gl.viewport(0, 0, canvasElement.width, canvasElement.height);
   }
 };

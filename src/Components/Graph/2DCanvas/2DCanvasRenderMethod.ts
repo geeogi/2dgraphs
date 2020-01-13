@@ -1,7 +1,4 @@
 import {
-  ACTIVE_HANDLE_BODY_RGB,
-  ACTIVE_HANDLE_BORDER_RGB,
-  ACTIVE_LINE_RGB,
   PRIMARY_COLOR_ALPHA_RGB,
   PRIMARY_COLOR_RGB
 } from "../../../Config/colors";
@@ -15,38 +12,27 @@ import {
   getGradientMethod
 } from "./2DCanvasUtils/drawUtils";
 
-interface Props {
+export const get2DCanvasLineGraphRenderMethod = (props: {
+  canvasElement: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  xGridLines: number[];
+  yGridLines: number[];
   points: {
     x: number;
     y: number;
     price: any;
     dateTime: any;
   }[];
-  xGridLines: number[];
-  yGridLines: number[];
-}
-
-export const getPeriodAverageRenderMethod = (props: Props) => {
-  const { points, xGridLines, yGridLines } = props;
+}) => {
+  const { points, xGridLines, yGridLines, canvasElement, ctx } = props;
 
   /* RETURN 2D CANVAS RENDER FUNCTION */
-  return function render(renderVariables?: {
-    canvasElement?: HTMLCanvasElement;
-    activeX?: number;
-    activeY?: number;
-    isClicked?: boolean;
-  }) {
-    // Extract render variables
-    const { canvasElement } = renderVariables as any;
-
+  return function render2DCanvasLineGraph() {
     // Fetch the desired canvas height and width
     const { height, width } = getParentDimensions(canvasElement);
 
-    // Fetch the canvas context
-    const context: CanvasRenderingContext2D = canvasElement.getContext("2d");
-
     // Clear graph
-    context.clearRect(0, 0, width, height);
+    ctx.clearRect(0, 0, width, height);
 
     // Calculate graph dimensions
     const graphDepth = height - 2 * GRAPH_MARGIN_Y;
@@ -57,9 +43,9 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
     const toCanvasX = (graphX: number) => GRAPH_MARGIN_X + graphX;
 
     // Get canvas util methods
-    const scaleRetina = getRetinaMethod(context, canvasElement, width, height);
+    const scaleRetina = getRetinaMethod(ctx, canvasElement, width, height);
     const getGradient = getGradientMethod(
-      context,
+      ctx,
       GRAPH_MARGIN_Y,
       GRAPH_MARGIN_Y + graphDepth
     );
@@ -77,7 +63,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
 
     // Draw x-axis
     drawXAxes(
-      context,
+      ctx,
       xGridLines,
       clipSpace => toCanvasX(((clipSpace + 1) / 2) * graphWidth),
       graphWidth,
@@ -86,7 +72,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
 
     // Draw y-axis
     drawYAxes(
-      context,
+      ctx,
       yGridLines,
       clipSpace => toCanvasY(((clipSpace + 1) / 2) * graphDepth),
       graphWidth
@@ -94,7 +80,7 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
 
     // Draw primary block
     fillPath(
-      context,
+      ctx,
       [
         { canvasX: toCanvasX(0), canvasY: toCanvasY(0) },
         ...scaledPoints,
@@ -107,6 +93,6 @@ export const getPeriodAverageRenderMethod = (props: Props) => {
     );
 
     // Draw primary line
-    drawLine(context, scaledPoints, PRIMARY_COLOR_RGB);
+    drawLine(ctx, scaledPoints, PRIMARY_COLOR_RGB);
   };
 };
