@@ -1,7 +1,7 @@
 import PRICE_DATA from "./allTime.json";
 import { positionActiveLegend } from "./Components/Graph/Universal/positionActiveLegend";
 import { positionLabels } from "./Components/Graph/Universal/positionLabels";
-import { setupValues } from "./Components/Graph/Universal/setupValues";
+import { initGraphValues } from "./Components/Graph/Universal/initGraphValues";
 import { getWebGLInteractivityHandlers } from "./Components/Graph/WebGL/WebGLUtils/eventUtils";
 
 const CANVAS_STYLE = [
@@ -59,7 +59,7 @@ export const drawGraph = (
     yGridLines,
     points,
     margin
-  } = setupValues([...values], currentNoOfDataPoints);
+  } = initGraphValues([...values], currentNoOfDataPoints);
 
   // Call clean up function if applicable
   if (cleanup) {

@@ -5,7 +5,6 @@ import { resizeGlCanvas } from "./WebGLUtils/canvasUtils";
 
 const margin: [number, number] = [GRAPH_MARGIN_X, GRAPH_MARGIN_Y];
 
-// To be called when the graph is first rendered and each time the data changes
 export const drawGraphWebGL = (props: {
   canvasElement: HTMLCanvasElement;
   xGridLines: number[];
@@ -43,9 +42,15 @@ export const drawGraphWebGL = (props: {
   // Call WebGL render method
   renderGLLineGraph();
 
-  // Return debounced resize handler (resizing WebGl canvas is slow ~20ms)
-  return debounce(() => {
+  // Define debounced canvas resize method (resizing WebGl canvas is slow ~20ms)
+  const debouncedCanvasResize = debounce(() => {
     resizeGlCanvas(gl, canvasElement);
     renderGLLineGraph();
   }, 100);
+
+  // Return resize handler
+  return () => {
+    renderGLLineGraph();
+    debouncedCanvasResize();
+  };
 };

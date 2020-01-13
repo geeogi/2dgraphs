@@ -2,7 +2,7 @@ import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "./constants";
 import { dateToUnix, getDateLabels, getPriceLabels } from "./labelUtils";
 import { getScaleMethod } from "./numberUtils";
 
-export const setupValues = (
+export const initGraphValues = (
   values: { dateTime: string; price: number }[],
   noOfDataPoints: number
 ) => {

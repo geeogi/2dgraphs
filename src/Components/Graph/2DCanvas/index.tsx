@@ -1,6 +1,5 @@
 import { get2DCanvasLineGraphRenderMethod } from "./2DCanvasRenderMethod";
 
-// To be called when the graph is first rendered and each time the data changes
 export const drawGraph2DCanvas = (props: {
   canvasElement: HTMLCanvasElement;
   xGridLines: number[];
