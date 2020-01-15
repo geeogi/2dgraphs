@@ -3,14 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@types/debounce": "^1.2.0",
-    "@types/node": "^12.12.14",
     "debounce": "^1.2.0",
-    "moment": "^2.24.0",
-    "typescript": "^3.7.4"
+    "moment": "^2.24.0"
   },
   "scripts": {
-    "build": "tsc index.ts --esModuleInterop --resolveJsonModule"
+    "build": "webpack && cp index.html ./dist/index.html && cp index.css ./dist/index.css",
+    "serve": "serve dist/"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -26,5 +24,13 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/debounce": "^1.2.0",
+    "@types/node": "^12.12.14",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.4",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
   }
 }

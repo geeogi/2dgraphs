@@ -1,20 +1,37 @@
-import PRICE_DATA from "./src/example.json";
-import { drawGraph2DCanvas } from "./src/Graph/2DCanvas/index";
-import { getGraphConfig } from "./src/Graph/Universal/getGraphConfig";
-import { positionActiveLegend } from "./src/Graph/Universal/positionActiveLegend";
-import { positionLabels } from "./src/Graph/Universal/positionLabels";
-import { drawGraphWebGL } from "./src/Graph/WebGL/index";
-import { getWebGLInteractivityHandlers } from "./src/Graph/WebGL/WebGLUtils/eventUtils";
+import { drawGraph2DCanvas } from "./Graph/2DCanvas";
+import { getGraphConfig } from "./Graph/Universal/getGraphConfig";
+import { positionActiveLegend } from "./Graph/Universal/positionActiveLegend";
+import { positionLabels } from "./Graph/Universal/positionLabels";
+import { drawGraphWebGL } from "./Graph/WebGL/index";
+import { getWebGLInteractivityHandlers } from "./Graph/WebGL/WebGLUtils/eventUtils";
 
-console.log(drawGraphWebGL, drawGraph2DCanvas);
+// Attach event listeners to main HTML
+window.onload = () => {
+  document.getElementById("render-2d-canvas-button").onclick = () =>
+    drawGraph("line-graph-2d-canvas", drawGraph2DCanvas);
 
-// Parse values from JSON file
-const values: { dateTime: string; price: number }[] = PRICE_DATA.map(value => ({
-  dateTime: value.date,
-  price: value["price(USD)"]
-}));
+  document.getElementById("render-webgl-button").onclick = () =>
+    drawGraph("line-graph-webgl", drawGraphWebGL);
 
-// Render variable cache
+  document.getElementById("data-points-slider").oninput = e => {
+    const newNoOfDataPoints = (e.target as HTMLInputElement).value as any;
+    const dataPointsEl = document.getElementById("data-points-preview");
+    dataPointsEl.innerText = newNoOfDataPoints.toString();
+    drawGraph(previousCanvasId, previousDrawingMethod, newNoOfDataPoints);
+  };
+};
+
+// Fetch and parse values from JSON file
+let values: { dateTime: string; price: number }[];
+fetch("./src/example.json").then(async response => {
+  const json = await response.json();
+  values = json.map((value: any) => ({
+    dateTime: value.date,
+    price: value["price(USD)"]
+  }));
+});
+
+// Declare cache for render variables
 let previousCanvasId: string;
 let previousDrawingMethod: (args: {
   canvasElement: HTMLCanvasElement;
@@ -24,7 +41,7 @@ let previousDrawingMethod: (args: {
 }) => () => void;
 let previousNoOfDataPoints: number = 400;
 
-// Cache cleanup function to be called if graph is re-rendered
+// Declare cache for the cleanup function to be called if graph is re-rendered
 let cleanup: () => void;
 
 export const drawGraph = (
@@ -139,10 +156,4 @@ export const drawGraph = (
 };
 
 // Method to update data points and re-render graph
-export const updateDataPoints = (newNoOfDataPoints: number) => {
-  const dataPointsEl = document.getElementById("data-points-preview");
-  if (dataPointsEl) {
-    dataPointsEl.innerText = newNoOfDataPoints.toString();
-  }
-  drawGraph(previousCanvasId, previousDrawingMethod, newNoOfDataPoints);
-};
+export const updateDataPoints = (newNoOfDataPoints: number) => {};
