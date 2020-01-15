@@ -3,23 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@types/jest": "^24.0.23",
-    "@types/node": "^12.12.14",
-    "@types/react": "^16.9.15",
-    "@types/react-dom": "^16.9.4",
-    "@types/styled-components": "^4.4.1",
-    "moment": "^2.24.0",
-    "react": "^16.11.0",
-    "react-dom": "^16.11.0",
-    "react-scripts": "3.2.0",
-    "styled-components": "^4.4.1",
-    "typescript": "^3.7.3"
+    "debounce": "^1.2.0",
+    "moment": "^2.24.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "build": "webpack && cp index.html ./dist/index.html && cp index.css ./dist/index.css && cp ./src/example.json ./dist/example.json",
+    "serve": "yarn build && serve dist/"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -35,5 +24,13 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/debounce": "^1.2.0",
+    "@types/node": "^12.12.14",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.4",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
   }
 }

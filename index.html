@@ -1,0 +1,58 @@
+<html>
+  <head>
+    <script src="./bundle.js"></script>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <main>
+      <header class="Header">
+        <h1>2D Graphs</h1>
+        <p>Canvas vs. WebGL comparison</p>
+      </header>
+      <div class="GraphCard">
+        <h3>Render method:</h3>
+        <div class="Row">
+          <button id="render-2d-canvas-button">
+            2D Canvas
+          </button>
+          <button id="render-webgl-button">
+            WebGL
+          </button>
+        </div>
+        <h3>Data points:</h3>
+        <div class="Row">
+          <input
+            id="data-points-slider"
+            type="range"
+            min="5"
+            max="3000"
+            value="400"
+            step="1"
+          />
+          <p id="data-points-preview" class="DataPreview">400</p>
+        </div>
+        <div>
+          <div style="position: relative">
+            <canvas id="line-graph-2d-canvas" style="display: none"></canvas>
+            <canvas id="line-graph-webgl" style="display: none"></canvas>
+            <div
+              class="ActiveLegend"
+              id="active-legend"
+              style="display: none"
+            ></div>
+            <div
+              class="ActiveCircle"
+              id="active-circle"
+              style="display: none"
+            ></div>
+            <div
+              class="ActiveLine"
+              id="active-line"
+              style="display: none"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
