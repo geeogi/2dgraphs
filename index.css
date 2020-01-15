@@ -21,7 +21,7 @@ canvas {
 
 .Header {
   padding: 16px;
-  border-bottom: solid 1px red;
+  border-bottom: solid 1px rgb(230, 230, 230);
 }
 
 .Row {
@@ -38,6 +38,11 @@ canvas {
 h1,
 p {
   margin: 4px 0;
+}
+
+h3 {
+  font-size: 16px;
+  margin: 8px 0;
 }
 
 .ActiveLegend {
@@ -78,4 +83,8 @@ p {
   border-left: 1px solid red;
   height: 100%;
   z-index: 98;
+}
+
+.DataPreview {
+  padding-left: 8px;
 }

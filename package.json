@@ -7,8 +7,8 @@
     "moment": "^2.24.0"
   },
   "scripts": {
-    "build": "webpack && cp index.html ./dist/index.html && cp index.css ./dist/index.css",
-    "serve": "serve dist/"
+    "build": "webpack && cp index.html ./dist/index.html && cp index.css ./dist/index.css && cp ./src/example.json ./dist/example.json",
+    "serve": "yarn build && serve dist/"
   },
   "eslintConfig": {
     "extends": "react-app"

@@ -6,3 +6,12 @@ export const LABEL_MARGIN_X = 2 * SPACING_UNIT;
 export const ACTIVE_LEGEND = {
   WIDTH: 120
 };
+
+export const AXIS_LABEL_STYLE = [
+  "position: absolute",
+  "pointer-events: none",
+  "top: 0",
+  "left: 0",
+  "font-size: 12px",
+  "font-family: Arial"
+].join(";");

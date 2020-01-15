@@ -26,60 +26,51 @@ export const positionActiveLegend = (
   const activeLineElement = document.getElementById("active-line");
 
   // Show or hide active legend
-  if (activeLegendElement && activeCircleElement && activeLineElement) {
-    if (activeX && activeX > -1) {
-      // Scale activeX to [-1,1] clip space
-      const clipSpaceActiveX = activeX
-        ? ((activeX - margin[0]) / graphWidth) * 2 - 1
-        : undefined;
+  if (activeX && activeX > -1) {
+    // Scale activeX to [-1,1] clip space
+    const clipSpaceX = ((activeX - margin[0]) / graphWidth) * 2 - 1;
 
-      // Position elements
-      if (clipSpaceActiveX) {
-        // Fetch nearest point to activeX
-        const [{ x, y, dateTime, price }] = [...points].sort((a, b) => {
-          return (
-            Math.abs(a.x - clipSpaceActiveX) - Math.abs(b.x - clipSpaceActiveX)
-          );
-        });
+    // Fetch nearest point to activeX
+    const [{ x, y, dateTime, price }] = [...points].sort(
+      (a, b) => Math.abs(a.x - clipSpaceX) - Math.abs(b.x - clipSpaceX)
+    );
 
-        // Scale x from [-1,1] clip space to screen resolution
-        const nearXGraphX = margin[0] + ((x + 1) / 2) * graphWidth;
-        const rawLegendX = nearXGraphX - ACTIVE_LEGEND_WIDTH / 2;
-        const legendLeftMax = 0;
-        const legendRightMax = resolution[0] - ACTIVE_LEGEND_WIDTH;
-        const legendX = clamp(rawLegendX, legendLeftMax, legendRightMax);
+    // Scale x from [-1,1] clip space to screen resolution
+    const nearXGraphX = margin[0] + ((x + 1) / 2) * graphWidth;
+    const rawLegendX = nearXGraphX - ACTIVE_LEGEND_WIDTH / 2;
+    const legendLeftMax = 0;
+    const legendRightMax = resolution[0] - ACTIVE_LEGEND_WIDTH;
+    const legendX = clamp(rawLegendX, legendLeftMax, legendRightMax);
 
-        // Scale y from [-1,1] clip space to screen resolution
-        const nearYGraphY = margin[1] + ((y + 1) / 2) * graphHeight;
-        const baseLegendY = resolution[1] - (margin[1] + 2 * SPACING_UNIT);
-        const altLegendY = nearYGraphY - 5 * SPACING_UNIT;
-        const useBase = baseLegendY > nearYGraphY;
-        const legendY = useBase ? baseLegendY : altLegendY;
+    // Scale y from [-1,1] clip space to screen resolution
+    const nearYGraphY = margin[1] + ((y + 1) / 2) * graphHeight;
+    const baseLegendY = resolution[1] - (margin[1] + 2 * SPACING_UNIT);
+    const altLegendY = nearYGraphY - 5 * SPACING_UNIT;
+    const useBase = baseLegendY > nearYGraphY;
+    const legendY = useBase ? baseLegendY : altLegendY;
 
-        // Format display variables
-        const displayPrice = Math.round(price);
-        const displayDate = moment(dateTime).format("DD MMM YY");
+    // Format display variables
+    const displayPrice = Math.round(price);
+    const displayDate = moment(dateTime).format("DD MMM YY");
 
-        // Update active legend DOM element
-        activeLegendElement.style.left = legendX + "px";
-        activeLegendElement.style.top = resolution[1] - legendY + "px";
-        activeLegendElement.textContent = `$${displayPrice} – ${displayDate}`;
-        activeLegendElement.style.display = "block";
+    // Update active legend DOM element
+    activeLegendElement.style.left = legendX + "px";
+    activeLegendElement.style.top = resolution[1] - legendY + "px";
+    activeLegendElement.textContent = `$${displayPrice} – ${displayDate}`;
+    activeLegendElement.style.display = "block";
 
-        // Update active circle DOM element
-        const d = ACTIVE_CIRCLE_WIDTH / 2;
-        activeCircleElement.style.left = nearXGraphX - d + "px";
-        activeCircleElement.style.top = resolution[1] - nearYGraphY - d + "px";
-        activeCircleElement.style.display = "block";
+    // Update active circle DOM element
+    const d = ACTIVE_CIRCLE_WIDTH / 2;
+    activeCircleElement.style.left = nearXGraphX - d + "px";
+    activeCircleElement.style.top = resolution[1] - nearYGraphY - d + "px";
+    activeCircleElement.style.display = "block";
 
-        // Update active line DOM element
-        activeLineElement.style.left = nearXGraphX + "px";
-        activeLineElement.style.display = "block";
-      }
-    } else {
-      activeLegendElement.style.display = "none";
-      activeCircleElement.style.display = "none";
-      activeLineElement.style.display = "none";
-    }
+    // Update active line DOM element
+    activeLineElement.style.left = nearXGraphX + "px";
+    activeLineElement.style.display = "block";
+  } else {
+    activeLegendElement.style.display = "none";
+    activeCircleElement.style.display = "none";
+    activeLineElement.style.display = "none";
   }
 };

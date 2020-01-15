@@ -1,4 +1,4 @@
-import { LABEL_MARGIN_X } from "./constants";
+import { AXIS_LABEL_STYLE, LABEL_MARGIN_X } from "./constants";
 
 const existingLabelIds: string[] = [];
 
@@ -20,10 +20,7 @@ export const positionLabels = (
   const createLabel = (label: string) => {
     const node = document.createElement("label");
     node.setAttribute("id", label);
-    node.setAttribute(
-      "style",
-      "position: absolute; pointer-events: none; top: 0; left: 0; font-size: 12px; font-family: Arial;"
-    );
+    node.setAttribute("style", AXIS_LABEL_STYLE);
     const textNode = document.createTextNode(label);
     node.appendChild(textNode);
     canvasElement.insertAdjacentElement("afterend", node);
@@ -43,24 +40,20 @@ export const positionLabels = (
   priceLabels.forEach((label, index) => {
     const str = "$" + JSON.stringify(label);
     const labelElement = createLabel(str);
-    if (labelElement) {
-      const yTopPercentage = 1 - (yGridLines[index] + 1) / 2;
-      const yTop = yTopPercentage * (resolution[1] - 2 * margin[1]);
-      labelElement.style.top = Math.floor(margin[1] + yTop - 18) + "px";
-      labelElement.style.left = Math.floor(LABEL_MARGIN_X) + "px";
-      labelElement.style.display = "block";
-    }
+    const yTopPercentage = 1 - (yGridLines[index] + 1) / 2;
+    const yTop = yTopPercentage * (resolution[1] - 2 * margin[1]);
+    labelElement.style.top = Math.floor(margin[1] + yTop - 18) + "px";
+    labelElement.style.left = Math.floor(LABEL_MARGIN_X) + "px";
+    labelElement.style.display = "block";
   });
 
   // Create and position x-axis labels
   dateLabels.forEach(({ label }, index) => {
     const labelElement = createLabel(label);
-    if (labelElement) {
-      const xLeftPercentage = (xGridLines[index] + 1) / 2;
-      const xLeft = xLeftPercentage * (resolution[0] - 2 * margin[0]);
-      labelElement.style.left = Math.floor(xLeft - 10) + "px";
-      labelElement.style.top = Math.floor(resolution[1] - 19) + "px";
-      labelElement.style.display = "block";
-    }
+    const xLeftPercentage = (xGridLines[index] + 1) / 2;
+    const xLeft = xLeftPercentage * (resolution[0] - 2 * margin[0]);
+    labelElement.style.left = Math.floor(xLeft - 10) + "px";
+    labelElement.style.top = Math.floor(resolution[1] - 19) + "px";
+    labelElement.style.display = "block";
   });
 };
