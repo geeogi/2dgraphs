@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "debounce": "^1.2.0",
-    "moment": "^2.24.0"
+    "dayjs": "^1.8.19",
+    "debounce": "^1.2.0"
   },
   "scripts": {
-    "build": "webpack && cp index.html ./dist/index.html && cp index.css ./dist/index.css && cp ./src/example.json ./dist/example.json",
-    "serve": "yarn build && serve dist/"
+    "build": "webpack",
+    "start": "webpack-dev-server --open"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -31,6 +31,7 @@
     "ts-loader": "^6.2.1",
     "typescript": "^3.7.4",
     "webpack": "^4.41.5",
-    "webpack-cli": "^3.3.10"
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.10.1"
   }
 }

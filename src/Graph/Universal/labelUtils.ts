@@ -1,4 +1,4 @@
-import moment from "moment";
+import dayjs from "dayjs";
 
 export const dateToUnix = (dateString: string) =>
   new Date(dateString).getTime() / 1000;
@@ -46,15 +46,15 @@ export const getDateLabels = (
 
   const tryLabels = (period: any, amount: number) => {
     const labelArray: { unix: number; label: string }[] = [];
-    let momentToAdd = moment(earliestDate)
+    let dateToAdd = dayjs(earliestDate)
       .startOf(period)
       .add(1, period);
-    while (momentToAdd.isBefore(moment(latestDate))) {
+    while (dateToAdd.isBefore(dayjs(latestDate))) {
       labelArray.push({
-        unix: momentToAdd.unix() * 1000,
-        label: momentToAdd.format(displayFormat)
+        unix: dateToAdd.unix() * 1000,
+        label: dateToAdd.format(displayFormat)
       });
-      momentToAdd = momentToAdd.add(amount, period);
+      dateToAdd = dateToAdd.add(amount, period);
     }
     return labelArray;
   };
@@ -100,7 +100,7 @@ export const getDateLabels = (
 
   // 2 week intervals
   if (dateLabels.length < minNumberOfLabels) {
-    displayFormat = "Do MMM";
+    displayFormat = "D MMM";
     dateLabels = tryLabels("week", 2);
   }
 

@@ -5,7 +5,7 @@ import {
 import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "../Universal/constants";
 import { drawXAxes, drawYAxes } from "./2DCanvasUtils/axesUtils";
 import { getRetinaMethod } from "./2DCanvasUtils/canvasUtils";
-import { getParentDimensions } from "./2DCanvasUtils/domUtils";
+import { getParentDimensions } from "../Universal/domUtils";
 import {
   drawLine,
   fillPath,

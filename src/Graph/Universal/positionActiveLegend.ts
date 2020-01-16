@@ -1,4 +1,4 @@
-import moment from "moment";
+import dayjs from "dayjs";
 import { SPACING_UNIT } from "./constants";
 import { clamp } from "./numberUtils";
 
@@ -51,7 +51,7 @@ export const positionActiveLegend = (
 
     // Format display variables
     const displayPrice = Math.round(price);
-    const displayDate = moment(dateTime).format("DD MMM YY");
+    const displayDate = dayjs(dateTime).format("DD MMM YY");
 
     // Update active legend DOM element
     activeLegendElement.style.left = legendX + "px";

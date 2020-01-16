@@ -6,11 +6,10 @@ import {
 /**
  * Return event listeners which will call the render method with activeX,
  * activeY and isClicked whenever any of these values change
- * @param renderMethod
+ * @param callback
  */
 export const getInteractivityHandlers = (
-  renderMethod: (args: {
-    canvasElement: HTMLCanvasElement;
+  callback: (args: {
     activeX?: number;
     activeY?: number;
     isClicked?: boolean;
@@ -20,8 +19,7 @@ export const getInteractivityHandlers = (
 
   const handleMouseMove = (e: any) => {
     const { x, y } = getCoordinatesOfMouseEvent(e);
-    renderMethod({
-      canvasElement: e.target,
+    callback({
       activeX: x,
       activeY: y,
       isClicked
@@ -29,15 +27,14 @@ export const getInteractivityHandlers = (
   };
 
   const handleMouseLeave = (e: any) => {
-    renderMethod({ canvasElement: e.target });
+    callback({});
   };
 
   const handleMouseDown = (e: any) => {
     isClicked = true;
 
     const { x, y } = getCoordinatesOfMouseEvent(e);
-    renderMethod({
-      canvasElement: e.target,
+    callback({
       activeX: x,
       activeY: y,
       isClicked
@@ -47,8 +44,7 @@ export const getInteractivityHandlers = (
       isClicked = false;
 
       const { x, y } = getCoordinatesOfMouseEvent(e);
-      renderMethod({
-        canvasElement: e.target,
+      callback({
         activeX: x,
         activeY: y,
         isClicked
@@ -60,8 +56,7 @@ export const getInteractivityHandlers = (
 
   const handleTouchStart = (e: any) => {
     const { x, y } = getCoordinatesOfTouchEvent(e);
-    renderMethod({
-      canvasElement: e.target,
+    callback({
       activeX: x,
       activeY: y,
       isClicked
@@ -71,7 +66,7 @@ export const getInteractivityHandlers = (
   const handleTouchMove = handleTouchStart;
 
   const handleTouchEnd = (e: any) => {
-    renderMethod({ canvasElement: e.target });
+    callback({});
   };
 
   return {

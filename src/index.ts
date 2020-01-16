@@ -1,3 +1,4 @@
+import PRICE_DATA from "./example.json";
 import { drawGraph } from "./Graph";
 import { drawGraph2DCanvas } from "./Graph/2DCanvas";
 import { drawGraphWebGL } from "./Graph/WebGL/index";
@@ -11,7 +12,6 @@ import { GraphDrawingMethod } from "./types";
  */
 
 // Declare render variables to be cached
-let values: { dateTime: string; price: number }[];
 let prevCanvasId: string;
 let prevDrawingMethod: GraphDrawingMethod;
 let prevNoOfDataPoints: number = 400;
@@ -49,19 +49,15 @@ export const callDrawGraph = (
  *
  */
 
-// Fetch and parse values from JSON file
-fetch("./example.json").then(async response => {
-  const json = await response.json();
-  values = json.map((value: { date: string; ["price(USD)"]: number }) => ({
+// Parse values from JSON file
+const values: { dateTime: string; price: number }[] = PRICE_DATA.map(
+  (value: { date: string; ["price(USD)"]: number }) => ({
     dateTime: value.date,
     price: value["price(USD)"]
-  }));
+  })
+);
 
-  // Draw graph now the values have loaded
-  callDrawGraph("line-graph-2d-canvas", drawGraph2DCanvas, 400);
-});
-
-// Attach click handlers to buttons and inputs on Window load
+// Draw graph and attach handlers to buttons and inputs on Window load
 window.onload = () => {
   document.getElementById("render-2d-canvas-button").onclick = () =>
     callDrawGraph("line-graph-2d-canvas", drawGraph2DCanvas);
@@ -75,4 +71,6 @@ window.onload = () => {
     dataPointsElement.innerText = newNoOfDataPoints.toString();
     callDrawGraph(prevCanvasId, prevDrawingMethod, parseInt(newNoOfDataPoints));
   };
+
+  callDrawGraph("line-graph-2d-canvas", drawGraph2DCanvas, 400);
 };

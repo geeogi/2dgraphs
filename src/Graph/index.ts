@@ -2,7 +2,7 @@ import { GraphDrawingMethod } from "../types";
 import { getGraphConfig } from "./Universal/getGraphConfig";
 import { positionActiveLegend } from "./Universal/positionActiveLegend";
 import { positionLabels } from "./Universal/positionLabels";
-import { getWebGLInteractivityHandlers } from "./WebGL/WebGLUtils/eventUtils";
+import { getInteractivityHandlers } from "./Universal/eventUtils";
 
 // Declare cache for cleanup to be called before re-render
 let cleanup: () => void;
@@ -69,7 +69,7 @@ export const drawGraph = (
     handleMouseMove,
     handleTouchMove,
     handleTouchStart
-  } = getWebGLInteractivityHandlers(onInteraction); // @TODO
+  } = getInteractivityHandlers(onInteraction); // @TODO
 
   // Define resize handler
   const onResize = () => {
