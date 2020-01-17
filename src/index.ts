@@ -1,4 +1,4 @@
-import PRICE_DATA from "./example.json";
+import { VALUES } from "./data";
 import { drawGraph } from "./Graph";
 import { drawGraph2DCanvas } from "./Graph/2DCanvas";
 import { drawGraphWebGL } from "./Graph/WebGL/index";
@@ -35,7 +35,7 @@ export const callDrawGraph = (
   canvas.setAttribute("style", "display: block;");
 
   // Draw the graph
-  drawGraph(canvas, drawingMethod, noOfDataPoints, values);
+  drawGraph(canvas, drawingMethod, noOfDataPoints, VALUES);
 
   // Cache render variables
   prevNoOfDataPoints = noOfDataPoints;
@@ -48,15 +48,6 @@ export const callDrawGraph = (
  * Immediately invoked methods.
  *
  */
-
-// Parse values from JSON file
-const values: { dateTime: string; price: number }[] = PRICE_DATA.map(
-  (value: { date: string; ["price(USD)"]: number }) => ({
-    dateTime: value.date,
-    price: value["price(USD)"]
-  })
-);
-
 // Draw graph and attach handlers to buttons and inputs on Window load
 window.onload = () => {
   document.getElementById("render-2d-canvas-button").onclick = () =>

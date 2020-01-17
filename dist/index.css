@@ -5,8 +5,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #111;
-  color:fff;
+  background-color: #fff;
+  color: #000;
 }
 
 canvas {
