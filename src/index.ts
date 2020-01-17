@@ -1,3 +1,4 @@
+import "./index.css";
 import { VALUES } from "./Data/data";
 import { drawGraph } from "./Graph";
 import { drawGraph2DCanvas } from "./Graph/2DCanvas";

@@ -2,7 +2,6 @@ const path = require("path");
 
 module.exports = {
   entry: "./src/index.ts",
-  // devtool: "inline-source-map",
   mode: "production",
   module: {
     rules: [
@@ -10,6 +9,10 @@ module.exports = {
         test: /\.ts?$/,
         use: "ts-loader",
         exclude: /node_modules/
+      },
+      {
+        test: /\.css$/i,
+        use: ["style-loader", "css-loader"]
       }
     ]
   },
