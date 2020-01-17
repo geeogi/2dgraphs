@@ -16,9 +16,6 @@ module.exports = {
   devServer: {
     contentBase: "./dist"
   },
-  optimization: {
-    minimize: false
-  },
   resolve: {
     extensions: [".tsx", ".ts", ".js"]
   },
