@@ -1,4 +1,4 @@
-import { VALUES } from "./data";
+import { VALUES } from "./Data/data";
 import { drawGraph } from "./Graph";
 import { drawGraph2DCanvas } from "./Graph/2DCanvas";
 import { drawGraphWebGL } from "./Graph/WebGL/index";
@@ -22,14 +22,14 @@ export const callDrawGraph = (
   drawingMethod: GraphDrawingMethod,
   noOfDataPoints: number = prevNoOfDataPoints
 ) => {
+  // DOM: Fetch canvas element
+  const canvas: HTMLCanvasElement = document.getElementById(canvasId) as any;
+
   // DOM: Hide prev canvas if the canvasId has changed
   if (prevCanvasId && canvasId !== prevCanvasId) {
     const prevCanvas = document.getElementById(prevCanvasId);
     prevCanvas.setAttribute("style", "display: none;");
   }
-
-  // DOM: Fetch canvas element
-  const canvas: HTMLCanvasElement = document.getElementById(canvasId) as any;
 
   // DOM: Show canvas
   canvas.setAttribute("style", "display: block;");

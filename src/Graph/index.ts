@@ -86,11 +86,11 @@ export const drawGraph = (
   };
 
   // Attach event listeners
-  window.addEventListener("resize", onResize);
-  canvas.addEventListener("mousedown", handleMouseDown);
-  canvas.addEventListener("mousemove", handleMouseMove);
-  canvas.addEventListener("touchmove", handleTouchMove);
-  canvas.addEventListener("touchstart", handleTouchStart);
+  window.addEventListener("resize", onResize, { passive: true });
+  canvas.addEventListener("mousedown", handleMouseDown, { passive: true });
+  canvas.addEventListener("mousemove", handleMouseMove, { passive: true });
+  canvas.addEventListener("touchmove", handleTouchMove, { passive: true });
+  canvas.addEventListener("touchstart", handleTouchStart, { passive: true });
 
   // Remove event listeners during cleanup
   cleanup = () => {
