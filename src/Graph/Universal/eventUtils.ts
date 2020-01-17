@@ -4,8 +4,8 @@ import {
 } from "./domUtils";
 
 /**
- * Return event listeners which will call the render method with activeX,
- * activeY and isClicked whenever any of these values change
+ * Return event listeners which will call the callback method with activeX,
+ * activeY and isClicked whenever these values change
  * @param callback
  */
 export const getInteractivityHandlers = (

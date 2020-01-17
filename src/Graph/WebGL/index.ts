@@ -36,13 +36,13 @@ export const drawGraphWebGL = (props: {
     margin
   );
 
-  // Resize GL Canvas
+  // Size GL Canvas for retina displays
   resizeGlCanvas(gl, canvasElement);
 
   // Call WebGL render method
   renderGLLineGraph();
 
-  // Define debounced canvas resize method (resizing WebGl canvas is slow ~20ms)
+  // Define debounced resize method (resizing WebGl canvas is slow ~20ms)
   const debouncedCanvasResize = debounce(() => {
     resizeGlCanvas(gl, canvasElement);
     renderGLLineGraph();

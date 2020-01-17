@@ -1,9 +1,6 @@
 import dayjs from "dayjs";
-import { SPACING_UNIT } from "./constants";
+import { SPACING_UNIT, ACTIVE_LEGEND_WIDTH, ACTIVE_CIRCLE_WIDTH } from "./constants";
 import { clamp } from "./numberUtils";
-
-const ACTIVE_LEGEND_WIDTH = 120;
-const ACTIVE_CIRCLE_WIDTH = 10;
 
 export const positionActiveLegend = (
   canvasElement: HTMLCanvasElement,

@@ -1,11 +1,11 @@
-import { GraphDrawingMethod } from "../types";
+import { GraphCleanupMethod, GraphDrawingMethod } from "../types";
+import { getInteractivityHandlers } from "./Universal/eventUtils";
 import { getGraphConfig } from "./Universal/getGraphConfig";
 import { positionActiveLegend } from "./Universal/positionActiveLegend";
 import { positionLabels } from "./Universal/positionLabels";
-import { getInteractivityHandlers } from "./Universal/eventUtils";
 
 // Declare cache for cleanup to be called before re-render
-let cleanup: () => void;
+let cleanup: GraphCleanupMethod;
 
 /**
  * Triggers the drawing method, positions the labels and attaches event listeners
