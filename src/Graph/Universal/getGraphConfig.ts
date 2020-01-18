@@ -54,7 +54,8 @@ export const getGraphConfig = (
     x: scaleDateX(value.dateTime),
     y: scalePriceY(value.price),
     price: value.price,
-    dateTime: value.dateTime
+    dateTime: value.dateTime,
+    unix: dateToUnix(value.dateTime)
   }));
 
   return {
@@ -63,6 +64,10 @@ export const getGraphConfig = (
     xGridLines,
     yGridLines,
     points,
-    margin
+    margin,
+    minPrice,
+    maxPrice,
+    minUnix: points[0].unix,
+    maxUnix: points[points.length - 1].unix
   };
 };

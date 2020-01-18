@@ -1,9 +1,6 @@
 import { debounce } from "debounce";
-import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "../Universal/constants";
 import { getWebGLLineGraphRenderMethod } from "./WebGLRenderMethod";
 import { resizeGlCanvas } from "./WebGLUtils/canvasUtils";
-
-const margin: [number, number] = [GRAPH_MARGIN_X, GRAPH_MARGIN_Y];
 
 export const drawGraphWebGL = (props: {
   canvasElement: HTMLCanvasElement;
@@ -15,9 +12,22 @@ export const drawGraphWebGL = (props: {
     price: any;
     dateTime: any;
   }[];
+  minPrice: number;
+  maxPrice: number;
+  minUnix: number;
+  maxUnix: number;
 }) => {
   // Extract graph props
-  const { canvasElement, xGridLines, yGridLines, points } = props;
+  const {
+    canvasElement,
+    xGridLines,
+    yGridLines,
+    points,
+    minPrice,
+    maxPrice,
+    minUnix,
+    maxUnix
+  } = props;
 
   // Fetch WebGL context
   const gl: WebGLRenderingContext | null = canvasElement.getContext("webgl");
@@ -32,8 +42,7 @@ export const drawGraphWebGL = (props: {
     gl,
     xGridLines,
     yGridLines,
-    points,
-    margin
+    points
   );
 
   // Size GL Canvas for retina displays
@@ -48,9 +57,26 @@ export const drawGraphWebGL = (props: {
     renderGLLineGraph();
   }, 100);
 
-  // Return resize handler
-  return () => {
-    renderGLLineGraph();
-    debouncedCanvasResize();
+  // Return handlers
+  return {
+    resize: () => {
+      renderGLLineGraph();
+      debouncedCanvasResize();
+    },
+    rescale: (
+      newMinPrice: number,
+      newMaxPrice: number,
+      newMinUnix: number,
+      newMaxUnix: number
+    ) => {
+      const xScaleChange = (maxUnix - minUnix) / (newMaxUnix - newMinUnix);
+      const yScaleChange = (maxPrice - minPrice) / (newMaxPrice - newMinPrice);
+      const yBaseChange = (newMinPrice - minPrice) / newMaxPrice;
+
+      const scale: [number, number] = [xScaleChange, yScaleChange];
+      const translation: [number, number] = [-(scale[0] - 1), yBaseChange];
+
+      renderGLLineGraph(scale, translation);
+    }
   };
 };

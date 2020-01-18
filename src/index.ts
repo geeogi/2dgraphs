@@ -1,12 +1,12 @@
 import { VALUES } from "./Data/data";
 import { drawGraph } from "./Graph";
-import { drawGraph2DCanvas } from "./Graph/2DCanvas";
+import { drawGraph2DCanvas } from "./Graph/2DCanvas/index";
 import { drawGraphWebGL } from "./Graph/WebGL/index";
 import { GraphDrawingMethod } from "./types";
 
 /**
  *
- * Note: this file is concerned with the DOM and cache.
+ * Note: this file is concerned with the DOM and state.
  * See ./Graph for graph drawing logic.
  *
  */
@@ -14,9 +14,10 @@ import { GraphDrawingMethod } from "./types";
 // Declare render variables to be cached
 let prevCanvasId: string;
 let prevDrawingMethod: GraphDrawingMethod;
+let prevRescaleMethod: (numberOfDataPoints: number) => void;
 let prevNoOfDataPoints: number = 400;
 
-// Method to call the drawing method, manipulate the DOM and cache variables
+// Method to call the drawing method, manipulate the DOM and update cache state
 export const callDrawGraph = (
   canvasId: string,
   drawingMethod: GraphDrawingMethod,
@@ -35,11 +36,12 @@ export const callDrawGraph = (
   canvas.setAttribute("style", "display: block;");
 
   // Draw the graph
-  drawGraph(canvas, drawingMethod, noOfDataPoints, VALUES);
+  const { rescale } = drawGraph(canvas, drawingMethod, noOfDataPoints, VALUES);
 
   // Cache render variables
   prevNoOfDataPoints = noOfDataPoints;
   prevDrawingMethod = drawingMethod;
+  prevRescaleMethod = rescale ? rescale : undefined;
   prevCanvasId = canvasId;
 };
 
@@ -57,11 +59,16 @@ window.onload = () => {
     callDrawGraph("line-graph-webgl", drawGraphWebGL);
 
   document.getElementById("data-points-slider").oninput = e => {
-    const newNoOfDataPoints = (e.target as HTMLInputElement).value;
+    const newNoOfDataPoints = parseInt((e.target as HTMLInputElement).value);
     const dataPointsElement = document.getElementById("data-points-preview");
     dataPointsElement.innerText = newNoOfDataPoints.toString();
-    callDrawGraph(prevCanvasId, prevDrawingMethod, parseInt(newNoOfDataPoints));
+    if (prevRescaleMethod) {
+      prevNoOfDataPoints = newNoOfDataPoints;
+      prevRescaleMethod(newNoOfDataPoints);
+    } else {
+      callDrawGraph(prevCanvasId, prevDrawingMethod, newNoOfDataPoints);
+    }
   };
 
-  callDrawGraph("line-graph-2d-canvas", drawGraph2DCanvas, 400);
+  callDrawGraph("line-graph-2d-canvas", drawGraph2DCanvas, 3000);
 };

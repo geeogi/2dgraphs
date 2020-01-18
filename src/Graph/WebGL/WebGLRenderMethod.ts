@@ -13,8 +13,7 @@ export const getWebGLLineGraphRenderMethod = (
     y: number;
     price: number;
     dateTime: string;
-  }[],
-  margin: [number, number]
+  }[]
 ) => {
   // Initialize canvas coordinates
   const linePoints: { x: number; y: number }[] = [];
@@ -56,14 +55,17 @@ export const getWebGLLineGraphRenderMethod = (
   const drawXAxis = getDrawLinesMethod(gl, xAxis, AXIS_COLOR_VEC, "vertical");
 
   /* RETURN WEBGL RENDER FUNCTION */
-  return function renderWebGlLineGraph() {
+  return function renderWebGlLineGraph(
+    scale: [number, number] = [1, 1],
+    translation: [number, number] = [0, 0]
+  ) {
     // Fetch canvas resolution
     const resolution: [number, number] = [
       canvasElement.offsetWidth,
       canvasElement.offsetHeight
     ];
 
-    // Clear the canvas
+    // Set canvas clear color
     gl.clearColor(0, 0, 0, 0);
 
     // Enable alpha blend
@@ -73,16 +75,10 @@ export const getWebGLLineGraphRenderMethod = (
     // Clear the color and depth buffer
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // Convert px margin to [-1,1] clip space scale
-    const scale: [number, number] = [
-      1 - (2 * margin[0]) / resolution[0],
-      1 - (2 * margin[1]) / resolution[1]
-    ];
-
     // Draw the elements
-    drawYAxis(resolution, scale);
-    drawXAxis(resolution, scale);
-    drawPrimaryArea(resolution, scale);
-    drawPrimaryPath(resolution, scale);
+    drawYAxis(resolution);
+    drawXAxis(resolution);
+    drawPrimaryArea(resolution, scale, translation);
+    drawPrimaryPath(resolution, scale, translation);
   };
 };

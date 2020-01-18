@@ -1,11 +1,11 @@
-import { GraphCleanupMethod, GraphDrawingMethod } from "../types";
+import { GraphDrawingMethod } from "../types";
 import { getInteractivityHandlers } from "./Universal/eventUtils";
 import { getGraphConfig } from "./Universal/getGraphConfig";
 import { positionActiveLegend } from "./Universal/positionActiveLegend";
 import { positionLabels } from "./Universal/positionLabels";
 
 // Declare cache for cleanup to be called before re-render
-let cleanup: GraphCleanupMethod;
+let cleanup: () => void;
 
 /**
  * Triggers the drawing method, positions the labels and attaches event listeners
@@ -32,7 +32,11 @@ export const drawGraph = (
     xGridLines,
     yGridLines,
     points,
-    margin
+    margin,
+    minPrice,
+    maxPrice,
+    minUnix,
+    maxUnix
   } = getGraphConfig([...values], noOfDataPoints);
 
   // Define method to be called on graph interaction
@@ -41,14 +45,6 @@ export const drawGraph = (
     activeY?: number;
     isClicked?: boolean;
   }) => positionActiveLegend(canvas, args.activeX, margin, points);
-
-  // Draw the graph
-  const onGraphResize = drawingMethod({
-    canvasElement: canvas,
-    points,
-    xGridLines,
-    yGridLines
-  });
 
   // Position graph labels
   positionLabels(
@@ -71,10 +67,22 @@ export const drawGraph = (
     handleTouchStart
   } = getInteractivityHandlers(onInteraction); // @TODO
 
+  // Draw the graph
+  const { resize: onPathResize, rescale: onPathRescale } = drawingMethod({
+    canvasElement: canvas,
+    points,
+    xGridLines,
+    yGridLines,
+    minPrice,
+    maxPrice,
+    minUnix,
+    maxUnix
+  });
+
   // Define resize handler
   const onResize = () => {
     onInteraction({});
-    onGraphResize();
+    onPathResize();
     positionLabels(
       canvas,
       dateLabels,
@@ -99,5 +107,48 @@ export const drawGraph = (
     canvas.removeEventListener("mousemove", handleMouseMove);
     canvas.removeEventListener("touchmove", handleTouchMove);
     canvas.removeEventListener("touchstart", handleTouchStart);
+  };
+
+  return {
+    rescale: onPathRescale
+      ? (noOfDataPoints: number) => {
+          // Get graph configuration
+          const {
+            priceLabels,
+            dateLabels,
+            xGridLines,
+            yGridLines,
+            points,
+            margin,
+            minPrice,
+            maxPrice,
+            minUnix,
+            maxUnix
+          } = getGraphConfig([...values], noOfDataPoints);
+
+          // Define method to be called on graph interaction
+          const onInteraction = (args: {
+            activeX?: number;
+            activeY?: number;
+            isClicked?: boolean;
+          }) => positionActiveLegend(canvas, args.activeX, margin, points);
+
+          // Position graph labels
+          positionLabels(
+            canvas,
+            dateLabels,
+            priceLabels,
+            xGridLines,
+            yGridLines,
+            margin
+          );
+
+          // Clear interactive legend
+          onInteraction({});
+
+          // Rescale the graph
+          onPathRescale(minPrice, maxPrice, minUnix, maxUnix);
+        }
+      : undefined
   };
 };

@@ -34,5 +34,5 @@ export const drawGraph2DCanvas = (props: {
   render2DCanvasLineGraph();
 
   // Return resize handler
-  return () => render2DCanvasLineGraph();
+  return { resize: () => render2DCanvasLineGraph() };
 };
