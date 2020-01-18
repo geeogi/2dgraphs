@@ -1,6 +1,89 @@
 <html>
   <head>
     <title>2D Graphs Comparison</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+          "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+          "Helvetica Neue", sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #fff;
+        color: #000;
+      }
+      canvas {
+        user-select: none;
+        touch-action: none;
+        display: block;
+        width: 100%;
+        height: 400px;
+        @media (max-width: 600px) {
+          height: 300px;
+        }
+      }
+      .Header {
+        padding: 16px;
+        border-bottom: solid 1px rgb(230, 230, 230);
+      }
+      .Row {
+        display: flex;
+        padding-left: 16px;
+      }
+      .GraphCard {
+        max-width: 1000px;
+        margin: auto;
+        padding: 8px;
+      }
+      h1,
+      p {
+        margin: 4px 0;
+      }
+      h3 {
+        font-size: 16px;
+        margin: 8px 0;
+      }
+      .ActiveLegend {
+        user-select: none;
+        touch-action: none;
+        width: 120px;
+        background: blue;
+        color: white;
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 4px 0px;
+        font-size: 12px;
+        text-align: center;
+        z-index: 100;
+      }
+      .ActiveCircle {
+        user-select: none;
+        touch-action: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: yellow;
+        border: solid 1px black;
+        z-index: 99;
+      }
+      .ActiveLine {
+        user-select: none;
+        touch-action: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        border-left: 1px solid red;
+        height: 100%;
+        z-index: 98;
+      }
+      .DataPreview {
+        padding-left: 8px;
+      }
+    </style>
     <script async src="bundle.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
