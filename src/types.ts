@@ -1,5 +1,3 @@
-export type GraphResizeMethod = () => void;
-
 export type GraphPoints = {
   x: number;
   y: number;
@@ -7,21 +5,27 @@ export type GraphPoints = {
   dateTime: string;
 }[];
 
-export type GraphDrawingMethod = (args: {
+export type GraphResizeMethod = () => void;
+
+export type GraphRescaleMethod = (
+  minYValue: number,
+  maxYValue: number,
+  minXValue: number,
+  maxXValue: number
+) => GraphHandlers;
+
+export type GraphHandlers = {
+  resize: GraphResizeMethod;
+  rescale?: GraphRescaleMethod;
+};
+
+export type GraphInitializeMethod = (args: {
   canvasElement: HTMLCanvasElement;
   points: GraphPoints;
   xGridLines: number[];
   yGridLines: number[];
-  minPrice?: number;
-  maxPrice?: number;
-  minUnix?: number;
-  maxUnix?: number;
-}) => {
-  resize: GraphResizeMethod;
-  rescale?: (
-    newMinPrice: number,
-    newMaxPrice: number,
-    newMinUnix: number,
-    newMaxUnix: number
-  ) => void;
-};
+  minYValue: number;
+  maxYValue: number;
+  minXValue: number;
+  maxXValue: number;
+}) => GraphHandlers;

@@ -2,8 +2,6 @@ import { get2DCanvasLineGraphRenderMethod } from "./2DCanvasRenderMethod";
 
 export const drawGraph2DCanvas = (props: {
   canvasElement: HTMLCanvasElement;
-  xGridLines: number[];
-  yGridLines: number[];
   points: {
     x: number;
     y: number;
@@ -12,7 +10,7 @@ export const drawGraph2DCanvas = (props: {
   }[];
 }) => {
   // Extract props
-  const { canvasElement, points, xGridLines, yGridLines } = props;
+  const { canvasElement, points } = props;
 
   // Fetch the canvas context
   const ctx: CanvasRenderingContext2D | null = canvasElement.getContext("2d");
@@ -25,8 +23,6 @@ export const drawGraph2DCanvas = (props: {
   const render2DCanvasLineGraph = get2DCanvasLineGraphRenderMethod({
     canvasElement,
     ctx,
-    xGridLines,
-    yGridLines,
     points
   });
 

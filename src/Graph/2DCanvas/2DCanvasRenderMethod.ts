@@ -1,10 +1,9 @@
 import {
-  PRIMARY_COLOR_ALPHA_2D_CANVAS,
-  PRIMARY_COLOR_2D_CANVAS
+  PRIMARY_COLOR_2D_CANVAS,
+  PRIMARY_COLOR_ALPHA_2D_CANVAS
 } from "../../Config/colors";
-import { drawXAxes, drawYAxes } from "./2DCanvasUtils/axesUtils";
-import { getRetinaMethod } from "./2DCanvasUtils/canvasUtils";
 import { getParentDimensions } from "../Universal/domUtils";
+import { getRetinaMethod } from "./2DCanvasUtils/canvasUtils";
 import {
   drawLine,
   fillPath,
@@ -14,8 +13,6 @@ import {
 export const get2DCanvasLineGraphRenderMethod = (props: {
   canvasElement: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
-  xGridLines: number[];
-  yGridLines: number[];
   points: {
     x: number;
     y: number;
@@ -23,7 +20,7 @@ export const get2DCanvasLineGraphRenderMethod = (props: {
     dateTime: any;
   }[];
 }) => {
-  const { points, xGridLines, yGridLines, canvasElement, ctx } = props;
+  const { points, canvasElement, ctx } = props;
 
   /* RETURN 2D CANVAS RENDER FUNCTION */
   return function render2DCanvasLineGraph() {
@@ -55,23 +52,6 @@ export const get2DCanvasLineGraphRenderMethod = (props: {
 
     // Scale retina
     scaleRetina();
-
-    // Draw x-axis
-    drawXAxes(
-      ctx,
-      xGridLines,
-      clipSpace => toCanvasX(((clipSpace + 1) / 2) * graphWidth),
-      graphWidth,
-      graphDepth
-    );
-
-    // Draw y-axis
-    drawYAxes(
-      ctx,
-      yGridLines,
-      clipSpace => toCanvasY(((clipSpace + 1) / 2) * graphDepth),
-      graphWidth
-    );
 
     // Draw primary block
     fillPath(
