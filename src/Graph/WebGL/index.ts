@@ -71,10 +71,18 @@ export const drawGraphWebGL = (props: {
     ) => {
       const xScaleChange = (maxUnix - minUnix) / (newMaxUnix - newMinUnix);
       const yScaleChange = (maxPrice - minPrice) / (newMaxPrice - newMinPrice);
-      const yBaseChange = (newMinPrice - minPrice) / newMaxPrice;
+      const up = newMinPrice - minPrice;
+      const down = newMaxPrice - maxPrice;
+      const diff = up + down;
+      const change = -(diff / 2) * yScaleChange;
+      const yBaseChange = change / (maxPrice - minPrice);
+      const yBaseChangeClipSpace = yBaseChange * 2;
 
       const scale: [number, number] = [xScaleChange, yScaleChange];
-      const translation: [number, number] = [-(scale[0] - 1), yBaseChange];
+      const translation: [number, number] = [
+        -(scale[0] - 1),
+        yBaseChangeClipSpace
+      ];
 
       renderGLLineGraph(scale, translation);
     }

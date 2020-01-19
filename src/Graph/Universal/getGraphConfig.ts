@@ -65,7 +65,7 @@ export const getGraphConfig = (
     yGridLines,
     points,
     margin,
-    minPrice,
+    minPrice: priceLabels[0],
     maxPrice,
     minUnix: points[0].unix,
     maxUnix: points[points.length - 1].unix
