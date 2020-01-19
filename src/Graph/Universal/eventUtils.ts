@@ -3,20 +3,30 @@ import {
   getCoordinatesOfTouchEvent
 } from "./domUtils";
 
+let cleanup: () => void;
+
 /**
  * Return event listeners which will call the callback method with activeX,
  * activeY and isClicked whenever these values change
  * @param callback
  */
-export const getInteractivityHandlers = (
+export const addInteractivityHandlers = (
   callback: (args: {
     activeX?: number;
     activeY?: number;
     isClicked?: boolean;
-  }) => void
+  }) => void,
+  element: HTMLElement
 ) => {
+  // Cleanup existing listeners
+  if (cleanup) {
+    cleanup();
+  }
+
+  // Clicked state
   let isClicked = false;
 
+  // Methods
   const handleMouseMove = (e: any) => {
     const { x, y } = getCoordinatesOfMouseEvent(e);
     callback({
@@ -26,30 +36,22 @@ export const getInteractivityHandlers = (
     });
   };
 
-  const handleMouseLeave = (e: any) => {
-    callback({});
-  };
-
   const handleMouseDown = (e: any) => {
     isClicked = true;
-
     const { x, y } = getCoordinatesOfMouseEvent(e);
     callback({
       activeX: x,
       activeY: y,
       isClicked
     });
-
     document.addEventListener("mouseup", function onMouseUp(e: any) {
       isClicked = false;
-
       const { x, y } = getCoordinatesOfMouseEvent(e);
       callback({
         activeX: x,
         activeY: y,
         isClicked
       });
-
       document.removeEventListener("mouseup", onMouseUp);
     });
   };
@@ -65,16 +67,17 @@ export const getInteractivityHandlers = (
 
   const handleTouchMove = handleTouchStart;
 
-  const handleTouchEnd = (e: any) => {
-    callback({});
-  };
+  // Attach event listeners
+  element.addEventListener("mousedown", handleMouseDown, { passive: true });
+  element.addEventListener("mousemove", handleMouseMove, { passive: true });
+  element.addEventListener("touchmove", handleTouchMove, { passive: true });
+  element.addEventListener("touchstart", handleTouchStart, { passive: true });
 
-  return {
-    handleMouseDown,
-    handleMouseLeave,
-    handleMouseMove,
-    handleTouchEnd,
-    handleTouchMove,
-    handleTouchStart
+  // Remove event listeners during cleanup
+  cleanup = () => {
+    element.removeEventListener("mousedown", handleMouseDown);
+    element.removeEventListener("mousemove", handleMouseMove);
+    element.removeEventListener("touchmove", handleTouchMove);
+    element.removeEventListener("touchstart", handleTouchStart);
   };
 };

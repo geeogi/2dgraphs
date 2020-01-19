@@ -19,10 +19,10 @@ export const getRetinaMethod = (
     canvasElement.width !== displayWidth ||
     canvasElement.height !== displayHeight
   ) {
-    canvasElement.style.width = canvasWidth + "px";
-    canvasElement.style.height = canvasHeight + "px";
-    canvasElement.width = canvasWidth * canvasResolutionScale;
-    canvasElement.height = canvasHeight * canvasResolutionScale;
+    // canvasElement.style.width = canvasWidth + "px";
+    // canvasElement.style.height = canvasHeight + "px";
+    canvasElement.width = displayWidth;
+    canvasElement.height = displayHeight;
     canvasContext.scale(canvasResolutionScale, canvasResolutionScale);
   }
 };

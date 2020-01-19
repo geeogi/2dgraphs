@@ -1,7 +1,8 @@
 import { enableAttribute, initArrayBuffer, initProgram } from "../setupUtils";
 
 let areaProgram: WebGLProgram;
-let marginResolution: WebGLUniformLocation | null;
+let scaleUniform: WebGLUniformLocation | null;
+let translationUniform: WebGLUniformLocation | null;
 let colorUniform: WebGLUniformLocation | null;
 
 export const getDrawAreaMethod = (
@@ -11,12 +12,14 @@ export const getDrawAreaMethod = (
 ) => {
   // Vertex shader source code
   const areaVShader =
-    "uniform vec2 uMargin;" +
+    "uniform vec2 uScale;" +
+    "uniform vec2 uTranslation;" +
     "attribute vec3 aVertex;" +
     "varying mediump float vY;" +
     "void main(void) {" +
     " gl_Position = vec4(aVertex, 1.0);" +
-    " gl_Position.xy = gl_Position.xy * uMargin;" +
+    " gl_Position.xy = gl_Position.xy * uScale;" +
+    " gl_Position.xy = gl_Position.xy + uTranslation;" +
     " vY = gl_Position.y;" +
     "}";
 
@@ -33,7 +36,8 @@ export const getDrawAreaMethod = (
   // Setup and cache the program and uniform locations
   if (!areaProgram) {
     areaProgram = initProgram(gl, areaVShader, areaFShader);
-    marginResolution = gl.getUniformLocation(areaProgram, "uMargin");
+    scaleUniform = gl.getUniformLocation(areaProgram, "uScale");
+    translationUniform = gl.getUniformLocation(areaProgram, "uTranslation");
     colorUniform = gl.getUniformLocation(areaProgram, "uColor");
   }
 
@@ -47,7 +51,11 @@ export const getDrawAreaMethod = (
   /*======= Storing the geometry ======*/
   const fillAreaVertices_buffer = initArrayBuffer(gl, fillAreaVertices);
 
-  return (resolution: [number, number], margin: [number, number]) => {
+  return (
+    resolution: [number, number],
+    scale: [number, number] = [1, 1],
+    translation: [number, number] = [0, 0]
+  ) => {
     // Use the combined shader program object
     gl.useProgram(areaProgram);
 
@@ -55,7 +63,8 @@ export const getDrawAreaMethod = (
     enableAttribute(gl, areaProgram, fillAreaVertices_buffer, "aVertex");
 
     // Enable uniforms
-    gl.uniform2fv(marginResolution, margin);
+    gl.uniform2fv(scaleUniform, scale);
+    gl.uniform2fv(translationUniform, translation);
     gl.uniform4fv(colorUniform, color);
 
     /*============ Drawing the area =============*/

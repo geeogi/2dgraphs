@@ -19,6 +19,9 @@ module.exports = {
       }
     ]
   },
+  optimization: {
+    minimize: false
+  },
   devServer: {
     contentBase: "./dist"
   },

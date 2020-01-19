@@ -1,67 +1,126 @@
 import { VALUES } from "./Data/data";
-import { drawGraph } from "./Graph";
-import { drawGraph2DCanvas } from "./Graph/2DCanvas";
+import { initializeGraph } from "./Graph";
+import { drawGraph2DCanvas } from "./Graph/2DCanvas/index";
 import { drawGraphWebGL } from "./Graph/WebGL/index";
-import { GraphDrawingMethod } from "./types";
+import { GraphInitializeMethod } from "./types";
+
+const THREE_THOUSAND_VALUES = VALUES.slice(VALUES.length - 3000, VALUES.length);
 
 /**
  *
- * Note: this file is concerned with the DOM and cache.
+ * This file manages the DOM and render state.
  * See ./Graph for graph drawing logic.
  *
  */
 
-// Declare render variables to be cached
-let prevCanvasId: string;
-let prevDrawingMethod: GraphDrawingMethod;
-let prevNoOfDataPoints: number = 400;
+// State
+let currentCanvasId: string;
+let currentNoOfDataPoints: number = 3000;
+const redrawMethods: {
+  canvasId: string;
+  onRescale: (noOfPoints: number) => void;
+}[] = [];
 
-// Method to call the drawing method, manipulate the DOM and cache variables
-export const callDrawGraph = (
-  canvasId: string,
-  drawingMethod: GraphDrawingMethod,
-  noOfDataPoints: number = prevNoOfDataPoints
-) => {
-  // DOM: Fetch canvas element
-  const canvas: HTMLCanvasElement = document.getElementById(canvasId) as any;
-
-  // DOM: Hide prev canvas if the canvasId has changed
-  if (prevCanvasId && canvasId !== prevCanvasId) {
-    const prevCanvas = document.getElementById(prevCanvasId);
-    prevCanvas.setAttribute("style", "display: none;");
+/**
+ * Fetch and show the canvas by ID
+ * Hides the previous canvas
+ * @param canvasId
+ */
+export const showCanvasById = (canvasId: string) => {
+  // DOM: Hide current canvas if the canvasId has changed
+  if (currentCanvasId && canvasId !== currentCanvasId) {
+    const currentCanvas = document.getElementById(currentCanvasId);
+    currentCanvas.setAttribute("style", "display: none;");
   }
 
-  // DOM: Show canvas
+  // DOM: Fetch and show canvas element
+  const canvas: HTMLCanvasElement = document.getElementById(canvasId) as any;
   canvas.setAttribute("style", "display: block;");
 
-  // Draw the graph
-  drawGraph(canvas, drawingMethod, noOfDataPoints, VALUES);
+  // Update state
+  currentCanvasId = canvasId;
 
-  // Cache render variables
-  prevNoOfDataPoints = noOfDataPoints;
-  prevDrawingMethod = drawingMethod;
-  prevCanvasId = canvasId;
+  return canvas;
+};
+
+/**
+ * Calls the initialize graph method
+ * Updates canvas visibility
+ * Updates render variable cache
+ * @param canvasId
+ * @param drawingMethod
+ * @param noOfDataPoints
+ */
+export const setupGraph = (
+  canvasId: string,
+  drawingMethod: GraphInitializeMethod,
+  noOfDataPoints: number = currentNoOfDataPoints
+) => {
+  const canvas: HTMLCanvasElement = document.getElementById(canvasId) as any;
+
+  // Initialize the graph
+  const { onRescale } = initializeGraph(
+    canvas,
+    drawingMethod,
+    THREE_THOUSAND_VALUES
+  );
+
+  // Update state
+  currentNoOfDataPoints = noOfDataPoints;
+  redrawMethods.push({ canvasId, onRescale });
+
+  return onRescale;
 };
 
 /**
  *
- * Immediately invoked methods.
+ * Attach event listeners to index.html and initialize the graph
  *
  */
-// Draw graph and attach handlers to buttons and inputs on Window load
 window.onload = () => {
-  document.getElementById("render-2d-canvas-button").onclick = () =>
-    callDrawGraph("line-graph-2d-canvas", drawGraph2DCanvas);
+  // Initialize the WebGL graph on page load
+  showCanvasById("line-graph-webgl");
+  setupGraph("line-graph-webgl", drawGraphWebGL, THREE_THOUSAND_VALUES.length);
 
-  document.getElementById("render-webgl-button").onclick = () =>
-    callDrawGraph("line-graph-webgl", drawGraphWebGL);
-
-  document.getElementById("data-points-slider").oninput = e => {
-    const newNoOfDataPoints = (e.target as HTMLInputElement).value;
-    const dataPointsElement = document.getElementById("data-points-preview");
-    dataPointsElement.innerText = newNoOfDataPoints.toString();
-    callDrawGraph(prevCanvasId, prevDrawingMethod, parseInt(newNoOfDataPoints));
+  // Attach button listener
+  document.getElementById("render-2d-canvas-button").onclick = () => {
+    const id = "line-graph-2d-canvas";
+    const redraw = redrawMethods.find(({ canvasId }) => canvasId === id);
+    showCanvasById(id);
+    if (redraw) {
+      redraw.onRescale(currentNoOfDataPoints);
+    } else {
+      setupGraph(id, drawGraph2DCanvas)(currentNoOfDataPoints);
+    }
   };
 
-  callDrawGraph("line-graph-2d-canvas", drawGraph2DCanvas, 400);
+  // Attach button listener
+  document.getElementById("render-webgl-button").onclick = () => {
+    const id = "line-graph-webgl";
+    const redraw = redrawMethods.find(({ canvasId }) => canvasId === id);
+    showCanvasById(id);
+    if (redraw) {
+      redraw.onRescale(currentNoOfDataPoints);
+    } else {
+      setupGraph(id, drawGraph2DCanvas);
+    }
+  };
+
+  // Attach range input listener
+  document.getElementById("data-points-slider").oninput = e => {
+    const newNoOfDataPoints = parseInt((e.target as HTMLInputElement).value);
+
+    // Rescale graph
+    const redraw = redrawMethods.find(
+      ({ canvasId }) => canvasId === currentCanvasId
+    );
+    redraw.onRescale(newNoOfDataPoints);
+
+    // Update the cache
+    currentNoOfDataPoints = newNoOfDataPoints;
+
+    // Update data points label
+    const dataPointsPreviewEl = document.getElementById("data-points-preview");
+    dataPointsPreviewEl.innerText = newNoOfDataPoints.toString();
+  };
 };

@@ -1,20 +1,16 @@
-import { AXIS_COLOR_VEC, PRIMARY_COLOR_WEBGL } from "../../Config/colors";
+import { PRIMARY_COLOR_WEBGL } from "../../Config/colors";
 import { getDrawAreaMethod } from "./WebGLUtils/drawUtils/drawArea";
-import { getDrawLinesMethod } from "./WebGLUtils/drawUtils/drawLines";
 import { getDrawPathMethod } from "./WebGLUtils/drawUtils/drawPath";
 
 export const getWebGLLineGraphRenderMethod = (
   canvasElement: HTMLCanvasElement,
   gl: WebGLRenderingContext,
-  xGridLines: number[],
-  yGridLines: number[],
   points: {
     x: number;
     y: number;
     price: number;
     dateTime: string;
-  }[],
-  margin: [number, number]
+  }[]
 ) => {
   // Initialize canvas coordinates
   const linePoints: { x: number; y: number }[] = [];
@@ -29,18 +25,6 @@ export const getWebGLLineGraphRenderMethod = (
     areaPoints.push({ x, y: -1 });
   });
 
-  // Define y-axis coordinates
-  const yAxis = yGridLines.map(y => [
-    { x: -1, y },
-    { x: 1, y }
-  ]);
-
-  // Define x-axis coordinates
-  const xAxis = xGridLines.map(x => [
-    { x, y: -1.05 },
-    { x, y: -1 }
-  ]);
-
   // Define primary drawing methods
   const drawPrimaryPath = getDrawPathMethod(
     gl,
@@ -52,18 +36,19 @@ export const getWebGLLineGraphRenderMethod = (
     areaPoints,
     PRIMARY_COLOR_WEBGL
   );
-  const drawYAxis = getDrawLinesMethod(gl, yAxis, AXIS_COLOR_VEC, "horizontal");
-  const drawXAxis = getDrawLinesMethod(gl, xAxis, AXIS_COLOR_VEC, "vertical");
 
   /* RETURN WEBGL RENDER FUNCTION */
-  return function renderWebGlLineGraph() {
+  return function renderWebGlLineGraph(
+    scale: [number, number] = [1, 1],
+    translation: [number, number] = [0, 0]
+  ) {
     // Fetch canvas resolution
     const resolution: [number, number] = [
       canvasElement.offsetWidth,
       canvasElement.offsetHeight
     ];
 
-    // Clear the canvas
+    // Set canvas clear color
     gl.clearColor(0, 0, 0, 0);
 
     // Enable alpha blend
@@ -73,16 +58,9 @@ export const getWebGLLineGraphRenderMethod = (
     // Clear the color and depth buffer
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // Convert px margin to [-1,1] clip space scale
-    const scale: [number, number] = [
-      1 - (2 * margin[0]) / resolution[0],
-      1 - (2 * margin[1]) / resolution[1]
-    ];
-
     // Draw the elements
-    drawYAxis(resolution, scale);
-    drawXAxis(resolution, scale);
-    drawPrimaryArea(resolution, scale);
-    drawPrimaryPath(resolution, scale);
+
+    drawPrimaryArea(resolution, scale, translation);
+    drawPrimaryPath(resolution, scale, translation);
   };
 };

@@ -1,23 +1,29 @@
 import { debounce } from "debounce";
-import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "../Universal/constants";
 import { getWebGLLineGraphRenderMethod } from "./WebGLRenderMethod";
 import { resizeGlCanvas } from "./WebGLUtils/canvasUtils";
 
-const margin: [number, number] = [GRAPH_MARGIN_X, GRAPH_MARGIN_Y];
-
-export const drawGraphWebGL = (props: {
+export const drawGraphWebGL = (args: {
   canvasElement: HTMLCanvasElement;
-  xGridLines: number[];
-  yGridLines: number[];
   points: {
     x: number;
     y: number;
     price: any;
     dateTime: any;
   }[];
+  minYValue: number;
+  maxYValue: number;
+  minXValue: number;
+  maxXValue: number;
 }) => {
-  // Extract graph props
-  const { canvasElement, xGridLines, yGridLines, points } = props;
+  // Extract render args
+  const {
+    canvasElement,
+    points,
+    minYValue,
+    maxYValue,
+    minXValue,
+    maxXValue
+  } = args;
 
   // Fetch WebGL context
   const gl: WebGLRenderingContext | null = canvasElement.getContext("webgl");
@@ -30,10 +36,7 @@ export const drawGraphWebGL = (props: {
   const renderGLLineGraph = getWebGLLineGraphRenderMethod(
     canvasElement,
     gl,
-    xGridLines,
-    yGridLines,
-    points,
-    margin
+    points
   );
 
   // Size GL Canvas for retina displays
@@ -43,14 +46,53 @@ export const drawGraphWebGL = (props: {
   renderGLLineGraph();
 
   // Define debounced resize method (resizing WebGl canvas is slow ~20ms)
-  const debouncedCanvasResize = debounce(() => {
-    resizeGlCanvas(gl, canvasElement);
-    renderGLLineGraph();
-  }, 100);
+  const debouncedCanvasResize = (afterResize: () => void) =>
+    debounce(() => {
+      resizeGlCanvas(gl, canvasElement);
+      afterResize();
+    }, 100);
 
-  // Return resize handler
-  return () => {
-    renderGLLineGraph();
-    debouncedCanvasResize();
+  // Return graph handlers (resize and rescale)
+  return {
+    resize: () => {
+      renderGLLineGraph();
+      debouncedCanvasResize(renderGLLineGraph);
+    },
+    rescale: (
+      newMinYValue: number,
+      newMaxYValue: number,
+      newMinXValue: number,
+      newMaxXValue: number
+    ) => {
+      // Scale
+      const initXRange = maxXValue - minXValue;
+      const newXRange = newMaxXValue - newMinXValue;
+      const initYRange = maxYValue - minYValue;
+      const newYRange = newMaxYValue - newMinYValue;
+      const xScaleChange = initXRange / newXRange;
+      const yScaleChange = initYRange / newYRange;
+      const scale: [number, number] = [xScaleChange, yScaleChange];
+
+      // Translation
+      const yBaseChangeUp = newMinYValue - minYValue;
+      const yBaseChangeDown = newMaxYValue - maxYValue;
+      const yBaseChange = yBaseChangeUp + yBaseChangeDown;
+      const scaledYBaseChange = -(yBaseChange / 2) * yScaleChange;
+      const percentageYBaseChange = scaledYBaseChange / (maxYValue - minYValue);
+      const clipSpaceYBaseChange = percentageYBaseChange * 2;
+      const xTranslation = -(scale[0] - 1);
+      const yTranslation = clipSpaceYBaseChange;
+      const translation: [number, number] = [xTranslation, yTranslation];
+
+      // Redraw the graph with new scale and translation
+      renderGLLineGraph(scale, translation);
+
+      return {
+        resize: () => {
+          renderGLLineGraph(scale, translation);
+          debouncedCanvasResize(() => renderGLLineGraph(scale, translation));
+        }
+      };
+    }
   };
 };

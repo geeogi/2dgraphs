@@ -2,7 +2,8 @@ import { enableAttribute, initArrayBuffer, initProgram } from "../setupUtils";
 
 let lineProgram: WebGLProgram;
 let resolutionUniform: WebGLUniformLocation | null;
-let marginResolution: WebGLUniformLocation | null;
+let scaleUniform: WebGLUniformLocation | null;
+let translationUniform: WebGLUniformLocation | null;
 let colorUniform: WebGLUniformLocation | null;
 
 export const getDrawPathMethod = (
@@ -12,14 +13,15 @@ export const getDrawPathMethod = (
 ) => {
   const lineVShader =
     "uniform vec2 uResolution;" +
-    "uniform vec2 uMargin;" +
+    "uniform vec2 uScale;" +
+    "uniform vec2 uTranslation;" +
     "attribute vec3 aVertex;" +
     "attribute vec3 aPrev;" +
     "attribute vec3 aNext;" +
     "attribute vec2 aDirection;" +
     "void main(void) {" +
     " gl_Position = vec4(aVertex, 1.0);" +
-    " vec2 uScreen = uResolution * uMargin;" +
+    " vec2 uScreen = uResolution * uScale;" +
     " vec2 AB = normalize(normalize(gl_Position.xy - aPrev.xy) * uScreen);" +
     " vec2 BC = normalize(normalize(aNext.xy - gl_Position.xy) * uScreen);" +
     " vec2 tangent = normalize(AB + BC);" +
@@ -27,7 +29,8 @@ export const getDrawPathMethod = (
     " vec2 normalA = vec2(-AB.y, AB.x);" +
     " float miterLength = min(1.0 / dot(miter, normalA), 5.0);" +
     " gl_Position.xy = gl_Position.xy + (aDirection.x * miter * miterLength * 1.0) / uScreen.xy;" +
-    " gl_Position.xy = gl_Position.xy * uMargin;" +
+    " gl_Position.xy = gl_Position.xy * uScale;" +
+    " gl_Position.xy = gl_Position.xy + uTranslation;" +
     "}";
 
   const lineFShader = `
@@ -41,7 +44,8 @@ export const getDrawPathMethod = (
   if (!lineProgram) {
     lineProgram = initProgram(gl, lineVShader, lineFShader);
     resolutionUniform = gl.getUniformLocation(lineProgram, "uResolution");
-    marginResolution = gl.getUniformLocation(lineProgram, "uMargin");
+    scaleUniform = gl.getUniformLocation(lineProgram, "uScale");
+    translationUniform = gl.getUniformLocation(lineProgram, "uTranslation");
     colorUniform = gl.getUniformLocation(lineProgram, "uColor");
   }
 
@@ -81,7 +85,11 @@ export const getDrawPathMethod = (
   const nextVertices_buffer = initArrayBuffer(gl, nextVertices);
   const direction_buffer = initArrayBuffer(gl, direction);
 
-  return (resolution: [number, number], margin: [number, number]) => {
+  return (
+    resolution: [number, number],
+    scale: [number, number] = [1, 1],
+    translation: [number, number] = [0, 0]
+  ) => {
     // Use the combined shader program object
     gl.useProgram(lineProgram);
 
@@ -93,7 +101,8 @@ export const getDrawPathMethod = (
 
     // Enable uniforms
     gl.uniform2fv(resolutionUniform, resolution);
-    gl.uniform2fv(marginResolution, margin);
+    gl.uniform2fv(scaleUniform, scale);
+    gl.uniform2fv(translationUniform, translation);
     gl.uniform4fv(colorUniform, color);
 
     // Draw the line

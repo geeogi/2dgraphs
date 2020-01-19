@@ -36,93 +36,99 @@ export const getPriceLabels = (
   return { priceLabels };
 };
 
-export const getDateLabels = (
-  earliestDate: string,
-  latestDate: string,
-  minNumberOfLabels: number
-) => {
-  let dateLabels: { unix: number; label: string }[] = [];
+export const getDateLabels = (earliestDate: string, latestDate: string) => {
+  const oneYear = 31536000;
+  const oneMonth = 2628000;
+  const oneWeek = 604800;
+  const oneDay = 86400;
+
+  const dateRange = dateToUnix(latestDate) - dateToUnix(earliestDate);
+
   let displayFormat = "MMM 'YY";
 
-  const tryLabels = (period: any, amount: number) => {
+  const getLabels = (period: any, amount: number) => {
     const labelArray: { unix: number; label: string }[] = [];
+    const latestDayJs = dayjs(latestDate);
+    // Date being added
     let dateToAdd = dayjs(earliestDate)
       .startOf(period)
       .add(1, period);
-    while (dateToAdd.isBefore(dayjs(latestDate))) {
+
+    // Loop while date is within date range
+    while (dateToAdd.isBefore(latestDayJs)) {
       labelArray.push({
         unix: dateToAdd.unix() * 1000,
         label: dateToAdd.format(displayFormat)
       });
       dateToAdd = dateToAdd.add(amount, period);
     }
+
     return labelArray;
   };
+
   // 10 year intervals
-  if (dateLabels.length < minNumberOfLabels) {
-    dateLabels = tryLabels("year", 10);
+  if (dateRange / 2 > 10 * oneYear) {
+    return getLabels("year", 10);
   }
 
   // 5 year intervals
-  if (dateLabels.length < minNumberOfLabels) {
-    dateLabels = tryLabels("year", 5);
+  if (dateRange / 2 > 5 * oneYear) {
+    return getLabels("year", 5);
   }
 
   // 2 year intervals
-  if (dateLabels.length < minNumberOfLabels) {
-    dateLabels = tryLabels("year", 2);
+  if (dateRange / 2 > 2 * oneYear) {
+    return getLabels("year", 2);
   }
 
   // 1 year intervals
-  if (dateLabels.length < minNumberOfLabels) {
-    dateLabels = tryLabels("year", 1);
+  if (dateRange / 2 > 1 * oneYear) {
+    return getLabels("year", 1);
   }
 
   // 6 month intervals
-  if (dateLabels.length < minNumberOfLabels) {
-    dateLabels = tryLabels("month", 6);
+  if (dateRange / 2 > 6 * oneMonth) {
+    return getLabels("month", 6);
   }
 
   // 3 month intervals
-  if (dateLabels.length < minNumberOfLabels) {
-    dateLabels = tryLabels("month", 3);
+  if (dateRange / 2 > 3 * oneMonth) {
+    return getLabels("month", 3);
   }
 
   // 2 month intervals
-  if (dateLabels.length < minNumberOfLabels) {
-    dateLabels = tryLabels("month", 2);
+  if (dateRange / 2 > 2 * oneMonth) {
+    return getLabels("month", 2);
   }
 
   // 1 month intervals
-  if (dateLabels.length < minNumberOfLabels) {
-    dateLabels = tryLabels("month", 1);
+  if (dateRange / 2 > 1 * oneMonth) {
+    return getLabels("month", 1);
   }
 
   // 2 week intervals
-  if (dateLabels.length < minNumberOfLabels) {
+  if (dateRange / 2 > 2 * oneWeek) {
     displayFormat = "D MMM";
-    dateLabels = tryLabels("week", 2);
+    return getLabels("week", 2);
   }
 
   // 1 week intervals
-  if (dateLabels.length < minNumberOfLabels) {
-    dateLabels = tryLabels("week", 1);
+  if (dateRange / 2 > 1 * oneWeek) {
+    return getLabels("week", 1);
   }
 
   // 4 day intervals
-  if (dateLabels.length < minNumberOfLabels) {
-    dateLabels = tryLabels("day", 4);
+  if (dateRange / 2 > 4 * oneDay) {
+    return getLabels("day", 4);
   }
 
   // 2 day intervals
-  if (dateLabels.length < minNumberOfLabels) {
-    dateLabels = tryLabels("day", 2);
+  if (dateRange / 2 > 2 * oneDay) {
+    return getLabels("day", 2);
   }
 
   // 1 day intervals
-  if (dateLabels.length < minNumberOfLabels) {
-    dateLabels = tryLabels("day", 1);
+  if (dateRange / 2 > 1 * oneDay) {
+    return getLabels("day", 1);
   }
-
-  return dateLabels;
 };
