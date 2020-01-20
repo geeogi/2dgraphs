@@ -4,8 +4,6 @@ import { drawGraph2DCanvas } from "./Graph/2DCanvas/index";
 import { drawGraphWebGL } from "./Graph/WebGL/index";
 import { GraphInitializeMethod } from "./types";
 
-const THREE_THOUSAND_VALUES = VALUES.slice(VALUES.length - 3000, VALUES.length);
-
 /**
  *
  * This file manages the DOM and render state.
@@ -59,11 +57,7 @@ export const setupGraph = (
   const canvas: HTMLCanvasElement = document.getElementById(canvasId) as any;
 
   // Initialize the graph
-  const { onRescale } = initializeGraph(
-    canvas,
-    drawingMethod,
-    THREE_THOUSAND_VALUES
-  );
+  const { onRescale } = initializeGraph(canvas, drawingMethod, VALUES);
 
   // Update state
   currentNoOfDataPoints = noOfDataPoints;
@@ -80,7 +74,7 @@ export const setupGraph = (
 window.onload = () => {
   // Initialize the WebGL graph on page load
   showCanvasById("line-graph-webgl");
-  setupGraph("line-graph-webgl", drawGraphWebGL, THREE_THOUSAND_VALUES.length);
+  setupGraph("line-graph-webgl", drawGraphWebGL, VALUES.length);
 
   // Attach button listener
   document.getElementById("render-2d-canvas-button").onclick = () => {

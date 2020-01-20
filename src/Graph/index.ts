@@ -23,7 +23,7 @@ import { addResizeHandler } from "./Universal/resize";
 export const initializeGraph = (
   canvasElement: HTMLCanvasElement,
   initGraphMethod: GraphInitializeMethod,
-  values: { dateTime: string; price: number }[]
+  values: { dateTime: number; price: number }[]
 ) => {
   /**
    * Initializes or rescales the graph
@@ -35,7 +35,7 @@ export const initializeGraph = (
    */
   const drawGraph = (args: {
     initGraph?: GraphInitializeMethod;
-    initValues?: { dateTime: string; price: number }[];
+    initValues?: { dateTime: number; price: number }[];
     rescaleGraph?: GraphRescaleMethod;
   }) => {
     // Extract render arguments

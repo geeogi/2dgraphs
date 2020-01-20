@@ -1,12 +1,17 @@
+import { GraphPoints } from "./../../types";
 import dayjs from "dayjs";
-import { SPACING_UNIT, ACTIVE_LEGEND_WIDTH, ACTIVE_CIRCLE_WIDTH } from "./constants";
+import {
+  SPACING_UNIT,
+  ACTIVE_LEGEND_WIDTH,
+  ACTIVE_CIRCLE_WIDTH
+} from "./constants";
 import { clamp } from "./numberUtils";
 
 export const positionActiveLegend = (
   canvasElement: HTMLCanvasElement,
   activeX: number | undefined,
   margin: [number, number],
-  points: { x: number; y: number; dateTime: string; price: number }[]
+  points: GraphPoints
 ) => {
   // Fetch resolution
   const resolution: [number, number] = [
@@ -48,7 +53,7 @@ export const positionActiveLegend = (
 
     // Format display variables
     const displayPrice = Math.round(price);
-    const displayDate = dayjs(dateTime).format("DD MMM YY");
+    const displayDate = dayjs.unix(dateTime).format("DD MMM YY");
 
     // Update active legend DOM element
     activeLegendElement.style.left = legendX + "px";

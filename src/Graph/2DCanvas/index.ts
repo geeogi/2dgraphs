@@ -1,13 +1,9 @@
+import { GraphPoints } from "./../../types";
 import { get2DCanvasLineGraphRenderMethod } from "./2DCanvasRenderMethod";
 
 export const drawGraph2DCanvas = (props: {
   canvasElement: HTMLCanvasElement;
-  points: {
-    x: number;
-    y: number;
-    price: number;
-    dateTime: string;
-  }[];
+  points: GraphPoints;
 }) => {
   // Extract props
   const { canvasElement, points } = props;

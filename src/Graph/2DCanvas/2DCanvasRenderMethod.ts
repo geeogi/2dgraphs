@@ -1,3 +1,4 @@
+import { GraphPoints } from "./../../types";
 import {
   PRIMARY_COLOR_2D_CANVAS,
   PRIMARY_COLOR_ALPHA_2D_CANVAS
@@ -13,12 +14,7 @@ import {
 export const get2DCanvasLineGraphRenderMethod = (props: {
   canvasElement: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
-  points: {
-    x: number;
-    y: number;
-    price: any;
-    dateTime: any;
-  }[];
+  points: GraphPoints;
 }) => {
   const { points, canvasElement, ctx } = props;
 
