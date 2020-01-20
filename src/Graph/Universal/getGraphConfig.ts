@@ -1,6 +1,6 @@
 import { GraphPoints } from "../../types";
 import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "./constants";
-import { dateToUnix, getDateLabels, getPriceLabels } from "./labelUtils";
+import { getDateLabels, getPriceLabels } from "./labelUtils";
 import { getScaleMethod } from "./numberUtils";
 
 /**
@@ -10,7 +10,7 @@ import { getScaleMethod } from "./numberUtils";
  * @returns { priceLabels, dateLabels, xGridLines, yGridLines, points, margin }
  */
 export const getGraphConfig = (args: {
-  initValues?: { dateTime: string; price: number }[];
+  initValues?: { dateTime: number; price: number }[];
   initPoints?: GraphPoints;
 }) => {
   // Determine the base for the config
@@ -36,10 +36,9 @@ export const getGraphConfig = (args: {
   const { priceLabels } = yConfig;
 
   // Configure x-axis scale helpers
-  const unixMin = dateToUnix(earliestDate);
-  const unixMax = dateToUnix(latestDate);
+  const unixMin = earliestDate;
+  const unixMax = latestDate;
   const scaleUnixX = getScaleMethod(unixMin, unixMax, -1, 1);
-  const scaleDateX = (date: string) => scaleUnixX(dateToUnix(date));
 
   // Configure y-axis scale helpers
   const scalePriceY = getScaleMethod(priceLabels[0], maxPrice, -1, 1);
@@ -52,11 +51,10 @@ export const getGraphConfig = (args: {
   const points: GraphPoints =
     initPoints ||
     initValues.map(value => ({
-      x: scaleDateX(value.dateTime),
+      x: scaleUnixX(value.dateTime),
       y: scalePriceY(value.price),
       price: value.price,
-      dateTime: value.dateTime,
-      unix: dateToUnix(value.dateTime)
+      dateTime: value.dateTime
     }));
 
   return {
@@ -68,7 +66,7 @@ export const getGraphConfig = (args: {
     margin,
     minYValue: priceLabels[0],
     maxYValue: maxPrice,
-    minXValue: points[0].unix,
-    maxXValue: points[points.length - 1].unix
+    minXValue: points[0].dateTime,
+    maxXValue: points[points.length - 1].dateTime
   };
 };

@@ -36,21 +36,22 @@ export const getPriceLabels = (
   return { priceLabels };
 };
 
-export const getDateLabels = (earliestDate: string, latestDate: string) => {
+export const getDateLabels = (earliestDate: number, latestDate: number) => {
   const oneYear = 31536000;
   const oneMonth = 2628000;
   const oneWeek = 604800;
   const oneDay = 86400;
 
-  const dateRange = dateToUnix(latestDate) - dateToUnix(earliestDate);
+  const dateRange = latestDate - earliestDate;
 
   let displayFormat = "MMM 'YY";
 
   const getLabels = (period: any, amount: number) => {
     const labelArray: { unix: number; label: string }[] = [];
-    const latestDayJs = dayjs(latestDate);
+    const latestDayJs = dayjs.unix(latestDate);
     // Date being added
-    let dateToAdd = dayjs(earliestDate)
+    let dateToAdd = dayjs
+      .unix(earliestDate)
       .startOf(period)
       .add(1, period);
 

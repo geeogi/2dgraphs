@@ -2,8 +2,7 @@ export type GraphPoints = {
   x: number;
   y: number;
   price: number;
-  dateTime: string;
-  unix: number;
+  dateTime: number;
 }[];
 
 export type GraphResizeMethod = () => void;
