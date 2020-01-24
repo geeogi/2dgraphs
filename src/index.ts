@@ -42,7 +42,7 @@ export const showCanvasById = (canvasId: string) => {
 };
 
 /**
- * Calls the initialize graph method
+ * Calls the graph initialize method
  * Updates canvas visibility
  * Updates render variable cache
  * @param canvasId
@@ -68,7 +68,7 @@ export const setupGraph = (
 
 /**
  *
- * Attach event listeners to index.html and initialize the graph
+ * Attach event listeners to index.html and initialize the graph on window load
  *
  */
 window.onload = () => {

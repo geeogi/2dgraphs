@@ -1,6 +1,11 @@
-import { AXIS_LABEL_STYLE, LABEL_MARGIN_X } from "./constants";
+import {
+  AXIS_LABEL_STYLE,
+  HORIZONTAL_GRID_LINE_STYLE,
+  LABEL_MARGIN_X,
+  VERTICAL_GRID_LINE_STYLE
+} from "./constants";
 
-const existingLabelIds: string[] = [];
+const existingElementIds: string[] = [];
 
 // Position axis labels
 export const positionLabels = (
@@ -18,42 +23,75 @@ export const positionLabels = (
 
   // Method for creating label in DOM
   const createLabel = (label: string) => {
+    const id = label;
     const node = document.createElement("label");
-    node.setAttribute("id", label);
+    node.setAttribute("id", id);
     node.setAttribute("style", AXIS_LABEL_STYLE);
     const textNode = document.createTextNode(label);
     node.appendChild(textNode);
     canvasElement.insertAdjacentElement("afterend", node);
-    existingLabelIds.push(label);
+    existingElementIds.push(id);
     return node;
   };
 
-  // Clean up existing labels
-  existingLabelIds.forEach(id => {
+  // Method for creating y grid line in DOM
+  const createYGridLine = (id: string) => {
+    const node = document.createElement("hr");
+    node.setAttribute("id", id);
+    node.setAttribute("style", HORIZONTAL_GRID_LINE_STYLE);
+    canvasElement.insertAdjacentElement("afterend", node);
+    existingElementIds.push(id);
+    return node;
+  };
+
+  // Method for creating x grid line in DOM
+  const createXGridLine = (id: string) => {
+    const node = document.createElement("div");
+    node.setAttribute("id", id);
+    node.setAttribute("style", VERTICAL_GRID_LINE_STYLE);
+    canvasElement.insertAdjacentElement("afterend", node);
+    existingElementIds.push(id);
+    return node;
+  };
+
+  // Clean up existing elements
+  existingElementIds.forEach(id => {
     const element = document.getElementById(id);
     if (element) {
       element.remove();
     }
   });
 
-  // Create and position y-axis labels
+  // Create and position y-axis grid lines and labels
   priceLabels.forEach((label, index) => {
-    const str = "$" + JSON.stringify(label);
-    const labelElement = createLabel(str);
+    // Calculate position
     const yTopPercentage = 1 - (yGridLines[index] + 1) / 2;
     const yTop = yTopPercentage * (resolution[1] - 2 * margin[1]);
+
+    // Create and position grid line element
+    const gridLine = createYGridLine(`${label}-grid-line`);
+    gridLine.style.top = Math.floor(margin[1] + yTop) + "px";
+
+    // Create and position label element
+    const str = "$" + JSON.stringify(label);
+    const labelElement = createLabel(str);
     labelElement.style.top = Math.floor(margin[1] + yTop - 18) + "px";
     labelElement.style.left = Math.floor(LABEL_MARGIN_X) + "px";
-    labelElement.style.display = "block";
   });
 
-  // Create and position x-axis labels
+  // Create and position x-axis grid lines and labels
   dateLabels.forEach(({ label }, index) => {
-    const labelElement = createLabel(label);
+    // Calculate position
     const xLeftPercentage = (xGridLines[index] + 1) / 2;
     const xLeft = xLeftPercentage * (resolution[0] - 2 * margin[0]);
+
+    // Create and position grid line element
+    const gridLine = createXGridLine(`${label}-grid-line`);
+    gridLine.style.left = Math.floor(margin[0] + xLeft) + "px";
+
+    // Create and position label element
+    const labelElement = createLabel(label);
     labelElement.style.left = Math.floor(xLeft - 10) + "px";
-    labelElement.style.top = Math.floor(resolution[1] - 19) + "px";
-    labelElement.style.display = "block";
+    labelElement.style.top = Math.floor(resolution[1] - 20) + "px";
   });
 };
