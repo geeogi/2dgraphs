@@ -8,7 +8,7 @@ export const PRIMARY_COLOR_2D_CANVAS = "rgb(255, 0, 255)";
 export const PRIMARY_COLOR_ALPHA_2D_CANVAS = (opacity: number) =>
   `rgba(255, 0, 255, ${opacity})`;
 
-export const AXIS_COLOR_VEC = [0.8, 0.8, 0.8, 1];
+export const AXIS_COLOR_VEC = [0.95, 0.95, 0.95, 1];
 export const AXIS_COLOR_RGB = `
 rgb(${AXIS_COLOR_VEC[0] * 255}, 
     ${AXIS_COLOR_VEC[1] * 255}, 

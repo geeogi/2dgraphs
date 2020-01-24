@@ -5,9 +5,19 @@ import {
   VERTICAL_GRID_LINE_STYLE
 } from "./constants";
 
-const existingElementIds: string[] = [];
+// Cache the container element
+let container: HTMLElement;
 
-// Position axis labels
+/**
+ * Creates and positions label and grid line elements
+ * Removes existing label and grid line elements
+ * @param canvasElement
+ * @param dateLabels
+ * @param priceLabels
+ * @param xGridLines
+ * @param yGridLines
+ * @param margin
+ */
 export const positionLabels = (
   canvasElement: HTMLCanvasElement,
   dateLabels: { unix: number; label: string }[],
@@ -21,7 +31,17 @@ export const positionLabels = (
     canvasElement.offsetHeight
   ];
 
-  // Method for creating label in DOM
+  // Clean up existing label and grid line elements
+  if (container) {
+    container.remove();
+  }
+
+  // Declare arrays for elements
+  const xGridLineElements: HTMLElement[] = [];
+  const yGridLineElements: HTMLElement[] = [];
+  const labelElements: HTMLElement[] = [];
+
+  // Method for creating label element
   const createLabel = (label: string) => {
     const id = label;
     const node = document.createElement("label");
@@ -29,38 +49,24 @@ export const positionLabels = (
     node.setAttribute("style", AXIS_LABEL_STYLE);
     const textNode = document.createTextNode(label);
     node.appendChild(textNode);
-    canvasElement.insertAdjacentElement("afterend", node);
-    existingElementIds.push(id);
     return node;
   };
 
-  // Method for creating y grid line in DOM
+  // Method for creating Y grid line element
   const createYGridLine = (id: string) => {
     const node = document.createElement("hr");
     node.setAttribute("id", id);
     node.setAttribute("style", HORIZONTAL_GRID_LINE_STYLE);
-    canvasElement.insertAdjacentElement("afterend", node);
-    existingElementIds.push(id);
     return node;
   };
 
-  // Method for creating x grid line in DOM
+  // Method for creating X grid line element
   const createXGridLine = (id: string) => {
     const node = document.createElement("div");
     node.setAttribute("id", id);
     node.setAttribute("style", VERTICAL_GRID_LINE_STYLE);
-    canvasElement.insertAdjacentElement("afterend", node);
-    existingElementIds.push(id);
     return node;
   };
-
-  // Clean up existing elements
-  existingElementIds.forEach(id => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.remove();
-    }
-  });
 
   // Create and position y-axis grid lines and labels
   priceLabels.forEach((label, index) => {
@@ -77,6 +83,10 @@ export const positionLabels = (
     const labelElement = createLabel(str);
     labelElement.style.top = Math.floor(margin[1] + yTop - 18) + "px";
     labelElement.style.left = Math.floor(LABEL_MARGIN_X) + "px";
+
+    // Mark elements for insertion
+    xGridLineElements.push(gridLine);
+    labelElements.push(labelElement);
   });
 
   // Create and position x-axis grid lines and labels
@@ -93,5 +103,18 @@ export const positionLabels = (
     const labelElement = createLabel(label);
     labelElement.style.left = Math.floor(xLeft - 10) + "px";
     labelElement.style.top = Math.floor(resolution[1] - 20) + "px";
+
+    // Mark elements for insertion
+    yGridLineElements.push(gridLine);
+    labelElements.push(labelElement);
   });
+
+  // Create new container, append elements and and insert into DOM
+  container = document.createElement("div");
+  [...xGridLineElements, ...yGridLineElements, ...labelElements].forEach(
+    node => {
+      container.appendChild(node);
+    }
+  );
+  canvasElement.insertAdjacentElement("afterend", container);
 };

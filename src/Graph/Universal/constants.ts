@@ -17,15 +17,16 @@ export const AXIS_LABEL_STYLE = [
 ].join(";");
 
 export const HORIZONTAL_GRID_LINE_STYLE = [
-  "width: 100%",
+  `width: calc(100% - ${2 * GRAPH_MARGIN_X}px)`,
   "height: 1px",
+  "margin: 0",
+  `margin-left: ${GRAPH_MARGIN_X}px`,
   "position: absolute",
   "top: 0",
   "left: 0",
   "border: none",
   `background-color: ${AXIS_COLOR_RGB}`,
-  `color: ${AXIS_COLOR_RGB}`,
-  "margin: 0"
+  `color: ${AXIS_COLOR_RGB}`
 ].join(";");
 
 export const VERTICAL_GRID_LINE_STYLE = [
