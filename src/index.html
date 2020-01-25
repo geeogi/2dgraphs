@@ -14,6 +14,7 @@
       }
       canvas {
         user-select: none;
+        -webkit-user-select: none;
         touch-action: none;
         display: block;
         position: relative;
@@ -49,10 +50,12 @@
       }
       .ActiveLegend {
         user-select: none;
+        -webkit-user-select: none;
         touch-action: none;
         width: 120px;
-        background: blue;
-        color: white;
+        background: white;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 1px rgba(0, 0, 0, 0.14);
+        color: black;
         position: absolute;
         top: 0;
         left: 0;
@@ -63,6 +66,7 @@
       }
       .ActiveCircle {
         user-select: none;
+        -webkit-user-select: none;
         touch-action: none;
         position: absolute;
         top: 0;
@@ -76,11 +80,12 @@
       }
       .ActiveLine {
         user-select: none;
+        -webkit-user-select: none;
         touch-action: none;
         position: absolute;
         top: 0;
         left: 0;
-        border-left: 1px solid red;
+        border-left: 1px dashed lightgrey;
         height: 100%;
         z-index: 98;
       }

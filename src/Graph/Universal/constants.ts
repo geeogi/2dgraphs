@@ -10,6 +10,9 @@ export const ACTIVE_CIRCLE_WIDTH = 10;
 export const AXIS_LABEL_STYLE = [
   "position: absolute",
   "pointer-events: none",
+  "user-select: none",
+  "-webkit-user-select: none",
+  "touch-action: none",
   "top: 0",
   "left: 0",
   "font-size: 12px",
@@ -17,6 +20,10 @@ export const AXIS_LABEL_STYLE = [
 ].join(";");
 
 export const HORIZONTAL_GRID_LINE_STYLE = [
+  "pointer-events: none",
+  "user-select: none",
+  "-webkit-user-select: none",
+  "touch-action: none",
   `width: calc(100% - ${2 * GRAPH_MARGIN_X}px)`,
   "height: 1px",
   "margin: 0",
@@ -29,6 +36,10 @@ export const HORIZONTAL_GRID_LINE_STYLE = [
 ].join("; ");
 
 export const VERTICAL_GRID_LINE_STYLE = [
+  "pointer-events: none",
+  "user-select: none",
+  "-webkit-user-select: none",
+  "touch-action: none",
   "height: 8px",
   "width: 1px",
   "position: absolute",

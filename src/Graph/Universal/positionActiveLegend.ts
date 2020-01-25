@@ -29,26 +29,27 @@ export const positionActiveLegend = (
 
   // Show or hide active legend
   if (activeX && activeX > -1) {
-    // Scale activeX to [-1,1] clip space
-    const clipSpaceX = ((activeX - margin[0]) / graphWidth) * 2 - 1;
+    // Scale activeX to [-1,1]
+    const scaledActiveX = ((activeX - margin[0]) / graphWidth) * 2 - 1;
 
     // Fetch nearest point to activeX
     const [{ x, y, dateTime, price }] = [...points].sort(
-      (a, b) => Math.abs(a.x - clipSpaceX) - Math.abs(b.x - clipSpaceX)
+      (a, b) => Math.abs(a.x - scaledActiveX) - Math.abs(b.x - scaledActiveX)
     );
 
-    // Scale x from [-1,1] clip space to screen resolution
+    // Calculate x for legend in px
     const nearXGraphX = margin[0] + ((x + 1) / 2) * graphWidth;
     const rawLegendX = nearXGraphX - ACTIVE_LEGEND_WIDTH / 2;
     const legendLeftMax = 0;
     const legendRightMax = resolution[0] - ACTIVE_LEGEND_WIDTH;
     const legendX = clamp(rawLegendX, legendLeftMax, legendRightMax);
 
-    // Scale y from [-1,1] clip space to screen resolution
+    // Calculate y for legend in px
     const nearYGraphY = margin[1] + ((y + 1) / 2) * graphHeight;
-    const baseLegendY = resolution[1] - (margin[1] + 2 * SPACING_UNIT);
-    const altLegendY = nearYGraphY - 5 * SPACING_UNIT;
-    const useBase = baseLegendY > nearYGraphY;
+    const legendMargin = margin[1] + 2 * SPACING_UNIT;
+    const baseLegendY = resolution[1] - legendMargin;
+    const altLegendY = legendMargin;
+    const useBase = baseLegendY > nearYGraphY + 5 * SPACING_UNIT;
     const legendY = useBase ? baseLegendY : altLegendY;
 
     // Format display variables
