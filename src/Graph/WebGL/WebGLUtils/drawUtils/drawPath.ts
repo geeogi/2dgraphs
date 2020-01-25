@@ -20,15 +20,24 @@ export const getDrawPathMethod = (
     "attribute vec3 aNext;" +
     "attribute vec2 aDirection;" +
     "void main(void) {" +
+    // Declare variables
     " gl_Position = vec4(aVertex, 1.0);" +
+    " float lineWidth = 1.0;" +
+    // Determine whether this vertex is at the edge of the screen
+    " bool isEdge = aVertex.x == -1.0 || aVertex.x == 1.0;" +
+    // Handle resolution and scale
     " vec2 uScreen = uResolution * uScale;" +
+    // Calculate miter direction
     " vec2 AB = normalize(normalize(gl_Position.xy - aPrev.xy) * uScreen);" +
     " vec2 BC = normalize(normalize(aNext.xy - gl_Position.xy) * uScreen);" +
     " vec2 tangent = normalize(AB + BC);" +
-    " vec2 miter = vec2(-tangent.y, tangent.x);" +
+    " vec2 miter = isEdge ? vec2(0.0, 1.0) : vec2(-tangent.y, tangent.x);" +
+    // Calculate miter length (max = 5)
     " vec2 normalA = vec2(-AB.y, AB.x);" +
-    " float miterLength = min(1.0 / dot(miter, normalA), 5.0);" +
-    " gl_Position.xy = gl_Position.xy + (aDirection.x * miter * miterLength * 1.0) / uScreen.xy;" +
+    " float miterLength = min(1.0 / dot(miter, normalA), 100.0);" +
+    // Apply miter
+    " gl_Position.xy = gl_Position.xy + (aDirection.x * miter * miterLength * lineWidth) / uScreen.xy;" +
+    // Scale and translate
     " gl_Position.xy = gl_Position.xy * uScale;" +
     " gl_Position.xy = gl_Position.xy + uTranslation;" +
     "}";
@@ -57,7 +66,7 @@ export const getDrawPathMethod = (
 
   pathPoints.forEach((point, index) => {
     const { x, y, z = 0 } = point;
-    // aVertex
+    // Vertex
     lineVertices.push(x, y, z);
     lineVertices.push(x, y, z);
     // Prev
@@ -69,15 +78,12 @@ export const getDrawPathMethod = (
       nextVertices.push(x, y, z);
     }
     // Miter direction
-    if (index === 0 || index === pathPoints.length - 1) {
-      // First and last points have no miter
-      direction.push(0, 0, 0, 0, 0, 0);
-    } else {
-      direction.push(1, -1, 1, -1, 1, -1);
-    }
+    direction.push(1, -1, 1);
+    direction.push(-1, 1, -1);
   });
 
-  nextVertices.push(0, 0, 0, 0, 0, 0);
+  nextVertices.push(0, 0, 0);
+  nextVertices.push(0, 0, 0);
 
   // Upload buffers to GLSL
   const lineVertices_buffer = initArrayBuffer(gl, lineVertices);
