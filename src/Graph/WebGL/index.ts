@@ -46,17 +46,19 @@ export const drawGraphWebGL = (args: {
   renderGLLineGraph();
 
   // Define debounced resize method (resizing WebGl canvas is slow ~20ms)
-  const debouncedCanvasResize = (afterResize: () => void) =>
-    debounce(() => {
+  const debouncedCanvasResize = debounce(
+    (scale?: [number, number], translation?: [number, number]) => {
       resizeGlCanvas(gl, canvasElement);
-      afterResize();
-    }, 100);
+      renderGLLineGraph(scale, translation);
+    },
+    150
+  );
 
   // Return graph handlers (resize and rescale)
   return {
     resize: () => {
       renderGLLineGraph();
-      debouncedCanvasResize(renderGLLineGraph);
+      debouncedCanvasResize();
     },
     rescale: (
       newMinYValue: number,
@@ -90,7 +92,7 @@ export const drawGraphWebGL = (args: {
       return {
         resize: () => {
           renderGLLineGraph(scale, translation);
-          debouncedCanvasResize(() => renderGLLineGraph(scale, translation));
+          debouncedCanvasResize(scale, translation);
         }
       };
     }

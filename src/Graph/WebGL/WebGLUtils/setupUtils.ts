@@ -48,7 +48,10 @@ export const initProgram = (
   return program;
 };
 
-export const initArrayBuffer = (gl: WebGLRenderingContext, values: number[]) => {
+export const initArrayBuffer = (
+  gl: WebGLRenderingContext,
+  values: number[]
+) => {
   const buffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(values), gl.STATIC_DRAW);
@@ -66,7 +69,7 @@ export const enableAttribute = (
   attributeName: string
 ) => {
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-  var prevVertex = gl.getAttribLocation(program, attributeName);
-  gl.vertexAttribPointer(prevVertex, 3, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(prevVertex);
+  const attribLocation = gl.getAttribLocation(program, attributeName);
+  gl.vertexAttribPointer(attribLocation, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(attribLocation);
 };
