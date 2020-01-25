@@ -24,17 +24,17 @@ export const HORIZONTAL_GRID_LINE_STYLE = [
   "position: absolute",
   "top: 0",
   "left: 0",
-  "border: none",
-  `background-color: ${AXIS_COLOR_RGB}`,
-  `color: ${AXIS_COLOR_RGB}`
-].join(";");
+  `border: solid 0.5px ${AXIS_COLOR_RGB}`,
+  "box-sizing: border-box"
+].join("; ");
 
 export const VERTICAL_GRID_LINE_STYLE = [
   "height: 8px",
-  "width: 0px",
+  "width: 1px",
   "position: absolute",
   `bottom: ${GRAPH_MARGIN_Y - 8}`,
   "left: 0",
-  `border-left: solid 1px ${AXIS_COLOR_RGB}`,
-  "margin: 0"
-].join(";");
+  "margin: 0",
+  `border: solid 0.5px ${AXIS_COLOR_RGB}`,
+  "box-sizing: border-box"
+].join("; ");

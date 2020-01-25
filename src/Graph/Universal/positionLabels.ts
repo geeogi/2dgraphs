@@ -54,7 +54,7 @@ export const positionLabels = (
 
   // Method for creating Y grid line element
   const createYGridLine = (id: string) => {
-    const node = document.createElement("hr");
+    const node = document.createElement("div");
     node.setAttribute("id", id);
     node.setAttribute("style", HORIZONTAL_GRID_LINE_STYLE);
     return node;
@@ -111,6 +111,7 @@ export const positionLabels = (
 
   // Create new container, append elements and and insert into DOM
   container = document.createElement("div");
+  container.setAttribute("id", "label-and-grid-line-container");
   [...xGridLineElements, ...yGridLineElements, ...labelElements].forEach(
     node => {
       container.appendChild(node);
