@@ -72,40 +72,40 @@ export const getDrawPathMethod = (
 
   // Calculate geometry
   const lineVertices: number[] = [];
-  const prevVertices: number[] = [0, 0, 0, 0, 0, 0];
+  const prevVertices: number[] = [0, 0, 0, 0, 0, 0, 0, 0];
   const nextVertices: number[] = [];
   const corner: number[] = [];
 
   pathPoints.forEach((point, index) => {
-    const { x, y, z = 0 } = point;
+    const { x, y } = point;
     // Vertex
-    lineVertices.push(x, y, z);
-    lineVertices.push(x, y, z);
-    lineVertices.push(x, y, z);
-    lineVertices.push(x, y, z);
+    lineVertices.push(x, y);
+    lineVertices.push(x, y);
+    lineVertices.push(x, y);
+    lineVertices.push(x, y);
     // Prev
-    prevVertices.push(x, y, z);
-    prevVertices.push(x, y, z);
-    prevVertices.push(x, y, z);
-    prevVertices.push(x, y, z);
+    prevVertices.push(x, y);
+    prevVertices.push(x, y);
+    prevVertices.push(x, y);
+    prevVertices.push(x, y);
     // Next
     if (index > 0) {
-      nextVertices.push(x, y, z);
-      nextVertices.push(x, y, z);
-      nextVertices.push(x, y, z);
-      nextVertices.push(x, y, z);
+      nextVertices.push(x, y);
+      nextVertices.push(x, y);
+      nextVertices.push(x, y);
+      nextVertices.push(x, y);
     }
     // Miter corner
-    corner.push(-1, -1, 0);
-    corner.push(1, -1, 0);
-    corner.push(-1, 1, 0);
-    corner.push(1, 1, 0);
+    corner.push(-1, -1);
+    corner.push(1, -1);
+    corner.push(-1, 1);
+    corner.push(1, 1);
   });
 
-  nextVertices.push(0, 0, 0);
-  nextVertices.push(0, 0, 0);
-  nextVertices.push(0, 0, 0);
-  nextVertices.push(0, 0, 0);
+  nextVertices.push(0, 0);
+  nextVertices.push(0, 0);
+  nextVertices.push(0, 0);
+  nextVertices.push(0, 0);
 
   // Upload buffers to GLSL
   const lineVertices_buffer = initArrayBuffer(gl, lineVertices);

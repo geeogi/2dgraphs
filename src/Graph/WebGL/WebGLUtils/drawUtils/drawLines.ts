@@ -47,27 +47,27 @@ export const getDrawLinesMethod = (
 
   lines.forEach(line => {
     // aVertex
-    lineVertices.push(line[0].x, line[0].y, line[0].z || 0);
-    lineVertices.push(line[0].x, line[0].y, line[0].z || 0);
-    lineVertices.push(line[1].x, line[1].y, line[1].z || 0);
-    lineVertices.push(line[1].x, line[1].y, line[1].z || 0);
-    lineVertices.push(line[1].x, line[1].y, line[1].z || 0);
-    lineVertices.push(line[0].x, line[0].y, line[0].z || 0);
+    lineVertices.push(line[0].x, line[0].y);
+    lineVertices.push(line[0].x, line[0].y);
+    lineVertices.push(line[1].x, line[1].y);
+    lineVertices.push(line[1].x, line[1].y);
+    lineVertices.push(line[1].x, line[1].y);
+    lineVertices.push(line[0].x, line[0].y);
     // Direction
     if (mode === "horizontal") {
-      direction.push(0, -1, 0);
-      direction.push(0, 1, 0);
-      direction.push(0, -1, 0);
-      direction.push(0, 1, 0);
-      direction.push(0, -1, 0);
-      direction.push(0, 1, 0);
+      direction.push(0, -1);
+      direction.push(0, 1);
+      direction.push(0, -1);
+      direction.push(0, 1);
+      direction.push(0, -1);
+      direction.push(0, 1);
     } else if (mode === "vertical") {
-      direction.push(-1, 0, 0);
-      direction.push(1, 0, 0);
-      direction.push(-1, 0, 0);
-      direction.push(1, 0, 0);
-      direction.push(-1, 0, 0);
-      direction.push(1, 0, 0);
+      direction.push(-1, 0);
+      direction.push(1, 0);
+      direction.push(-1, 0);
+      direction.push(1, 0);
+      direction.push(-1, 0);
+      direction.push(1, 0);
     }
   });
 

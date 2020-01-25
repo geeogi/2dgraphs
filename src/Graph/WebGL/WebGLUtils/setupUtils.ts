@@ -70,6 +70,6 @@ export const enableAttribute = (
 ) => {
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
   const attribLocation = gl.getAttribLocation(program, attributeName);
-  gl.vertexAttribPointer(attribLocation, 3, gl.FLOAT, false, 0, 0);
+  gl.vertexAttribPointer(attribLocation, 2, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(attribLocation);
 };

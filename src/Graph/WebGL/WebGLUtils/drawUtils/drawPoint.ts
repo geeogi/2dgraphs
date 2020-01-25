@@ -74,7 +74,7 @@ export const getDrawCircleMethod = (
   }
 
   // Upload buffers to GLSL
-  const point_buffer = initArrayBuffer(gl, [circle.x, circle.y, 0]);
+  const point_buffer = initArrayBuffer(gl, [circle.x, circle.y]);
 
   return (
     resolution: [number, number],

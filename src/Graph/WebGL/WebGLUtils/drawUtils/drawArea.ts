@@ -44,8 +44,8 @@ export const getDrawAreaMethod = (
   /*======= Defining the geometry ======*/
   const fillAreaVertices: number[] = [];
   areaPoints.forEach(point => {
-    const { x, y, z = 0 } = point;
-    fillAreaVertices.push(x, y, z);
+    const { x, y } = point;
+    fillAreaVertices.push(x, y);
   });
 
   /*======= Storing the geometry ======*/
