@@ -6,21 +6,17 @@
  * @param {*} canvasHeight
  * @param {*} canvasResolutionScale
  */
-export const getRetinaMethod = (
+export const scale2DCanvas = (
   canvasContext: CanvasRenderingContext2D,
-  canvasElement: HTMLCanvasElement,
-  canvasWidth: number,
-  canvasHeight: number
-) => () => {
+  canvasElement: HTMLCanvasElement
+) => {
   const canvasResolutionScale = window.devicePixelRatio;
-  const displayWidth = canvasWidth * canvasResolutionScale;
-  const displayHeight = canvasHeight * canvasResolutionScale;
+  const displayWidth = canvasElement.offsetWidth * canvasResolutionScale;
+  const displayHeight = canvasElement.offsetHeight * canvasResolutionScale;
   if (
     canvasElement.width !== displayWidth ||
     canvasElement.height !== displayHeight
   ) {
-    // canvasElement.style.width = canvasWidth + "px";
-    // canvasElement.style.height = canvasHeight + "px";
     canvasElement.width = displayWidth;
     canvasElement.height = displayHeight;
     canvasContext.scale(canvasResolutionScale, canvasResolutionScale);

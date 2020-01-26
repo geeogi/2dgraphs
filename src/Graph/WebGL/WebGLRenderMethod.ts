@@ -1,6 +1,6 @@
 import { PRIMARY_COLOR_WEBGL } from "../../Config/colors";
 import { getDrawAreaMethod } from "./WebGLUtils/drawUtils/drawArea";
-import { getDrawPathMethod } from "./WebGLUtils/drawUtils/drawPath";
+import { getDrawLineMethod } from "./WebGLUtils/drawUtils/drawLine";
 
 export const getWebGLLineGraphRenderMethod = (
   canvasElement: HTMLCanvasElement,
@@ -26,7 +26,7 @@ export const getWebGLLineGraphRenderMethod = (
   });
 
   // Define primary drawing methods
-  const drawPrimaryPath = getDrawPathMethod(
+  const drawPrimaryPath = getDrawLineMethod(
     gl,
     linePoints,
     PRIMARY_COLOR_WEBGL
@@ -59,7 +59,6 @@ export const getWebGLLineGraphRenderMethod = (
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // Draw the elements
-
     drawPrimaryArea(resolution, scale, translation);
     drawPrimaryPath(resolution, scale, translation);
   };

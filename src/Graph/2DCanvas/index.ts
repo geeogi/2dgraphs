@@ -1,5 +1,6 @@
 import { GraphPoints } from "./../../types";
 import { get2DCanvasLineGraphRenderMethod } from "./2DCanvasRenderMethod";
+import { scale2DCanvas } from "./2DCanvasUtils/canvasUtils";
 
 export const drawGraph2DCanvas = (props: {
   canvasElement: HTMLCanvasElement;
@@ -22,9 +23,17 @@ export const drawGraph2DCanvas = (props: {
     points
   });
 
+  // Size 2D Canvas for retina displays
+  scale2DCanvas(ctx, canvasElement);
+
   // Render
   render2DCanvasLineGraph();
 
   // Return resize handler
-  return { resize: () => render2DCanvasLineGraph() };
+  return {
+    resize: () => {
+      scale2DCanvas(ctx, canvasElement);
+      render2DCanvasLineGraph();
+    }
+  };
 };

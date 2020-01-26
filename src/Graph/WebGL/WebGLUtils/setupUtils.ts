@@ -62,7 +62,7 @@ export const initArrayBuffer = (
   return buffer;
 };
 
-export const enableAttribute = (
+export const enable2DAttribute = (
   gl: WebGLRenderingContext,
   program: WebGLProgram,
   buffer: WebGLBuffer,

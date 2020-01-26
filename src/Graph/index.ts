@@ -3,7 +3,6 @@ import {
   GraphInitializeMethod,
   GraphRescaleMethod
 } from "../types";
-import { GraphPoints } from "./../types";
 import { addInteractivityHandlers } from "./Universal/eventUtils";
 import { getGraphConfig } from "./Universal/getGraphConfig";
 import { positionActiveLegend } from "./Universal/positionActiveLegend";
@@ -112,7 +111,7 @@ export const initializeGraph = (
   };
 
   // Draw the graph and fetch the graph handlers
-  const { graphHandlers, points } = drawGraph({
+  const { graphHandlers } = drawGraph({
     initGraph: initGraphMethod,
     initValues: values
   });

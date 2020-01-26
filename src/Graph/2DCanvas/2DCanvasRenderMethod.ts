@@ -1,10 +1,8 @@
-import { GraphPoints } from "./../../types";
 import {
   PRIMARY_COLOR_2D_CANVAS,
   PRIMARY_COLOR_ALPHA_2D_CANVAS
 } from "../../Config/colors";
-import { getParentDimensions } from "../Universal/domUtils";
-import { getRetinaMethod } from "./2DCanvasUtils/canvasUtils";
+import { GraphPoints } from "./../../types";
 import {
   drawLine,
   fillPath,
@@ -21,7 +19,8 @@ export const get2DCanvasLineGraphRenderMethod = (props: {
   /* RETURN 2D CANVAS RENDER FUNCTION */
   return function render2DCanvasLineGraph() {
     // Fetch the desired canvas height and width
-    const { height, width } = getParentDimensions(canvasElement);
+    const height = canvasElement.offsetHeight;
+    const width = canvasElement.offsetWidth;
 
     // Clear graph
     ctx.clearRect(0, 0, width, height);
@@ -35,7 +34,6 @@ export const get2DCanvasLineGraphRenderMethod = (props: {
     const toCanvasX = (graphX: number) => graphX;
 
     // Get canvas util methods
-    const scaleRetina = getRetinaMethod(ctx, canvasElement, width, height);
     const getGradient = getGradientMethod(ctx, 0, graphDepth);
 
     // Scale points to screen resolution
@@ -45,9 +43,6 @@ export const get2DCanvasLineGraphRenderMethod = (props: {
       dateTime: point.dateTime,
       price: point.price
     }));
-
-    // Scale retina
-    scaleRetina();
 
     // Draw primary block
     fillPath(

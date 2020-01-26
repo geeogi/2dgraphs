@@ -1,3 +1,11 @@
+import {
+  CANVAS_2D_CANVAS_ID,
+  CANVAS_2D_RENDER_BUTTON,
+  DATA_POINTS_PREVIEW,
+  DATA_POINTS_SLIDER,
+  WEB_GL_CANVAS_ID,
+  WEB_GL_RENDER_BUTTON
+} from "./Config/constants";
 import { VALUES } from "./Data/data";
 import { initializeGraph } from "./Graph";
 import { drawGraph2DCanvas } from "./Graph/2DCanvas/index";
@@ -73,12 +81,12 @@ export const setupGraph = (
  */
 window.onload = () => {
   // Initialize the WebGL graph on page load
-  showCanvasById("line-graph-webgl");
-  setupGraph("line-graph-webgl", drawGraphWebGL, VALUES.length);
+  showCanvasById(WEB_GL_CANVAS_ID);
+  setupGraph(WEB_GL_CANVAS_ID, drawGraphWebGL, VALUES.length);
 
   // Attach button listener
-  document.getElementById("render-2d-canvas-button").onclick = () => {
-    const id = "line-graph-2d-canvas";
+  document.getElementById(CANVAS_2D_RENDER_BUTTON).onclick = () => {
+    const id = CANVAS_2D_CANVAS_ID;
     const redraw = redrawMethods.find(({ canvasId }) => canvasId === id);
     showCanvasById(id);
     if (redraw) {
@@ -89,8 +97,8 @@ window.onload = () => {
   };
 
   // Attach button listener
-  document.getElementById("render-webgl-button").onclick = () => {
-    const id = "line-graph-webgl";
+  document.getElementById(WEB_GL_RENDER_BUTTON).onclick = () => {
+    const id = WEB_GL_CANVAS_ID;
     const redraw = redrawMethods.find(({ canvasId }) => canvasId === id);
     showCanvasById(id);
     if (redraw) {
@@ -101,7 +109,7 @@ window.onload = () => {
   };
 
   // Attach range input listener
-  document.getElementById("data-points-slider").oninput = e => {
+  document.getElementById(DATA_POINTS_SLIDER).oninput = e => {
     const newNoOfDataPoints = parseInt((e.target as HTMLInputElement).value);
 
     // Rescale graph
@@ -114,7 +122,7 @@ window.onload = () => {
     currentNoOfDataPoints = newNoOfDataPoints;
 
     // Update data points label
-    const dataPointsPreviewEl = document.getElementById("data-points-preview");
+    const dataPointsPreviewEl = document.getElementById(DATA_POINTS_PREVIEW);
     dataPointsPreviewEl.innerText = newNoOfDataPoints.toString();
   };
 };

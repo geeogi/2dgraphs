@@ -5,7 +5,7 @@ export const resizeGlCanvas = (gl: any, canvasElement: HTMLCanvasElement) => {
     canvasElement.clientHeight * realToCSSPixels
   );
 
-  // Check if the canvas is not the same size.
+  // Check if the canvas is not the same size
   if (
     canvasElement.width !== displayWidth ||
     canvasElement.height !== displayHeight

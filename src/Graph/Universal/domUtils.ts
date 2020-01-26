@@ -1,18 +1,4 @@
 /**
- * Method: Get dimensions of the element's parent
- * @param {*} element
- */
-export const getParentDimensions = (element: HTMLElement) => {
-  const { parentElement } = element;
-  if (!parentElement) {
-    throw new Error("No parent element found");
-  }
-  const height = parentElement.offsetHeight;
-  const width = parentElement.offsetWidth;
-  return { height, width };
-};
-
-/**
  * Method: Get the coordinates of a mouse event
  * @param {*} e
  */
