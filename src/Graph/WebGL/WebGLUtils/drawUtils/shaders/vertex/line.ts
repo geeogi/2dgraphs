@@ -1,12 +1,13 @@
-import { glsl } from "../../../vscodeUtils";
+import { glsl } from "../../../glslUtils";
 
 // https://github.com/d3fc/d3fc/blob/9decc02b958db6ec772073493da7bbbbd94407a7/packages/d3fc-webgl/src/shaders/vertexShaderSnippets.js#L148
 // https://blog.scottlogic.com/2019/11/18/drawing-lines-with-webgl.html
 
-export const LINE_VERTEX_SHADER = glsl`uniform vec2 uResolution; 
+export const LINE_VERTEX_SHADER = glsl`
+      uniform vec2 uResolution; 
       uniform vec2 uScale; 
       uniform vec2 uTranslation; 
-      attribute vec2 aCorner; // Defines which vertex in the line join we are considering
+      attribute vec2 aCorner; // Defines which corner in the line join we are considering
       attribute vec2 aCurrent; // Current vertex
       attribute vec2 aNext; // Next vertex
       attribute vec2 aPrev; // Previous vertex   

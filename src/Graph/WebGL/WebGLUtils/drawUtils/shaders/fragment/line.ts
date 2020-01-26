@@ -1,4 +1,4 @@
-import { glsl } from "../../../vscodeUtils";
+import { glsl } from "../../../glslUtils";
 
 export const LINE_FRAGMENT_SHADER = glsl`
 precision mediump float;
