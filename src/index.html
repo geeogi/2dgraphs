@@ -1,7 +1,23 @@
 <html>
   <head>
     <title>2D Graphs Comparison</title>
+    <!-- CSS -->
     <style>
+      :root {
+        --background-color: #fff;
+        --border-color: rgb(230, 230, 230);
+        --contrast-color: #000;
+        --active-circle-color: yellow;
+        --active-circle-width: 10px;
+        --active-legend-width: 120px;
+        --graph-margin-x: 8px;
+        --graph-label-margin-x: 8px;
+        --graph-margin-y: 32px;
+        --graph-spacing-unit: 8px;
+        --graph-height: 400px;
+        --graph-height-mobile: 250px;
+      }
+
       body {
         margin: 0;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
@@ -9,9 +25,10 @@
           "Helvetica Neue", sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-        background-color: #fff;
-        color: #000;
+        background-color: var(--background-color);
+        color: var(--contrast-color);
       }
+
       canvas {
         user-select: none;
         -webkit-user-select: none;
@@ -19,43 +36,53 @@
         display: block;
         position: relative;
         z-index: 1;
-        /* Apply graph margin */
-        width: calc(100% - 32px);
-        height: calc(400px - 64px);
-        padding: 32px 16px;
-        @media (max-width: 600px) {
-          height: calc(300px - 64px);
+        width: calc(100% - calc(2 * var(--graph-margin-x)));
+        height: calc(var(--graph-height) - calc(2 * var(--graph-margin-y)));
+        padding: var(--graph-margin-y) var(--graph-margin-x);
+      }
+
+      @media only screen and (max-width: 600px) {
+        canvas {
+          height: calc(
+            var(--graph-height-mobile) - calc(2 * var(--graph-margin-y))
+          );
         }
       }
+
       .Header {
         padding: 16px;
-        border-bottom: solid 1px rgb(230, 230, 230);
+        border-bottom: solid 1px var(--border-color);
       }
+
       .Row {
         display: flex;
         padding-left: 16px;
       }
+
       .GraphCard {
         max-width: 1000px;
         margin: auto;
         padding: 8px;
       }
+
       h1,
       p {
         margin: 4px 0;
       }
+
       h3 {
         font-size: 16px;
         margin: 8px 0;
       }
+
       .ActiveLegend {
         user-select: none;
         -webkit-user-select: none;
         touch-action: none;
-        width: 120px;
-        background: white;
+        width: var(--active-legend-width);
+        background: var(--background-color);
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 1px rgba(0, 0, 0, 0.14);
-        color: black;
+        color: var(--contrast-color);
         position: absolute;
         top: 0;
         left: 0;
@@ -64,6 +91,7 @@
         text-align: center;
         z-index: 100;
       }
+
       .ActiveCircle {
         user-select: none;
         -webkit-user-select: none;
@@ -74,10 +102,11 @@
         width: 10px;
         height: 10px;
         border-radius: 50%;
-        background: yellow;
-        border: solid 1px black;
+        background: var(--active-circle-color);
+        border: solid 1px var(--contrast-color);
         z-index: 99;
       }
+
       .ActiveLine {
         user-select: none;
         -webkit-user-select: none;
@@ -85,18 +114,68 @@
         position: absolute;
         top: 0;
         left: 0;
-        border-left: 1px dashed lightgrey;
+        border-left: 1px dashed var(--border-color);
         height: 100%;
         z-index: 98;
       }
+
+      .AxisLabel {
+        position: absolute;
+        pointer-events: none;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: none;
+        top: 0;
+        left: 0;
+        font-size: 12px;
+        font-family: Arial;
+      }
+
+      .HorizontalGridLine {
+        pointer-events: none;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: none;
+        width: calc(100% - calc(2 * var(--graph-margin-x)));
+        height: 1px;
+        margin: 0;
+        margin-left: var(--graph-margin-x);
+        position: absolute;
+        top: 0;
+        left: 0;
+        border: solid 0.5px var(--border-color);
+        box-sizing: border-box;
+      }
+
+      .VerticalGridLine {
+        pointer-events: none;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: none;
+        height: 8px;
+        width: 1px;
+        position: absolute;
+        bottom: calc(var(--graph-margin-y) - var(--graph-spacing-unit));
+        left: 0;
+        margin: 0;
+        border: solid 0.5px var(--border-color);
+        box-sizing: border-box;
+      }
+
       .DataPreview {
         padding-left: 8px;
       }
     </style>
+
+    <!-- JS -->
     <script async src="bundle.js"></script>
+
+    <!-- META -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
+
   <body>
+    <!-- TEMPLATE -->
     <main>
       <header class="Header">
         <h1>2D Graphs</h1>

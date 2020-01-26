@@ -1,9 +1,9 @@
 import {
-  AXIS_LABEL_STYLE,
-  HORIZONTAL_GRID_LINE_STYLE,
-  LABEL_MARGIN_X,
-  VERTICAL_GRID_LINE_STYLE
-} from "./constants";
+  AXIS_LABEL_CLASS,
+  HORIZONTAL_GRID_LINE_CLASS,
+  LABEL_MARGIN_X
+} from "../../Config/constants";
+import { VERTICAL_GRID_LINE_CLASS } from "./../../Config/constants";
 
 // Cache the container element
 let container: HTMLElement;
@@ -46,7 +46,7 @@ export const positionLabels = (
     const id = label;
     const node = document.createElement("label");
     node.setAttribute("id", id);
-    node.setAttribute("style", AXIS_LABEL_STYLE);
+    node.className = AXIS_LABEL_CLASS;
     const textNode = document.createTextNode(label);
     node.appendChild(textNode);
     return node;
@@ -56,7 +56,7 @@ export const positionLabels = (
   const createYGridLine = (id: string) => {
     const node = document.createElement("div");
     node.setAttribute("id", id);
-    node.setAttribute("style", HORIZONTAL_GRID_LINE_STYLE);
+    node.className = HORIZONTAL_GRID_LINE_CLASS;
     return node;
   };
 
@@ -64,7 +64,7 @@ export const positionLabels = (
   const createXGridLine = (id: string) => {
     const node = document.createElement("div");
     node.setAttribute("id", id);
-    node.setAttribute("style", VERTICAL_GRID_LINE_STYLE);
+    node.className = VERTICAL_GRID_LINE_CLASS;
     return node;
   };
 

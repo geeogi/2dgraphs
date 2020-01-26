@@ -1,5 +1,5 @@
 import { GraphPoints } from "../../types";
-import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "./constants";
+import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "../../Config/constants";
 import { getDateLabels, getPriceLabels } from "./labelUtils";
 import { getScaleMethod } from "./numberUtils";
 

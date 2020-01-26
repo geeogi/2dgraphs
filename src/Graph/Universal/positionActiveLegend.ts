@@ -4,7 +4,7 @@ import {
   SPACING_UNIT,
   ACTIVE_LEGEND_WIDTH,
   ACTIVE_CIRCLE_WIDTH
-} from "./constants";
+} from "../../Config/constants";
 import { clamp } from "./numberUtils";
 
 export const positionActiveLegend = (
