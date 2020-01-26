@@ -1,15 +1,11 @@
+import { GraphPoints } from "./../../types";
 import { debounce } from "debounce";
 import { getWebGLLineGraphRenderMethod } from "./WebGLRenderMethod";
 import { resizeGlCanvas } from "./WebGLUtils/canvasUtils";
 
 export const drawGraphWebGL = (args: {
   canvasElement: HTMLCanvasElement;
-  points: {
-    x: number;
-    y: number;
-    price: any;
-    dateTime: any;
-  }[];
+  points: GraphPoints;
   minYValue: number;
   maxYValue: number;
   minXValue: number;

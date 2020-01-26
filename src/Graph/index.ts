@@ -40,7 +40,7 @@ export const initializeGraph = (
     // Extract render arguments
     const { initGraph, initValues, rescaleGraph } = args;
 
-    // Get graph configuration with desired number of data points
+    // Get graph configuration
     const {
       priceLabels,
       dateLabels,
@@ -59,7 +59,9 @@ export const initializeGraph = (
       activeX?: number;
       activeY?: number;
       isClicked?: boolean;
-    }) => positionActiveLegend(canvasElement, args.activeX, margin, points);
+    }) => {
+      positionActiveLegend(canvasElement, args.activeX, margin, points);
+    };
 
     // Position graph labels
     positionLabels(
@@ -71,7 +73,7 @@ export const initializeGraph = (
       margin
     );
 
-    // Clear interactive legend
+    // Reset interaction state
     onInteraction({});
 
     // Draw or rescale the path

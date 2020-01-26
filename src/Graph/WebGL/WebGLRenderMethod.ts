@@ -1,3 +1,4 @@
+import { GraphPoints } from "./../../types";
 import { PRIMARY_COLOR_WEBGL } from "../../Config/colors";
 import { getDrawAreaMethod } from "./WebGLUtils/drawUtils/drawArea";
 import { getDrawLineMethod } from "./WebGLUtils/drawUtils/drawLine";
@@ -5,12 +6,7 @@ import { getDrawLineMethod } from "./WebGLUtils/drawUtils/drawLine";
 export const getWebGLLineGraphRenderMethod = (
   canvasElement: HTMLCanvasElement,
   gl: WebGLRenderingContext,
-  points: {
-    x: number;
-    y: number;
-    price: number;
-    dateTime: string;
-  }[]
+  points: GraphPoints
 ) => {
   // Initialize canvas coordinates
   const linePoints: { x: number; y: number }[] = [];
