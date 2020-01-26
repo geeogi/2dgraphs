@@ -109,7 +109,7 @@ export const positionLabels = (
     labelElements.push(labelElement);
   });
 
-  // Create new container, append elements and and insert into DOM
+  // Create new container, append elements and insert into DOM
   container = document.createElement("div");
   container.setAttribute("id", "label-and-grid-line-container");
   [...xGridLineElements, ...yGridLineElements, ...labelElements].forEach(
