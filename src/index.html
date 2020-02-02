@@ -59,8 +59,8 @@
         padding-left: 16px;
       }
 
-      .GraphCard {
-        max-width: 1000px;
+      .Column {
+        max-width: 800px;
         margin: auto;
         padding: 8px;
       }
@@ -72,7 +72,6 @@
 
       h3 {
         font-size: 16px;
-        margin: 8px 0;
       }
 
       .ActiveLegend {
@@ -165,6 +164,44 @@
       .DataPreview {
         padding-left: 8px;
       }
+
+      .Table {
+        overflow-x: scroll;
+      }
+
+      table {
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+
+      td,
+      th {
+        border: 1px solid var(--border-color);
+        padding: 4px;
+        text-align: left;
+      }
+
+      .Red {
+        background-color: rgb(255, 163, 220);
+      }
+      .Yellow {
+        background-color: rgb(255, 255, 220);
+      }
+      .Green {
+        background-color: rgb(164, 255, 220);
+      }
+
+      ul {
+        list-style-position: outside;
+      }
+
+      li {
+        margin: 16px 0;
+      }
+
+      p {
+        padding: 8px;
+      }
     </style>
 
     <!-- JS -->
@@ -179,9 +216,9 @@
     <main>
       <header class="Header">
         <h1>2D Graphs</h1>
-        <p>Canvas vs. WebGL comparison</p>
+        <span>2D Canvas vs. WebGL comparison</span>
       </header>
-      <div class="GraphCard">
+      <div class="Column">
         <h3>Render method:</h3>
         <div class="Row">
           <button id="render-2d-canvas-button">
@@ -223,6 +260,102 @@
               style="display: none"
             ></div>
           </div>
+        </div>
+        <h3>Key findings:</h3>
+        <p>
+          The initial load of the 2D Canvas graph (~15ms) is significantly
+          faster than the initial load of the WebGL graph (~40ms). This is
+          primarily because fetching the WebGL context is slow in all major
+          browsers (~10ms) and fetching the attribute and uniform locations for
+          the compiled drawing program (~3ms each) and sizing the canvas (~2ms)
+          can also take a significant amount of time.
+        </p>
+        <p>
+          The WebGL drawing program should be compiled and the attribute and
+          uniform locations fetched as soon as possible on application start.
+          These should be cached and reused throughout the lifetime of the
+          application. The WebGL canvas should be resized as infrequently as
+          possible which is achieved on this page by a debounced resize handler.
+        </p>
+        <p>
+          Subsequent rendering of the WebGL graphic (~0.01ms) is extremely fast
+          in comparison with the 2D Canvas graphic (~1.2ms). For this reason
+          WebGL a far superior rendering technology for graphics which require
+          drawing the same shape repeatedly with matrix vectors applied (e.g.
+          scale, skew, rotation, transformation). To make the most of WebGL, the
+          pan-able and zoom-able features of graphs should be achieved through
+          matrix transformation of a single set of attributes.
+        </p>
+        <p>
+          In theory, a 2D graph could be loaded using the 2D Canvas context
+          first for the quickest initial load and then replaced with a WebGL
+          context for the quickest zoom and pan interactions. This
+          implementation would benefit from the best performance of each
+          technology.
+        </p>
+        <h3>Performance analysis:</h3>
+        <div class="Table">
+          <table>
+            <tr>
+              <th>Action</th>
+              <th>2D snippet</th>
+              <th>WebGL snippet</th>
+              <th>2D performance</th>
+              <th>WebGL performance</th>
+              <th>Example</th>
+            </tr>
+            <tr>
+              <td>Instantiating the context</td>
+              <td>getContext(“2d”);</td>
+              <td>getContext(“webgl”);</td>
+              <td class="Green">~0.01ms</td>
+              <td class="Red">~7.8ms</td>
+              <td>
+                <a
+                  href="https://perf.link/#bGV0IGNhbnZhczEgPSBkb2N1bWVudC5jcmVhdGVFbGVtZW50KCJjYW52YXMiKTsKbGV0IGNhbnZhczIgPSBkb2N1bWVudC5jcmVhdGVFbGVtZW50KCJjYW52YXMiKTs=/W3siY29kZSI6ImxldCBjb250ZXh0MSA9IGNhbnZhczEuZ2V0Q29udGV4dChcIjJkXCIpOyIsImVycm9yIjpmYWxzZSwibWVkaWFuIjowLjAxMDAwMDAwMTU4MDkyMDA3fSx7ImNvZGUiOiJsZXQgY29udGV4dDIgPSBjYW52YXMyLmdldENvbnRleHQoXCJ3ZWJnbFwiKTsiLCJlcnJvciI6ZmFsc2UsIm1lZGlhbiI6Ny45ODAwMDAwMDAzMzA2MTk1fV0="
+                  >Perflink</a
+                >
+              </td>
+            </tr>
+            <tr>
+              <td>Resizing the canvas</td>
+              <td>canvas.width=400;</td>
+              <td>canvas.width=400;</td>
+              <td class="Green">~0.02ms</td>
+              <td class="Yellow">~1.4ms</td>
+              <td>
+                <a
+                  href="https://perf.link/#Ly8gMkQgQ2FudmFzCmxldCBjYW52YXMxID0gZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgiY2FudmFzIik7CmxldCBjb250ZXh0MSA9IGNhbnZhczEuZ2V0Q29udGV4dCgiMmQiKTsKLy8gV2ViR0wKbGV0IGNhbnZhczIgPSBkb2N1bWVudC5jcmVhdGVFbGVtZW50KCJjYW52YXMiKTsKbGV0IGNvbnRleHQyID0gY2FudmFzMi5nZXRDb250ZXh0KCJ3ZWJnbCIpOw==/W3siY29kZSI6ImNhbnZhczEud2lkdGggPSAzMDA7XG5jYW52YXMxLndpZHRoID0gNDAwOyIsImVycm9yIjpmYWxzZSwibWVkaWFuIjowLjAxOTk5OTk5OTQ5NDc1NzUwM30seyJjb2RlIjoiXG5jYW52YXMyLndpZHRoID0gMzAwO1xuY2FudmFzMi53aWR0aCA9IDQwMDtcbiIsImVycm9yIjpmYWxzZSwibWVkaWFuIjoxLjQyMDAwMDAwMDUwNzU3MDh9XQ=="
+                  >Perflink</a
+                >
+              </td>
+            </tr>
+            <tr>
+              <td>Initiating a drawing program</td>
+              <td>N/A</td>
+              <td>
+                compileShader(...); linkProgram(...);
+              </td>
+              <td>
+                N/A
+              </td>
+              <td class="Yellow">~1.2ms</td>
+              <td>
+                <a
+                  href="https://perf.link/#bGV0IGNhbnZhcyA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoImNhbnZhcyIpOwpsZXQgZ2wgPSBjYW52YXMuZ2V0Q29udGV4dCgid2ViZ2wiKTs=/W3siY29kZSI6Ii8qPT09PT09PT09PSBEZWZpbmluZyBhbmQgc3RvcmluZyB0aGUgZ2VvbWV0cnkgPT09PT09PT09Ki9cblxudmFyIHZlcnRpY2VzID0gWy0xLjAsIDEuMCwgMC4wLCAtMS4wLCAtMS4wLCAwLjAsIDEuMCwgLTEuMCwgMC4wLCAxLjAsIDEuMCwgMC4wXTtcblxudmFyIGluZGljZXMgPSBbMywgMiwgMSwgMywgMSwgMF07XG5cbi8vIENyZWF0ZSBhbiBlbXB0eSBidWZmZXIgb2JqZWN0IHRvIHN0b3JlIHZlcnRleCBidWZmZXJcbnZhciB2ZXJ0ZXhfYnVmZmVyID0gZ2wuY3JlYXRlQnVmZmVyKCk7XG5cbi8vIEJpbmQgYXBwcm9wcmlhdGUgYXJyYXkgYnVmZmVyIHRvIGl0XG5nbC5iaW5kQnVmZmVyKGdsLkFSUkFZX0JVRkZFUiwgdmVydGV4X2J1ZmZlcik7XG5cbi8vIFBhc3MgdGhlIHZlcnRleCBkYXRhIHRvIHRoZSBidWZmZXJcbmdsLmJ1ZmZlckRhdGEoZ2wuQVJSQVlfQlVGRkVSLCBuZXcgRmxvYXQzMkFycmF5KHZlcnRpY2VzKSwgZ2wuU1RBVElDX0RSQVcpO1xuXG4vLyBVbmJpbmQgdGhlIGJ1ZmZlclxuZ2wuYmluZEJ1ZmZlcihnbC5BUlJBWV9CVUZGRVIsIG51bGwpO1xuXG4vLyBDcmVhdGUgYW4gZW1wdHkgYnVmZmVyIG9iamVjdCB0byBzdG9yZSBpbmRleCBidWZmZXJcbnZhciBpbmRleF9CdWZmZXIgPSBnbC5jcmVhdGVCdWZmZXIoKTtcblxuLy8gQmluZCBhcHByb3ByaWF0ZSBhcnJheSBidWZmZXIgdG8gaXRcbmdsLmJpbmRCdWZmZXIoZ2wuRUxFTUVOVF9BUlJBWV9CVUZGRVIsIGluZGV4X0J1ZmZlcik7XG5cbi8vIFBhc3MgdGhlIHZlcnRleCBkYXRhIHRvIHRoZSBidWZmZXJcbmdsLmJ1ZmZlckRhdGEoXG4gIGdsLkVMRU1FTlRfQVJSQVlfQlVGRkVSLFxuICBuZXcgVWludDE2QXJyYXkoaW5kaWNlcyksXG4gIGdsLlNUQVRJQ19EUkFXXG4pO1xuXG4vLyBVbmJpbmQgdGhlIGJ1ZmZlclxuZ2wuYmluZEJ1ZmZlcihnbC5FTEVNRU5UX0FSUkFZX0JVRkZFUiwgbnVsbCk7XG5cbi8qPT09PT09PT09PT09PT09PT09PT09PSBTaGFkZXJzID09PT09PT09PT09PT09PT09PT09PT09Ki9cblxuLy8gVmVydGV4IHNoYWRlciBzb3VyY2UgY29kZVxudmFyIHZlcnRDb2RlID1cbiAgXCJhdHRyaWJ1dGUgdmVjMyBjb29yZGluYXRlcztcIiArXG4gIFwidm9pZCBtYWluKHZvaWQpIHtcIiArXG4gIFwiIGdsX1Bvc2l0aW9uID0gdmVjNChjb29yZGluYXRlcywgMS4wKTtcIiArXG4gIFwifVwiO1xuXG4vLyBDcmVhdGUgYSB2ZXJ0ZXggc2hhZGVyIG9iamVjdFxudmFyIHZlcnRTaGFkZXIgPSBnbC5jcmVhdGVTaGFkZXIoZ2wuVkVSVEVYX1NIQURFUik7XG5cbi8vIEF0dGFjaCB2ZXJ0ZXggc2hhZGVyIHNvdXJjZSBjb2RlXG5nbC5zaGFkZXJTb3VyY2UodmVydFNoYWRlciwgdmVydENvZGUpO1xuXG4vLyBDb21waWxlIHRoZSB2ZXJ0ZXggc2hhZGVyXG5nbC5jb21waWxlU2hhZGVyKHZlcnRTaGFkZXIpO1xuXG4vLyBGcmFnbWVudCBzaGFkZXIgc291cmNlIGNvZGVcbnZhciBmcmFnQ29kZSA9XG4gIFwidm9pZCBtYWluKHZvaWQpIHtcIiArIFwiIGdsX0ZyYWdDb2xvciA9IHZlYzQoMC4wLCAwLjAsIDAuMCwgMS4wKTtcIiArIFwifVwiO1xuXG4vLyBDcmVhdGUgZnJhZ21lbnQgc2hhZGVyIG9iamVjdFxudmFyIGZyYWdTaGFkZXIgPSBnbC5jcmVhdGVTaGFkZXIoZ2wuRlJBR01FTlRfU0hBREVSKTtcblxuLy8gQXR0YWNoIGZyYWdtZW50IHNoYWRlciBzb3VyY2UgY29kZVxuZ2wuc2hhZGVyU291cmNlKGZyYWdTaGFkZXIsIGZyYWdDb2RlKTtcblxuLy8gQ29tcGlsZSB0aGUgZnJhZ21lbnQgc2hhZGVyXG5nbC5jb21waWxlU2hhZGVyKGZyYWdTaGFkZXIpO1xuXG4vLyBDcmVhdGUgYSBzaGFkZXIgcHJvZ3JhbSBvYmplY3QgdG8gc3RvcmUgdGhlIGNvbWJpbmVkIHNoYWRlciBwcm9ncmFtXG52YXIgc2hhZGVyUHJvZ3JhbSA9IGdsLmNyZWF0ZVByb2dyYW0oKTtcblxuLy8gQXR0YWNoIGEgdmVydGV4IHNoYWRlclxuZ2wuYXR0YWNoU2hhZGVyKHNoYWRlclByb2dyYW0sIHZlcnRTaGFkZXIpO1xuXG4vLyBBdHRhY2ggYSBmcmFnbWVudCBzaGFkZXJcbmdsLmF0dGFjaFNoYWRlcihzaGFkZXJQcm9ncmFtLCBmcmFnU2hhZGVyKTtcblxuLy8gTGluayBib3RoIHRoZSBwcm9ncmFtc1xuZ2wubGlua1Byb2dyYW0oc2hhZGVyUHJvZ3JhbSk7XG5cbi8vIFVzZSB0aGUgY29tYmluZWQgc2hhZGVyIHByb2dyYW0gb2JqZWN0XG5nbC51c2VQcm9ncmFtKHNoYWRlclByb2dyYW0pO1xuXG4vLyBHZXQgdGhlIGF0dHJpYnV0ZSBsb2NhdGlvblxudmFyIGNvb3JkaW5hdGVzQXR0cmliTG9jYXRpb24gPSBnbC5nZXRBdHRyaWJMb2NhdGlvbihcbiAgc2hhZGVyUHJvZ3JhbSxcbiAgXCJjb29yZGluYXRlc1wiXG4pOyIsImVycm9yIjpmYWxzZSwibWVkaWFuIjoxLjI1MDAwMDAwMTE2NDE1MzJ9XQ=="
+                  >Perflink</a
+                >
+              </td>
+            </tr>
+            <tr>
+              <td>Executing a drawing command (3000 points)</td>
+              <td>lineTo(…); ctx.stroke();</td>
+              <td>drawElements(…);</td>
+              <td class="Yellow">~1.2ms</td>
+              <td class="Green">~0.01ms</td>
+              <td>This page</td>
+            </tr>
+          </table>
         </div>
       </div>
     </main>
