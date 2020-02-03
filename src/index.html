@@ -30,7 +30,7 @@
         -moz-osx-font-smoothing: grayscale;
         background-color: var(--background-color);
         color: var(--contrast-color);
-        background-color:#fafafa;
+        background-color: white;
       }
 
       canvas {
@@ -55,16 +55,14 @@
 
       header {
         padding: 16px;
-        border-bottom: solid 1px var(--border-color);
-        background-color: white;
+        border-bottom: solid 2px var(--border-color);
       }
 
       footer {
         padding: 16px;
         margin-top: 16px;
-        border-top: solid 1px var(--border-color);
+        border-top: solid 2px var(--border-color);
         text-align: right;
-        background-color: white;
       }
 
       h1,
@@ -189,6 +187,7 @@
 
       .Table {
         overflow-x: scroll;
+        padding: 8px 0;
       }
 
       table {
@@ -260,8 +259,8 @@
         </div>
         <div>
           <div style="position: relative">
+            <canvas id="line-graph-webgl"></canvas>
             <canvas id="line-graph-2d-canvas" style="display: none"></canvas>
-            <canvas id="line-graph-webgl" style="display: none"></canvas>
             <div
               class="ActiveLegend"
               id="active-legend"
@@ -327,7 +326,7 @@
         <p>
           Resizing the <em>WebGL</em> canvas is slow and should be done as
           infrequently as possible. The <em>WebGL</em> resize handler on this
-          page scales the canvas element (0.01ms) immediately and then resizes
+          page scales the canvas element (~0.01ms) immediately and then resizes
           the <em>WebGL</em> canvas (~1.4ms) in a debounced action.
         </p>
         <p>
@@ -382,18 +381,86 @@
               </td>
             </tr>
             <tr>
-              <td>Initiating a drawing program</td>
+              <td>Initiating buffers</td>
               <td>N/A</td>
               <td>
-                compileShader(...); linkProgram(...);
+                createBuffer(...); bindBuffer(...);
               </td>
               <td>
                 N/A
               </td>
-              <td class="Yellow">~1.2ms</td>
+              <td class="Green">~0.03ms</td>
               <td>
                 <a
-                  href="https://perf.link/#bGV0IGNhbnZhcyA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoImNhbnZhcyIpOwpsZXQgZ2wgPSBjYW52YXMuZ2V0Q29udGV4dCgid2ViZ2wiKTs=/W3siY29kZSI6Ii8qPT09PT09PT09PSBEZWZpbmluZyBhbmQgc3RvcmluZyB0aGUgZ2VvbWV0cnkgPT09PT09PT09Ki9cblxudmFyIHZlcnRpY2VzID0gWy0xLjAsIDEuMCwgMC4wLCAtMS4wLCAtMS4wLCAwLjAsIDEuMCwgLTEuMCwgMC4wLCAxLjAsIDEuMCwgMC4wXTtcblxudmFyIGluZGljZXMgPSBbMywgMiwgMSwgMywgMSwgMF07XG5cbi8vIENyZWF0ZSBhbiBlbXB0eSBidWZmZXIgb2JqZWN0IHRvIHN0b3JlIHZlcnRleCBidWZmZXJcbnZhciB2ZXJ0ZXhfYnVmZmVyID0gZ2wuY3JlYXRlQnVmZmVyKCk7XG5cbi8vIEJpbmQgYXBwcm9wcmlhdGUgYXJyYXkgYnVmZmVyIHRvIGl0XG5nbC5iaW5kQnVmZmVyKGdsLkFSUkFZX0JVRkZFUiwgdmVydGV4X2J1ZmZlcik7XG5cbi8vIFBhc3MgdGhlIHZlcnRleCBkYXRhIHRvIHRoZSBidWZmZXJcbmdsLmJ1ZmZlckRhdGEoZ2wuQVJSQVlfQlVGRkVSLCBuZXcgRmxvYXQzMkFycmF5KHZlcnRpY2VzKSwgZ2wuU1RBVElDX0RSQVcpO1xuXG4vLyBVbmJpbmQgdGhlIGJ1ZmZlclxuZ2wuYmluZEJ1ZmZlcihnbC5BUlJBWV9CVUZGRVIsIG51bGwpO1xuXG4vLyBDcmVhdGUgYW4gZW1wdHkgYnVmZmVyIG9iamVjdCB0byBzdG9yZSBpbmRleCBidWZmZXJcbnZhciBpbmRleF9CdWZmZXIgPSBnbC5jcmVhdGVCdWZmZXIoKTtcblxuLy8gQmluZCBhcHByb3ByaWF0ZSBhcnJheSBidWZmZXIgdG8gaXRcbmdsLmJpbmRCdWZmZXIoZ2wuRUxFTUVOVF9BUlJBWV9CVUZGRVIsIGluZGV4X0J1ZmZlcik7XG5cbi8vIFBhc3MgdGhlIHZlcnRleCBkYXRhIHRvIHRoZSBidWZmZXJcbmdsLmJ1ZmZlckRhdGEoXG4gIGdsLkVMRU1FTlRfQVJSQVlfQlVGRkVSLFxuICBuZXcgVWludDE2QXJyYXkoaW5kaWNlcyksXG4gIGdsLlNUQVRJQ19EUkFXXG4pO1xuXG4vLyBVbmJpbmQgdGhlIGJ1ZmZlclxuZ2wuYmluZEJ1ZmZlcihnbC5FTEVNRU5UX0FSUkFZX0JVRkZFUiwgbnVsbCk7XG5cbi8qPT09PT09PT09PT09PT09PT09PT09PSBTaGFkZXJzID09PT09PT09PT09PT09PT09PT09PT09Ki9cblxuLy8gVmVydGV4IHNoYWRlciBzb3VyY2UgY29kZVxudmFyIHZlcnRDb2RlID1cbiAgXCJhdHRyaWJ1dGUgdmVjMyBjb29yZGluYXRlcztcIiArXG4gIFwidm9pZCBtYWluKHZvaWQpIHtcIiArXG4gIFwiIGdsX1Bvc2l0aW9uID0gdmVjNChjb29yZGluYXRlcywgMS4wKTtcIiArXG4gIFwifVwiO1xuXG4vLyBDcmVhdGUgYSB2ZXJ0ZXggc2hhZGVyIG9iamVjdFxudmFyIHZlcnRTaGFkZXIgPSBnbC5jcmVhdGVTaGFkZXIoZ2wuVkVSVEVYX1NIQURFUik7XG5cbi8vIEF0dGFjaCB2ZXJ0ZXggc2hhZGVyIHNvdXJjZSBjb2RlXG5nbC5zaGFkZXJTb3VyY2UodmVydFNoYWRlciwgdmVydENvZGUpO1xuXG4vLyBDb21waWxlIHRoZSB2ZXJ0ZXggc2hhZGVyXG5nbC5jb21waWxlU2hhZGVyKHZlcnRTaGFkZXIpO1xuXG4vLyBGcmFnbWVudCBzaGFkZXIgc291cmNlIGNvZGVcbnZhciBmcmFnQ29kZSA9XG4gIFwidm9pZCBtYWluKHZvaWQpIHtcIiArIFwiIGdsX0ZyYWdDb2xvciA9IHZlYzQoMC4wLCAwLjAsIDAuMCwgMS4wKTtcIiArIFwifVwiO1xuXG4vLyBDcmVhdGUgZnJhZ21lbnQgc2hhZGVyIG9iamVjdFxudmFyIGZyYWdTaGFkZXIgPSBnbC5jcmVhdGVTaGFkZXIoZ2wuRlJBR01FTlRfU0hBREVSKTtcblxuLy8gQXR0YWNoIGZyYWdtZW50IHNoYWRlciBzb3VyY2UgY29kZVxuZ2wuc2hhZGVyU291cmNlKGZyYWdTaGFkZXIsIGZyYWdDb2RlKTtcblxuLy8gQ29tcGlsZSB0aGUgZnJhZ21lbnQgc2hhZGVyXG5nbC5jb21waWxlU2hhZGVyKGZyYWdTaGFkZXIpO1xuXG4vLyBDcmVhdGUgYSBzaGFkZXIgcHJvZ3JhbSBvYmplY3QgdG8gc3RvcmUgdGhlIGNvbWJpbmVkIHNoYWRlciBwcm9ncmFtXG52YXIgc2hhZGVyUHJvZ3JhbSA9IGdsLmNyZWF0ZVByb2dyYW0oKTtcblxuLy8gQXR0YWNoIGEgdmVydGV4IHNoYWRlclxuZ2wuYXR0YWNoU2hhZGVyKHNoYWRlclByb2dyYW0sIHZlcnRTaGFkZXIpO1xuXG4vLyBBdHRhY2ggYSBmcmFnbWVudCBzaGFkZXJcbmdsLmF0dGFjaFNoYWRlcihzaGFkZXJQcm9ncmFtLCBmcmFnU2hhZGVyKTtcblxuLy8gTGluayBib3RoIHRoZSBwcm9ncmFtc1xuZ2wubGlua1Byb2dyYW0oc2hhZGVyUHJvZ3JhbSk7XG5cbi8vIFVzZSB0aGUgY29tYmluZWQgc2hhZGVyIHByb2dyYW0gb2JqZWN0XG5nbC51c2VQcm9ncmFtKHNoYWRlclByb2dyYW0pO1xuXG4vLyBHZXQgdGhlIGF0dHJpYnV0ZSBsb2NhdGlvblxudmFyIGNvb3JkaW5hdGVzQXR0cmliTG9jYXRpb24gPSBnbC5nZXRBdHRyaWJMb2NhdGlvbihcbiAgc2hhZGVyUHJvZ3JhbSxcbiAgXCJjb29yZGluYXRlc1wiXG4pOyIsImVycm9yIjpmYWxzZSwibWVkaWFuIjoxLjI1MDAwMDAwMTE2NDE1MzJ9XQ=="
+                  href="https://perf.link/#bGV0IGNhbnZhcyA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoImNhbnZhcyIpOwpsZXQgZ2wgPSBjYW52YXMuZ2V0Q29udGV4dCgid2ViZ2wiKTs=/W3siY29kZSI6Ii8qPT09PT09PT09PSBEZWZpbmluZyBhbmQgc3RvcmluZyB0aGUgZ2VvbWV0cnkgPT09PT09PT09Ki9cblxudmFyIHZlcnRpY2VzID0gWy0xLjAsIDEuMCwgMC4wLCAtMS4wLCAtMS4wLCAwLjAsIDEuMCwgLTEuMCwgMC4wLCAxLjAsIDEuMCwgMC4wXTtcblxudmFyIGluZGljZXMgPSBbMywgMiwgMSwgMywgMSwgMF07XG5cbi8vIENyZWF0ZSBhbiBlbXB0eSBidWZmZXIgb2JqZWN0IHRvIHN0b3JlIHZlcnRleCBidWZmZXJcbnZhciB2ZXJ0ZXhfYnVmZmVyID0gZ2wuY3JlYXRlQnVmZmVyKCk7XG5cbi8vIEJpbmQgYXBwcm9wcmlhdGUgYXJyYXkgYnVmZmVyIHRvIGl0XG5nbC5iaW5kQnVmZmVyKGdsLkFSUkFZX0JVRkZFUiwgdmVydGV4X2J1ZmZlcik7XG5cbi8vIFBhc3MgdGhlIHZlcnRleCBkYXRhIHRvIHRoZSBidWZmZXJcbmdsLmJ1ZmZlckRhdGEoZ2wuQVJSQVlfQlVGRkVSLCBuZXcgRmxvYXQzMkFycmF5KHZlcnRpY2VzKSwgZ2wuU1RBVElDX0RSQVcpO1xuXG4vLyBVbmJpbmQgdGhlIGJ1ZmZlclxuZ2wuYmluZEJ1ZmZlcihnbC5BUlJBWV9CVUZGRVIsIG51bGwpO1xuXG4vLyBDcmVhdGUgYW4gZW1wdHkgYnVmZmVyIG9iamVjdCB0byBzdG9yZSBpbmRleCBidWZmZXJcbnZhciBpbmRleF9CdWZmZXIgPSBnbC5jcmVhdGVCdWZmZXIoKTtcblxuLy8gQmluZCBhcHByb3ByaWF0ZSBhcnJheSBidWZmZXIgdG8gaXRcbmdsLmJpbmRCdWZmZXIoZ2wuRUxFTUVOVF9BUlJBWV9CVUZGRVIsIGluZGV4X0J1ZmZlcik7XG5cbi8vIFBhc3MgdGhlIHZlcnRleCBkYXRhIHRvIHRoZSBidWZmZXJcbmdsLmJ1ZmZlckRhdGEoXG4gIGdsLkVMRU1FTlRfQVJSQVlfQlVGRkVSLFxuICBuZXcgVWludDE2QXJyYXkoaW5kaWNlcyksXG4gIGdsLlNUQVRJQ19EUkFXXG4pO1xuXG4vLyBVbmJpbmQgdGhlIGJ1ZmZlclxuZ2wuYmluZEJ1ZmZlcihnbC5FTEVNRU5UX0FSUkFZX0JVRkZFUiwgbnVsbCk7IiwiZXJyb3IiOmZhbHNlLCJtZWRpYW4iOjAuMDM1MDAwMDAwOTM0ODE1MDM0fV0="
+                  >Perflink</a
+                >
+              </td>
+            </tr>
+            <tr>
+              <td>Initiating shaders</td>
+              <td>N/A</td>
+              <td>
+                createShader(...); compileShader(...);
+              </td>
+              <td>
+                N/A
+              </td>
+              <td class="Green">~0.02ms</td>
+              <td>
+                <a
+                  href="https://perf.link/#bGV0IGNhbnZhcyA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoImNhbnZhcyIpOwpsZXQgZ2wgPSBjYW52YXMuZ2V0Q29udGV4dCgid2ViZ2wiKTsKCi8qPT09PT09PT09PSBEZWZpbmluZyBhbmQgc3RvcmluZyB0aGUgZ2VvbWV0cnkgPT09PT09PT09Ki8KCnZhciB2ZXJ0aWNlcyA9IFstMS4wLCAxLjAsIDAuMCwgLTEuMCwgLTEuMCwgMC4wLCAxLjAsIC0xLjAsIDAuMCwgMS4wLCAxLjAsIDAuMF07Cgp2YXIgaW5kaWNlcyA9IFszLCAyLCAxLCAzLCAxLCAwXTsKCi8vIENyZWF0ZSBhbiBlbXB0eSBidWZmZXIgb2JqZWN0IHRvIHN0b3JlIHZlcnRleCBidWZmZXIKdmFyIHZlcnRleF9idWZmZXIgPSBnbC5jcmVhdGVCdWZmZXIoKTsKCi8vIEJpbmQgYXBwcm9wcmlhdGUgYXJyYXkgYnVmZmVyIHRvIGl0CmdsLmJpbmRCdWZmZXIoZ2wuQVJSQVlfQlVGRkVSLCB2ZXJ0ZXhfYnVmZmVyKTsKCi8vIFBhc3MgdGhlIHZlcnRleCBkYXRhIHRvIHRoZSBidWZmZXIKZ2wuYnVmZmVyRGF0YShnbC5BUlJBWV9CVUZGRVIsIG5ldyBGbG9hdDMyQXJyYXkodmVydGljZXMpLCBnbC5TVEFUSUNfRFJBVyk7CgovLyBVbmJpbmQgdGhlIGJ1ZmZlcgpnbC5iaW5kQnVmZmVyKGdsLkFSUkFZX0JVRkZFUiwgbnVsbCk7CgovLyBDcmVhdGUgYW4gZW1wdHkgYnVmZmVyIG9iamVjdCB0byBzdG9yZSBpbmRleCBidWZmZXIKdmFyIGluZGV4X0J1ZmZlciA9IGdsLmNyZWF0ZUJ1ZmZlcigpOwoKLy8gQmluZCBhcHByb3ByaWF0ZSBhcnJheSBidWZmZXIgdG8gaXQKZ2wuYmluZEJ1ZmZlcihnbC5FTEVNRU5UX0FSUkFZX0JVRkZFUiwgaW5kZXhfQnVmZmVyKTsKCi8vIFBhc3MgdGhlIHZlcnRleCBkYXRhIHRvIHRoZSBidWZmZXIKZ2wuYnVmZmVyRGF0YSgKICBnbC5FTEVNRU5UX0FSUkFZX0JVRkZFUiwKICBuZXcgVWludDE2QXJyYXkoaW5kaWNlcyksCiAgZ2wuU1RBVElDX0RSQVcKKTsKCi8vIFVuYmluZCB0aGUgYnVmZmVyCmdsLmJpbmRCdWZmZXIoZ2wuRUxFTUVOVF9BUlJBWV9CVUZGRVIsIG51bGwpOwo=/W3siY29kZSI6IlxuLyo9PT09PT09PT09PT09PT09PT09PT09IFNoYWRlcnMgPT09PT09PT09PT09PT09PT09PT09PT0qL1xuXG4vLyBWZXJ0ZXggc2hhZGVyIHNvdXJjZSBjb2RlXG52YXIgdmVydENvZGUgPVxuICBcImF0dHJpYnV0ZSB2ZWMzIGNvb3JkaW5hdGVzO1wiICtcbiAgXCJ2b2lkIG1haW4odm9pZCkge1wiICtcbiAgXCIgZ2xfUG9zaXRpb24gPSB2ZWM0KGNvb3JkaW5hdGVzLCAxLjApO1wiICtcbiAgXCJ9XCI7XG5cbi8vIENyZWF0ZSBhIHZlcnRleCBzaGFkZXIgb2JqZWN0XG52YXIgdmVydFNoYWRlciA9IGdsLmNyZWF0ZVNoYWRlcihnbC5WRVJURVhfU0hBREVSKTtcblxuLy8gQXR0YWNoIHZlcnRleCBzaGFkZXIgc291cmNlIGNvZGVcbmdsLnNoYWRlclNvdXJjZSh2ZXJ0U2hhZGVyLCB2ZXJ0Q29kZSk7XG5cbi8vIENvbXBpbGUgdGhlIHZlcnRleCBzaGFkZXJcbmdsLmNvbXBpbGVTaGFkZXIodmVydFNoYWRlcik7XG5cbi8vIEZyYWdtZW50IHNoYWRlciBzb3VyY2UgY29kZVxudmFyIGZyYWdDb2RlID1cbiAgXCJ2b2lkIG1haW4odm9pZCkge1wiICsgXCIgZ2xfRnJhZ0NvbG9yID0gdmVjNCgwLjAsIDAuMCwgMC4wLCAxLjApO1wiICsgXCJ9XCI7XG5cbi8vIENyZWF0ZSBmcmFnbWVudCBzaGFkZXIgb2JqZWN0XG52YXIgZnJhZ1NoYWRlciA9IGdsLmNyZWF0ZVNoYWRlcihnbC5GUkFHTUVOVF9TSEFERVIpO1xuXG4vLyBBdHRhY2ggZnJhZ21lbnQgc2hhZGVyIHNvdXJjZSBjb2RlXG5nbC5zaGFkZXJTb3VyY2UoZnJhZ1NoYWRlciwgZnJhZ0NvZGUpO1xuXG4vLyBDb21waWxlIHRoZSBmcmFnbWVudCBzaGFkZXJcbmdsLmNvbXBpbGVTaGFkZXIoZnJhZ1NoYWRlcik7XG4iLCJlcnJvciI6ZmFsc2UsIm1lZGlhbiI6MC4wMTk5OTk5OTk0OTQ3NTc1MDN9XQ=="
+                  >Perflink</a
+                >
+              </td>
+            </tr>
+            <tr>
+              <td>Initiating program</td>
+              <td>N/A</td>
+              <td>
+                createProgram(...); linkProgram(...);
+              </td>
+              <td>
+                N/A
+              </td>
+              <td class="Green">~0.01ms</td>
+              <td>
+                <a
+                  href="https://perf.link/#bGV0IGNhbnZhcyA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoImNhbnZhcyIpOwpsZXQgZ2wgPSBjYW52YXMuZ2V0Q29udGV4dCgid2ViZ2wiKTsKCi8qPT09PT09PT09PSBEZWZpbmluZyBhbmQgc3RvcmluZyB0aGUgZ2VvbWV0cnkgPT09PT09PT09Ki8KCnZhciB2ZXJ0aWNlcyA9IFstMS4wLCAxLjAsIDAuMCwgLTEuMCwgLTEuMCwgMC4wLCAxLjAsIC0xLjAsIDAuMCwgMS4wLCAxLjAsIDAuMF07Cgp2YXIgaW5kaWNlcyA9IFszLCAyLCAxLCAzLCAxLCAwXTsKCi8vIENyZWF0ZSBhbiBlbXB0eSBidWZmZXIgb2JqZWN0IHRvIHN0b3JlIHZlcnRleCBidWZmZXIKdmFyIHZlcnRleF9idWZmZXIgPSBnbC5jcmVhdGVCdWZmZXIoKTsKCi8vIEJpbmQgYXBwcm9wcmlhdGUgYXJyYXkgYnVmZmVyIHRvIGl0CmdsLmJpbmRCdWZmZXIoZ2wuQVJSQVlfQlVGRkVSLCB2ZXJ0ZXhfYnVmZmVyKTsKCi8vIFBhc3MgdGhlIHZlcnRleCBkYXRhIHRvIHRoZSBidWZmZXIKZ2wuYnVmZmVyRGF0YShnbC5BUlJBWV9CVUZGRVIsIG5ldyBGbG9hdDMyQXJyYXkodmVydGljZXMpLCBnbC5TVEFUSUNfRFJBVyk7CgovLyBVbmJpbmQgdGhlIGJ1ZmZlcgpnbC5iaW5kQnVmZmVyKGdsLkFSUkFZX0JVRkZFUiwgbnVsbCk7CgovLyBDcmVhdGUgYW4gZW1wdHkgYnVmZmVyIG9iamVjdCB0byBzdG9yZSBpbmRleCBidWZmZXIKdmFyIGluZGV4X0J1ZmZlciA9IGdsLmNyZWF0ZUJ1ZmZlcigpOwoKLy8gQmluZCBhcHByb3ByaWF0ZSBhcnJheSBidWZmZXIgdG8gaXQKZ2wuYmluZEJ1ZmZlcihnbC5FTEVNRU5UX0FSUkFZX0JVRkZFUiwgaW5kZXhfQnVmZmVyKTsKCi8vIFBhc3MgdGhlIHZlcnRleCBkYXRhIHRvIHRoZSBidWZmZXIKZ2wuYnVmZmVyRGF0YSgKICBnbC5FTEVNRU5UX0FSUkFZX0JVRkZFUiwKICBuZXcgVWludDE2QXJyYXkoaW5kaWNlcyksCiAgZ2wuU1RBVElDX0RSQVcKKTsKCi8vIFVuYmluZCB0aGUgYnVmZmVyCmdsLmJpbmRCdWZmZXIoZ2wuRUxFTUVOVF9BUlJBWV9CVUZGRVIsIG51bGwpOwoKLyo9PT09PT09PT09PT09PT09PT09PT09IFNoYWRlcnMgPT09PT09PT09PT09PT09PT09PT09PT0qLwoKLy8gVmVydGV4IHNoYWRlciBzb3VyY2UgY29kZQp2YXIgdmVydENvZGUgPQogICJhdHRyaWJ1dGUgdmVjMyBjb29yZGluYXRlczsiICsKICAidm9pZCBtYWluKHZvaWQpIHsiICsKICAiIGdsX1Bvc2l0aW9uID0gdmVjNChjb29yZGluYXRlcywgMS4wKTsiICsKICAifSI7CgovLyBDcmVhdGUgYSB2ZXJ0ZXggc2hhZGVyIG9iamVjdAp2YXIgdmVydFNoYWRlciA9IGdsLmNyZWF0ZVNoYWRlcihnbC5WRVJURVhfU0hBREVSKTsKCi8vIEF0dGFjaCB2ZXJ0ZXggc2hhZGVyIHNvdXJjZSBjb2RlCmdsLnNoYWRlclNvdXJjZSh2ZXJ0U2hhZGVyLCB2ZXJ0Q29kZSk7CgovLyBDb21waWxlIHRoZSB2ZXJ0ZXggc2hhZGVyCmdsLmNvbXBpbGVTaGFkZXIodmVydFNoYWRlcik7CgovLyBGcmFnbWVudCBzaGFkZXIgc291cmNlIGNvZGUKdmFyIGZyYWdDb2RlID0KICAidm9pZCBtYWluKHZvaWQpIHsiICsgIiBnbF9GcmFnQ29sb3IgPSB2ZWM0KDAuMCwgMC4wLCAwLjAsIDEuMCk7IiArICJ9IjsKCi8vIENyZWF0ZSBmcmFnbWVudCBzaGFkZXIgb2JqZWN0CnZhciBmcmFnU2hhZGVyID0gZ2wuY3JlYXRlU2hhZGVyKGdsLkZSQUdNRU5UX1NIQURFUik7CgovLyBBdHRhY2ggZnJhZ21lbnQgc2hhZGVyIHNvdXJjZSBjb2RlCmdsLnNoYWRlclNvdXJjZShmcmFnU2hhZGVyLCBmcmFnQ29kZSk7CgovLyBDb21waWxlIHRoZSBmcmFnbWVudCBzaGFkZXIKZ2wuY29tcGlsZVNoYWRlcihmcmFnU2hhZGVyKTs=/W3siY29kZSI6Ii8vIENyZWF0ZSBhIHNoYWRlciBwcm9ncmFtIG9iamVjdCB0byBzdG9yZSB0aGUgY29tYmluZWQgc2hhZGVyIHByb2dyYW1cbnZhciBzaGFkZXJQcm9ncmFtID0gZ2wuY3JlYXRlUHJvZ3JhbSgpO1xuXG4vLyBBdHRhY2ggYSB2ZXJ0ZXggc2hhZGVyXG5nbC5hdHRhY2hTaGFkZXIoc2hhZGVyUHJvZ3JhbSwgdmVydFNoYWRlcik7XG5cbi8vIEF0dGFjaCBhIGZyYWdtZW50IHNoYWRlclxuZ2wuYXR0YWNoU2hhZGVyKHNoYWRlclByb2dyYW0sIGZyYWdTaGFkZXIpO1xuXG4vLyBMaW5rIGJvdGggdGhlIHByb2dyYW1zXG5nbC5saW5rUHJvZ3JhbShzaGFkZXJQcm9ncmFtKTsiLCJlcnJvciI6ZmFsc2UsIm1lZGlhbiI6MC4wMDk5OTk5OTk3MTgyNzQ5MjF9XQ=="
+                  >Perflink</a
+                >
+              </td>
+            </tr>
+            <tr>
+              <td>Using program</td>
+              <td>N/A</td>
+              <td>
+                useProgram(...);
+              </td>
+              <td>
+                N/A
+              </td>
+              <td class="Yellow">~1ms</td>
+              <td>
+                <a
+                  href="https://perf.link/#bGV0IGNhbnZhcyA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoImNhbnZhcyIpOwpsZXQgZ2wgPSBjYW52YXMuZ2V0Q29udGV4dCgid2ViZ2wiKTsKCi8qPT09PT09PT09PSBEZWZpbmluZyBhbmQgc3RvcmluZyB0aGUgZ2VvbWV0cnkgPT09PT09PT09Ki8KCnZhciB2ZXJ0aWNlcyA9IFstMS4wLCAxLjAsIDAuMCwgLTEuMCwgLTEuMCwgMC4wLCAxLjAsIC0xLjAsIDAuMCwgMS4wLCAxLjAsIDAuMF07Cgp2YXIgaW5kaWNlcyA9IFszLCAyLCAxLCAzLCAxLCAwXTsKCi8vIENyZWF0ZSBhbiBlbXB0eSBidWZmZXIgb2JqZWN0IHRvIHN0b3JlIHZlcnRleCBidWZmZXIKdmFyIHZlcnRleF9idWZmZXIgPSBnbC5jcmVhdGVCdWZmZXIoKTsKCi8vIEJpbmQgYXBwcm9wcmlhdGUgYXJyYXkgYnVmZmVyIHRvIGl0CmdsLmJpbmRCdWZmZXIoZ2wuQVJSQVlfQlVGRkVSLCB2ZXJ0ZXhfYnVmZmVyKTsKCi8vIFBhc3MgdGhlIHZlcnRleCBkYXRhIHRvIHRoZSBidWZmZXIKZ2wuYnVmZmVyRGF0YShnbC5BUlJBWV9CVUZGRVIsIG5ldyBGbG9hdDMyQXJyYXkodmVydGljZXMpLCBnbC5TVEFUSUNfRFJBVyk7CgovLyBVbmJpbmQgdGhlIGJ1ZmZlcgpnbC5iaW5kQnVmZmVyKGdsLkFSUkFZX0JVRkZFUiwgbnVsbCk7CgovLyBDcmVhdGUgYW4gZW1wdHkgYnVmZmVyIG9iamVjdCB0byBzdG9yZSBpbmRleCBidWZmZXIKdmFyIGluZGV4X0J1ZmZlciA9IGdsLmNyZWF0ZUJ1ZmZlcigpOwoKLy8gQmluZCBhcHByb3ByaWF0ZSBhcnJheSBidWZmZXIgdG8gaXQKZ2wuYmluZEJ1ZmZlcihnbC5FTEVNRU5UX0FSUkFZX0JVRkZFUiwgaW5kZXhfQnVmZmVyKTsKCi8vIFBhc3MgdGhlIHZlcnRleCBkYXRhIHRvIHRoZSBidWZmZXIKZ2wuYnVmZmVyRGF0YSgKICBnbC5FTEVNRU5UX0FSUkFZX0JVRkZFUiwKICBuZXcgVWludDE2QXJyYXkoaW5kaWNlcyksCiAgZ2wuU1RBVElDX0RSQVcKKTsKCi8vIFVuYmluZCB0aGUgYnVmZmVyCmdsLmJpbmRCdWZmZXIoZ2wuRUxFTUVOVF9BUlJBWV9CVUZGRVIsIG51bGwpOwoKLyo9PT09PT09PT09PT09PT09PT09PT09IFNoYWRlcnMgPT09PT09PT09PT09PT09PT09PT09PT0qLwoKLy8gVmVydGV4IHNoYWRlciBzb3VyY2UgY29kZQp2YXIgdmVydENvZGUgPQogICJhdHRyaWJ1dGUgdmVjMyBjb29yZGluYXRlczsiICsKICAidm9pZCBtYWluKHZvaWQpIHsiICsKICAiIGdsX1Bvc2l0aW9uID0gdmVjNChjb29yZGluYXRlcywgMS4wKTsiICsKICAifSI7CgovLyBDcmVhdGUgYSB2ZXJ0ZXggc2hhZGVyIG9iamVjdAp2YXIgdmVydFNoYWRlciA9IGdsLmNyZWF0ZVNoYWRlcihnbC5WRVJURVhfU0hBREVSKTsKCi8vIEF0dGFjaCB2ZXJ0ZXggc2hhZGVyIHNvdXJjZSBjb2RlCmdsLnNoYWRlclNvdXJjZSh2ZXJ0U2hhZGVyLCB2ZXJ0Q29kZSk7CgovLyBDb21waWxlIHRoZSB2ZXJ0ZXggc2hhZGVyCmdsLmNvbXBpbGVTaGFkZXIodmVydFNoYWRlcik7CgovLyBGcmFnbWVudCBzaGFkZXIgc291cmNlIGNvZGUKdmFyIGZyYWdDb2RlID0KICAidm9pZCBtYWluKHZvaWQpIHsiICsgIiBnbF9GcmFnQ29sb3IgPSB2ZWM0KDAuMCwgMC4wLCAwLjAsIDEuMCk7IiArICJ9IjsKCi8vIENyZWF0ZSBmcmFnbWVudCBzaGFkZXIgb2JqZWN0CnZhciBmcmFnU2hhZGVyID0gZ2wuY3JlYXRlU2hhZGVyKGdsLkZSQUdNRU5UX1NIQURFUik7CgovLyBBdHRhY2ggZnJhZ21lbnQgc2hhZGVyIHNvdXJjZSBjb2RlCmdsLnNoYWRlclNvdXJjZShmcmFnU2hhZGVyLCBmcmFnQ29kZSk7CgovLyBDb21waWxlIHRoZSBmcmFnbWVudCBzaGFkZXIKZ2wuY29tcGlsZVNoYWRlcihmcmFnU2hhZGVyKTsKCi8vIENyZWF0ZSBhIHNoYWRlciBwcm9ncmFtIG9iamVjdCB0byBzdG9yZSB0aGUgY29tYmluZWQgc2hhZGVyIHByb2dyYW0KdmFyIHNoYWRlclByb2dyYW0gPSBnbC5jcmVhdGVQcm9ncmFtKCk7CgovLyBBdHRhY2ggYSB2ZXJ0ZXggc2hhZGVyCmdsLmF0dGFjaFNoYWRlcihzaGFkZXJQcm9ncmFtLCB2ZXJ0U2hhZGVyKTsKCi8vIEF0dGFjaCBhIGZyYWdtZW50IHNoYWRlcgpnbC5hdHRhY2hTaGFkZXIoc2hhZGVyUHJvZ3JhbSwgZnJhZ1NoYWRlcik7CgovLyBMaW5rIGJvdGggdGhlIHByb2dyYW1zCmdsLmxpbmtQcm9ncmFtKHNoYWRlclByb2dyYW0pOw==/W3siY29kZSI6Ii8vIFVzZSB0aGUgY29tYmluZWQgc2hhZGVyIHByb2dyYW0gb2JqZWN0XG5nbC51c2VQcm9ncmFtKHNoYWRlclByb2dyYW0pOyIsImVycm9yIjpmYWxzZSwibWVkaWFuIjoxLjA2NTAwMDAwMDM1MTU3NDN9XQ=="
+                  >Perflink</a
+                >
+              </td>
+            </tr>
+            <tr>
+              <td>Fetch locations</td>
+              <td>N/A</td>
+              <td>
+                getUniformLocation(...); getAttribLocation(...);
+              </td>
+              <td>
+                N/A
+              </td>
+              <td class="Green">~0.04ms</td>
+              <td>
+                <a
+                  href="https://perf.link/#bGV0IGNhbnZhcyA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoImNhbnZhcyIpOwpsZXQgZ2wgPSBjYW52YXMuZ2V0Q29udGV4dCgid2ViZ2wiKTsKCi8qPT09PT09PT09PSBEZWZpbmluZyBhbmQgc3RvcmluZyB0aGUgZ2VvbWV0cnkgPT09PT09PT09Ki8KCnZhciB2ZXJ0aWNlcyA9IFstMS4wLCAxLjAsIDAuMCwgLTEuMCwgLTEuMCwgMC4wLCAxLjAsIC0xLjAsIDAuMCwgMS4wLCAxLjAsIDAuMF07Cgp2YXIgaW5kaWNlcyA9IFszLCAyLCAxLCAzLCAxLCAwXTsKCi8vIENyZWF0ZSBhbiBlbXB0eSBidWZmZXIgb2JqZWN0IHRvIHN0b3JlIHZlcnRleCBidWZmZXIKdmFyIHZlcnRleF9idWZmZXIgPSBnbC5jcmVhdGVCdWZmZXIoKTsKCi8vIEJpbmQgYXBwcm9wcmlhdGUgYXJyYXkgYnVmZmVyIHRvIGl0CmdsLmJpbmRCdWZmZXIoZ2wuQVJSQVlfQlVGRkVSLCB2ZXJ0ZXhfYnVmZmVyKTsKCi8vIFBhc3MgdGhlIHZlcnRleCBkYXRhIHRvIHRoZSBidWZmZXIKZ2wuYnVmZmVyRGF0YShnbC5BUlJBWV9CVUZGRVIsIG5ldyBGbG9hdDMyQXJyYXkodmVydGljZXMpLCBnbC5TVEFUSUNfRFJBVyk7CgovLyBVbmJpbmQgdGhlIGJ1ZmZlcgpnbC5iaW5kQnVmZmVyKGdsLkFSUkFZX0JVRkZFUiwgbnVsbCk7CgovLyBDcmVhdGUgYW4gZW1wdHkgYnVmZmVyIG9iamVjdCB0byBzdG9yZSBpbmRleCBidWZmZXIKdmFyIGluZGV4X0J1ZmZlciA9IGdsLmNyZWF0ZUJ1ZmZlcigpOwoKLy8gQmluZCBhcHByb3ByaWF0ZSBhcnJheSBidWZmZXIgdG8gaXQKZ2wuYmluZEJ1ZmZlcihnbC5FTEVNRU5UX0FSUkFZX0JVRkZFUiwgaW5kZXhfQnVmZmVyKTsKCi8vIFBhc3MgdGhlIHZlcnRleCBkYXRhIHRvIHRoZSBidWZmZXIKZ2wuYnVmZmVyRGF0YSgKICBnbC5FTEVNRU5UX0FSUkFZX0JVRkZFUiwKICBuZXcgVWludDE2QXJyYXkoaW5kaWNlcyksCiAgZ2wuU1RBVElDX0RSQVcKKTsKCi8vIFVuYmluZCB0aGUgYnVmZmVyCmdsLmJpbmRCdWZmZXIoZ2wuRUxFTUVOVF9BUlJBWV9CVUZGRVIsIG51bGwpOwoKLyo9PT09PT09PT09PT09PT09PT09PT09IFNoYWRlcnMgPT09PT09PT09PT09PT09PT09PT09PT0qLwoKLy8gVmVydGV4IHNoYWRlciBzb3VyY2UgY29kZQp2YXIgdmVydENvZGUgPQogICJhdHRyaWJ1dGUgdmVjMyBjb29yZGluYXRlczsiICsKICAidm9pZCBtYWluKHZvaWQpIHsiICsKICAiIGdsX1Bvc2l0aW9uID0gdmVjNChjb29yZGluYXRlcywgMS4wKTsiICsKICAifSI7CgovLyBDcmVhdGUgYSB2ZXJ0ZXggc2hhZGVyIG9iamVjdAp2YXIgdmVydFNoYWRlciA9IGdsLmNyZWF0ZVNoYWRlcihnbC5WRVJURVhfU0hBREVSKTsKCi8vIEF0dGFjaCB2ZXJ0ZXggc2hhZGVyIHNvdXJjZSBjb2RlCmdsLnNoYWRlclNvdXJjZSh2ZXJ0U2hhZGVyLCB2ZXJ0Q29kZSk7CgovLyBDb21waWxlIHRoZSB2ZXJ0ZXggc2hhZGVyCmdsLmNvbXBpbGVTaGFkZXIodmVydFNoYWRlcik7CgovLyBGcmFnbWVudCBzaGFkZXIgc291cmNlIGNvZGUKdmFyIGZyYWdDb2RlID0KICAidW5pZm9ybSB2ZWM0IGNvbG91cjsgdm9pZCBtYWluKHZvaWQpIHsiICsgIiBnbF9GcmFnQ29sb3IgPSBjb2xvdXI7IiArICJ9IjsKCi8vIENyZWF0ZSBmcmFnbWVudCBzaGFkZXIgb2JqZWN0CnZhciBmcmFnU2hhZGVyID0gZ2wuY3JlYXRlU2hhZGVyKGdsLkZSQUdNRU5UX1NIQURFUik7CgovLyBBdHRhY2ggZnJhZ21lbnQgc2hhZGVyIHNvdXJjZSBjb2RlCmdsLnNoYWRlclNvdXJjZShmcmFnU2hhZGVyLCBmcmFnQ29kZSk7CgovLyBDb21waWxlIHRoZSBmcmFnbWVudCBzaGFkZXIKZ2wuY29tcGlsZVNoYWRlcihmcmFnU2hhZGVyKTsKCi8vIENyZWF0ZSBhIHNoYWRlciBwcm9ncmFtIG9iamVjdCB0byBzdG9yZSB0aGUgY29tYmluZWQgc2hhZGVyIHByb2dyYW0KdmFyIHNoYWRlclByb2dyYW0gPSBnbC5jcmVhdGVQcm9ncmFtKCk7CgovLyBBdHRhY2ggYSB2ZXJ0ZXggc2hhZGVyCmdsLmF0dGFjaFNoYWRlcihzaGFkZXJQcm9ncmFtLCB2ZXJ0U2hhZGVyKTsKCi8vIEF0dGFjaCBhIGZyYWdtZW50IHNoYWRlcgpnbC5hdHRhY2hTaGFkZXIoc2hhZGVyUHJvZ3JhbSwgZnJhZ1NoYWRlcik7CgovLyBMaW5rIGJvdGggdGhlIHByb2dyYW1zCmdsLmxpbmtQcm9ncmFtKHNoYWRlclByb2dyYW0pOwoKLy8gVXNlIHRoZSBjb21iaW5lZCBzaGFkZXIgcHJvZ3JhbSBvYmplY3QKZ2wudXNlUHJvZ3JhbShzaGFkZXJQcm9ncmFtKTsK/W3siY29kZSI6IlxuLy8gR2V0IHRoZSBhdHRyaWJ1dGUgbG9jYXRpb25cbnZhciBjb29yZGluYXRlc0F0dHJpYkxvY2F0aW9uID0gZ2wuZ2V0QXR0cmliTG9jYXRpb24oXG4gIHNoYWRlclByb2dyYW0sXG4gIFwiY29vcmRpbmF0ZXNcIlxuKTtcblxuLy8gR2V0IHRoZSB1bmlmb3JtIGxvY2F0aW9uXG52YXIgY29sb3VyVW5pZm9ybUxvY2F0aW9uID0gZ2wuZ2V0VW5pZm9ybUxvY2F0aW9uKFxuICBzaGFkZXJQcm9ncmFtLFxuICBcImNvbG91clwiXG4pOyIsImVycm9yIjpmYWxzZSwibWVkaWFuIjowLjAzNDk5OTk5OTEzMDM3NzU0Nn1d"
                   >Perflink</a
                 >
               </td>
@@ -408,6 +475,30 @@
             </tr>
           </table>
         </div>
+        <h3>References:</h3>
+        <ul>
+          <li>
+            <a
+              href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices"
+            >
+              https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices
+            </a>
+          </li>
+          <li>
+            <a
+              href=" https://emscripten.org/docs/optimizing/Optimizing-WebGL.html"
+            >
+              https://emscripten.org/docs/optimizing/Optimizing-WebGL.html
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://blog.scottlogic.com/2019/11/18/drawing-lines-with-webgl.html"
+            >
+              https://blog.scottlogic.com/2019/11/18/drawing-lines-with-webgl.html
+            </a>
+          </li>
+        </ul>
       </div>
     </main>
     <footer>
