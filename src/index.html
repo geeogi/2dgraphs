@@ -1,6 +1,8 @@
 <html>
   <head>
+    <!-- META -->
     <title>2D Graphs Comparison</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- CSS -->
     <style>
       :root {
@@ -20,13 +22,15 @@
 
       body {
         margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-          "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
-          "Helvetica Neue", sans-serif;
+        font-family: Arial, x-locale-body, sans-serif;
+        letter-spacing: -0.00278rem;
+        font-size: 18px;
+        font-size: 1rem;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         background-color: var(--background-color);
         color: var(--contrast-color);
+        background-color:#fafafa;
       }
 
       canvas {
@@ -49,20 +53,18 @@
         }
       }
 
-      .Header {
+      header {
         padding: 16px;
         border-bottom: solid 1px var(--border-color);
+        background-color: white;
       }
 
-      .Row {
-        display: flex;
-        padding-left: 16px;
-      }
-
-      .Column {
-        max-width: 800px;
-        margin: auto;
-        padding: 8px;
+      footer {
+        padding: 16px;
+        margin-top: 16px;
+        border-top: solid 1px var(--border-color);
+        text-align: right;
+        background-color: white;
       }
 
       h1,
@@ -70,8 +72,28 @@
         margin: 4px 0;
       }
 
+      p {
+        line-height: 1.6;
+      }
+
       h3 {
         font-size: 16px;
+      }
+
+      .Row {
+        display: flex;
+      }
+
+      .TextColumn {
+        max-width: 700px;
+        margin: auto;
+        padding: 8px;
+      }
+
+      .GraphCard {
+        max-width: 1000px;
+        margin: auto;
+        padding: 8px;
       }
 
       .ActiveLegend {
@@ -203,22 +225,18 @@
         padding: 8px;
       }
     </style>
-
     <!-- JS -->
     <script async src="bundle.js"></script>
-
-    <!-- META -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
 
   <body>
     <!-- TEMPLATE -->
+    <header class="Header">
+      <h1>2D Graphs</h1>
+      <span>2D Canvas vs. WebGL comparison</span>
+    </header>
     <main>
-      <header class="Header">
-        <h1>2D Graphs</h1>
-        <span>2D Canvas vs. WebGL comparison</span>
-      </header>
-      <div class="Column">
+      <div class="GraphCard">
         <h3>Render method:</h3>
         <div class="Row">
           <button id="render-2d-canvas-button">
@@ -261,39 +279,72 @@
             ></div>
           </div>
         </div>
+      </div>
+      <div class="TextColumn">
+        <h3>TL;DR</h3>
+        <p>
+          The initial load of the <em>2D Canvas</em> graph (~15ms) is
+          significantly faster than the initial load of the <em>WebGL</em> graph
+          (~40ms) [and faster than the best performing JS charting libraries
+          according to a recent
+          <a href="https://github.com/leeoniya/uPlot#performance">benchmark</a
+          >]. The <em>WebGL</em> graph is much faster when zooming and panning.
+        </p>
+        <h3>Introduction:</h3>
+        <p>
+          The objective of this page is to compare the relative performance of
+          two browser rendering technologies <em>2D Canvas</em> and
+          <em><em>WebGL</em></em> for 2D graphing. The primary line and the
+          shaded region of the graph have been implemented twice using each API.
+          The render technology can be toggled using the buttons above and the
+          graph can be re-rendered by toggling these buttons or by
+          reducing/increasing the number of data points. The graph data, labels
+          and grid lines are controlled identically for each graph by a separate
+          module.
+        </p>
         <h3>Key findings:</h3>
         <p>
-          The initial load of the 2D Canvas graph (~15ms) is significantly
-          faster than the initial load of the WebGL graph (~40ms). This is
-          primarily because fetching the WebGL context is slow in all major
-          browsers (~10ms) and fetching the attribute and uniform locations for
-          the compiled drawing program (~3ms each) and sizing the canvas (~2ms)
-          can also take a significant amount of time.
+          Both technologies produced satisfactory graphs. The initial load of
+          the <em>2D Canvas</em> graph (~15ms) is significantly faster than the
+          initial load of the <em>WebGL</em> graph (~40ms). This is primarily
+          because fetching the <em>WebGL</em> context is slow in all major
+          browsers (~10ms). Fetching the attribute and uniform locations for the
+          compiled drawing program (~3ms each) and sizing the canvas (~2ms) also
+          takes a significant amount of time.
         </p>
         <p>
-          The WebGL drawing program should be compiled and the attribute and
-          uniform locations fetched as soon as possible on application start.
-          These should be cached and reused throughout the lifetime of the
-          application. The WebGL canvas should be resized as infrequently as
-          possible which is achieved on this page by a debounced resize handler.
+          Executing the drawing command of the <em>WebGL</em> graphic (~0.01ms)
+          is extremely fast in comparison with the <em>2D Canvas</em> graphic
+          (~1.2ms).
+        </p>
+        <h3>Performance implementation:</h3>
+        <p>
+          Compiling the <em>WebGL</em> drawing program and fetching the
+          attribute and uniform locations (~3ms each) is slow and should be
+          completed as soon as possible on application start. These can be
+          cached and reused throughout the lifetime of the application.
         </p>
         <p>
-          Subsequent rendering of the WebGL graphic (~0.01ms) is extremely fast
-          in comparison with the 2D Canvas graphic (~1.2ms). For this reason
-          WebGL a far superior rendering technology for graphics which require
-          drawing the same shape repeatedly with matrix vectors applied (e.g.
-          scale, skew, rotation, transformation). To make the most of WebGL, the
-          pan-able and zoom-able features of graphs should be achieved through
-          matrix transformation of a single set of attributes.
+          Resizing the <em>WebGL</em> canvas is slow and should be done as
+          infrequently as possible. The <em>WebGL</em> resize handler on this
+          page scales the canvas element (0.01ms) immediately and then resizes
+          the <em>WebGL</em> canvas (~1.4ms) in a debounced action.
         </p>
         <p>
-          In theory, a 2D graph could be loaded using the 2D Canvas context
-          first for the quickest initial load and then replaced with a WebGL
-          context for the quickest zoom and pan interactions. This
-          implementation would benefit from the best performance of each
-          technology.
+          <em>WebGL</em> is extremely fast when drawing the same attributes
+          repeatedly with matrix vectors applied (e.g. scale, skew, rotation,
+          transformation). The pan-able and zoom-able features of the
+          <em>WebGL</em> graph are achieved through matrix transformation of a
+          single set of attributes for the best performance.
         </p>
-        <h3>Performance analysis:</h3>
+        <p>
+          In theory a 2D graph could be loaded using the
+          <em>2D Canvas</em> context and then replaced with a
+          <em>WebGL</em> context as soon as possible. This implementation would
+          benefit from the best performance of each technology i.e. fast load
+          times with 2D canvas and quick interaction times with <em>WebGL</em>.
+        </p>
+        <h3>Performance benchmark:</h3>
         <div class="Table">
           <table>
             <tr>
@@ -305,7 +356,7 @@
               <th>Example</th>
             </tr>
             <tr>
-              <td>Instantiating the context</td>
+              <td>Fetching the context</td>
               <td>getContext(“2d”);</td>
               <td>getContext(“webgl”);</td>
               <td class="Green">~0.01ms</td>
@@ -359,5 +410,8 @@
         </div>
       </div>
     </main>
+    <footer>
+      <a href="https://geeogi.com">@geeogi</a>
+    </footer>
   </body>
 </html>
