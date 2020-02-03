@@ -107,9 +107,10 @@ export const getDateLabels = (earliestDate: number, latestDate: number) => {
     return getLabels("month", 1);
   }
 
+  displayFormat = "D MMM";
+
   // 2 week intervals
   if (dateRange / 2 > 2 * oneWeek) {
-    displayFormat = "D MMM";
     return getLabels("week", 2);
   }
 
