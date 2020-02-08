@@ -1,3 +1,4 @@
+import { initializeWebGLGraph } from './Graph/webgl';
 import {
   CANVAS_2D_CANVAS_ID,
   CANVAS_2D_RENDER_BUTTON,
@@ -7,10 +8,10 @@ import {
   WEB_GL_RENDER_BUTTON
 } from "./Config/constants";
 import { VALUES } from "./Data/data";
-import { initializeGraph } from "./Graph";
 import { drawGraph2DCanvas } from "./Graph/2DCanvas/index";
 import { drawGraphWebGL } from "./Graph/WebGL/index";
 import { GraphInitializeMethod } from "./types";
+import { initialize2DCanvasGraph } from './Graph/2dcanvas';
 
 /**
  *
@@ -19,13 +20,16 @@ import { GraphInitializeMethod } from "./types";
  *
  */
 
+// Types
+type GraphRedrawMethod = {
+  canvasId: string;
+  onRescale: (noOfPoints: number) => void;
+};
+
 // State
 let currentCanvasId: string;
 let currentNoOfDataPoints: number = 3000;
-const redrawMethods: {
-  canvasId: string;
-  onRescale: (noOfPoints: number) => void;
-}[] = [];
+const redrawMethods: GraphRedrawMethod[] = [];
 
 /**
  * Fetch and show the canvas by ID
@@ -60,7 +64,8 @@ export const showCanvasById = (canvasId: string) => {
 export const setupGraph = (
   canvasId: string,
   drawingMethod: GraphInitializeMethod,
-  noOfDataPoints: number = currentNoOfDataPoints
+  noOfDataPoints: number = currentNoOfDataPoints,
+  initializeGraph: any
 ) => {
   const canvas: HTMLCanvasElement = document.getElementById(canvasId) as any;
 
@@ -82,7 +87,7 @@ export const setupGraph = (
 window.onload = () => {
   // Initialize the WebGL graph on page load
   showCanvasById(WEB_GL_CANVAS_ID);
-  setupGraph(WEB_GL_CANVAS_ID, drawGraphWebGL, VALUES.length);
+  setupGraph(WEB_GL_CANVAS_ID, drawGraphWebGL, VALUES.length, initializeWebGLGraph);
 
   // Attach button listener
   document.getElementById(CANVAS_2D_RENDER_BUTTON).onclick = () => {
@@ -92,7 +97,7 @@ window.onload = () => {
     if (redraw) {
       redraw.onRescale(currentNoOfDataPoints);
     } else {
-      setupGraph(id, drawGraph2DCanvas)(currentNoOfDataPoints);
+      setupGraph(id, drawGraph2DCanvas, undefined, initialize2DCanvasGraph)(currentNoOfDataPoints);
     }
   };
 
@@ -104,7 +109,7 @@ window.onload = () => {
     if (redraw) {
       redraw.onRescale(currentNoOfDataPoints);
     } else {
-      setupGraph(id, drawGraph2DCanvas);
+      setupGraph(id, drawGraph2DCanvas, undefined, initialize2DCanvasGraph);
     }
   };
 

@@ -10,16 +10,16 @@ import { positionLabels } from "./Universal/positionLabels";
 import { addResizeHandler } from "./Universal/resize";
 
 /**
- * Initializes the drawing method (WebGl or 2DCanvas)
+ * Initializes the drawing method (can be WebGl or 2DCanvas)
  * Positions the graph labels
  * Attaches event listeners (resize and interaction)
- * Returns rescale method which can used to redraw the graph
+ * Returns redraw method which can used to redraw the graph
  * @param canvasElement
  * @param initGraphMethod
  * @param initNoOfDataPoints
  * @param values
  */
-export const initializeGraph = (
+export const initializeWebGLGraph = (
   canvasElement: HTMLCanvasElement,
   initGraphMethod: GraphInitializeMethod,
   values: { dateTime: number; price: number }[]
