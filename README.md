@@ -7,7 +7,7 @@ The initial load of the 2D Canvas graph (~15ms) is significantly faster than the
 
 ### Introduction:
 
-The aim of this page is to compare the relative performance of two browser rendering technologies 2D Canvas and WebGL for 2D graphing. The primary line and the shaded region of the graph have been implemented using each API. You can toggle the render technology by using the buttons and you can re-render the graph by reducing/increasing the number of data points. The rest of the graph (data parsing, labels and grid lines) is handled by a separate module to achieve a controlled environment for comparing the two render technologies.
+The aim of this repo is to compare the relative performance of two browser rendering technologies 2D Canvas and WebGL for 2D graphing. The primary line and the shaded region of the graph have been implemented using each API. You can toggle the render technology by using the buttons and you can re-render the graph by reducing/increasing the number of data points. The rest of the graph (data parsing, labels and grid lines) is handled by a separate module to achieve a controlled environment for comparing the two render technologies.
 
 ### Key findings:
 
