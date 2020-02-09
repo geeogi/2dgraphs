@@ -11,7 +11,7 @@ The aim of this page is to compare the relative performance of two browser rende
 
 ### Key findings:
 
-Both technologies produced fine graphs but their performance differs. The initial load of the 2D Canvas graph (~15ms) is significantly faster than the initial load of the WebGL graph (~40ms). However, once the WebGL graph is loaded the drawing command executes extremely fast (~0.01ms) in comparison to the 2D Canvas graph (up to 1.2ms) and so the WebGL graph is quicker to re-render when making zoom/pan interactions.
+The initial load of the 2D Canvas graph (~15ms) is significantly faster than the initial load of the WebGL graph (~40ms). However, once the WebGL graph is loaded the drawing command executes extremely fast (~0.01ms) in comparison to the 2D Canvas graph (up to 1.2ms) and so the WebGL graph is quicker to re-render when making zoom/pan interactions.
 
 The slow loading speed of the WebGL graph is due to the fact that fetching the WebGL context is slow in all major browsers (~10ms). Fetching the attribute and uniform locations for the compiled drawing program (~3ms each) and sizing the canvas (~2ms) also takes a significant amount of time. The WebGL graph benefits from performing matrix transformations (e.g. zoom) on the GPU, whereas the 2D Canvas is bound to performing these on the CPU and so performance greatly decreases as the number of data points increases.
 
