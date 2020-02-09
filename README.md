@@ -11,19 +11,19 @@ The aim of this repo is to compare the relative performance of two browser rende
 
 ### Key findings:
 
-The initial load of the 2D Canvas graph (~15ms) is significantly faster than the initial load of the WebGL graph (~40ms). However, once the WebGL graph is loaded the drawing command executes extremely fast (~0.01ms) in comparison to the 2D Canvas graph (up to 1.2ms) and so the WebGL graph is quicker to re-render when making zoom/pan interactions.
+* The initial load of the 2D Canvas graph (~15ms) is significantly faster than the initial load of the WebGL graph (~40ms). However, once the WebGL graph is loaded the drawing command executes extremely fast (~0.01ms) in comparison to the 2D Canvas graph (up to 1.2ms) and so the WebGL graph is quicker to re-render when making zoom/pan interactions.
 
-The slow loading speed of the WebGL graph is due to the fact that fetching the WebGL context is slow in all major browsers (~10ms). Fetching the attribute and uniform locations for the compiled drawing program (~3ms each) and sizing the canvas (~2ms) also takes a significant amount of time. The WebGL graph benefits from performing matrix transformations (e.g. zoom) on the GPU, whereas the 2D Canvas is bound to performing these on the CPU and so performance greatly decreases as the number of data points increases.
+* The slow loading speed of the WebGL graph is due to the fact that fetching the WebGL context is slow in all major browsers (~10ms). Fetching the attribute and uniform locations for the compiled drawing program (~3ms each) and sizing the canvas (~2ms) also takes a significant amount of time. The WebGL graph benefits from performing matrix transformations (e.g. zoom) on the GPU, whereas the 2D Canvas is bound to performing these on the CPU and so performance greatly decreases as the number of data points increases.
 
 ### Performance considerations:
 
-Compiling the WebGL drawing program and fetching the attribute and uniform locations (~3ms each) is slow and should be completed as soon as possible on application start. These can be cached and reused throughout the lifetime of the application.
+* Compiling the WebGL drawing program and fetching the attribute and uniform locations (~3ms each) is slow and should be completed as soon as possible on application start. These can be cached and reused throughout the lifetime of the application.
 
-Resizing the WebGL canvas is slow and should be done as infrequently as possible. The WebGL resize handler on this page scales the canvas element (~0.01ms) immediately and then resizes the WebGL canvas (~1.4ms) in a debounced action.
+* Resizing the WebGL canvas is slow and should be done as infrequently as possible. The WebGL resize handler on this page scales the canvas element (~0.01ms) immediately and then resizes the WebGL canvas (~1.4ms) in a debounced action.
 
-WebGL is extremely fast when drawing the same attributes repeatedly with matrix vectors applied (e.g. scale, skew, rotation, transformation). The pan-able and zoom-able features of the WebGL graph are achieved through matrix transformation of a single set of attributes for the best performance.
+* WebGL is extremely fast when drawing the same attributes repeatedly with matrix vectors applied (e.g. scale, skew, rotation, transformation). The pan-able and zoom-able features of the WebGL graph are achieved through matrix transformation of a single set of attributes for the best performance.
 
-In theory a 2D graph could be loaded using the 2D Canvas context and then replaced with a WebGL context as soon as possible. This implementation could benefit from the best performance of each technology i.e. fast load times with 2D canvas and quick interaction times with WebGL (note: not tried this yet, could be a bad idea).
+* In theory a 2D graph could be loaded using the 2D Canvas context and then replaced with a WebGL context as soon as possible. This implementation could benefit from the best performance of each technology i.e. fast load times with 2D canvas and quick interaction times with WebGL (note: not tried this yet, could be a bad idea).
 
 ### Performance benchmark (MacBook Pro 2017 2.3 GHz Intel Core i5):
 
