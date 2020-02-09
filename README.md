@@ -1,4 +1,4 @@
-# 2D Graphs
+# 2D Graphs 📈
 ## WebGL vs. 2D Canvas comparison
 
 ### TL;DR
