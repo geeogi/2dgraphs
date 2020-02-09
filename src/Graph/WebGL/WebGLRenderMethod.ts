@@ -34,7 +34,7 @@ export const getWebGLLineGraphRenderMethod = (
   );
 
   /* RETURN WEBGL RENDER FUNCTION */
-  return function renderWebGlLineGraph(
+  return function renderWebGLPath(
     scale: [number, number] = [1, 1],
     translation: [number, number] = [0, 0]
   ) {

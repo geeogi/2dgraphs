@@ -1,12 +1,24 @@
-import { GraphPoints } from "./../../types";
 import dayjs from "dayjs";
 import {
-  SPACING_UNIT,
+  ACTIVE_CIRCLE_WIDTH,
   ACTIVE_LEGEND_WIDTH,
-  ACTIVE_CIRCLE_WIDTH
+  SPACING_UNIT
 } from "../../Config/constants";
+import {
+  ACTIVE_CIRCLE,
+  ACTIVE_LEGEND,
+  ACTIVE_LINE
+} from "./../../Config/constants";
+import { GraphPoints } from "./../../types";
 import { clamp } from "./numberUtils";
 
+/**
+ * Position the active legend, circle and line to match the active x-coordinate
+ * @param canvasElement
+ * @param activeX
+ * @param margin
+ * @param points
+ */
 export const positionActiveLegend = (
   canvasElement: HTMLCanvasElement,
   activeX: number | undefined,
@@ -23,9 +35,9 @@ export const positionActiveLegend = (
   const graphHeight = resolution[1] - 2 * margin[1];
 
   // Fetch active elements
-  const activeLegendElement = document.getElementById("active-legend");
-  const activeCircleElement = document.getElementById("active-circle");
-  const activeLineElement = document.getElementById("active-line");
+  const activeLegendElement = document.getElementById(ACTIVE_LEGEND);
+  const activeCircleElement = document.getElementById(ACTIVE_CIRCLE);
+  const activeLineElement = document.getElementById(ACTIVE_LINE);
 
   // Show or hide active legend
   if (activeX && activeX > -1) {

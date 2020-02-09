@@ -5,9 +5,6 @@
 /.pnp
 .pnp.js
 
-# script
-parseData.js
-
 # testing
 /coverage
 

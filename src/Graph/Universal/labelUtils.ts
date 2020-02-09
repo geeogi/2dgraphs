@@ -11,6 +11,12 @@ const roundDownToNearest = (value: number, multiple: number) => {
   return Math.floor(value / multiple) * multiple;
 };
 
+/**
+ * Returns an array of suggested labels for a given price range e.g. [1000, 2000, 3000]
+ * @param minPrice
+ * @param maxPrice
+ * @param numberOfLabels
+ */
 export const getPriceLabels = (
   minPrice: number,
   maxPrice: number,
@@ -36,6 +42,11 @@ export const getPriceLabels = (
   return { priceLabels };
 };
 
+/**
+ * * Returns an array of suggested labels for a given date range
+ * @param earliestDate
+ * @param latestDate
+ */
 export const getDateLabels = (earliestDate: number, latestDate: number) => {
   const oneYear = 31536000;
   const oneMonth = 2628000;

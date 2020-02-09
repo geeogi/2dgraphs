@@ -17,7 +17,7 @@ export const get2DCanvasLineGraphRenderMethod = (props: {
   const { points, canvasElement, ctx } = props;
 
   /* RETURN 2D CANVAS RENDER FUNCTION */
-  return function render2DCanvasLineGraph() {
+  return function render2DCanvasPath() {
     // Fetch the desired canvas height and width
     const height = canvasElement.offsetHeight;
     const width = canvasElement.offsetWidth;

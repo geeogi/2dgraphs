@@ -3,6 +3,10 @@ import { debounce } from "debounce";
 import { getWebGLLineGraphRenderMethod } from "./WebGLRenderMethod";
 import { resizeGlCanvas } from "./WebGLUtils/canvasUtils";
 
+/**
+ * Draws the primary path of the WebGL graph
+ * @param args
+ */
 export const drawGraphWebGL = (args: {
   canvasElement: HTMLCanvasElement;
   points: GraphPoints;
@@ -25,11 +29,11 @@ export const drawGraphWebGL = (args: {
   const gl: WebGLRenderingContext | null = canvasElement.getContext("webgl");
 
   if (!gl) {
-    throw new Error("Could not get WebGL context");
+    throw new Error("Could not retrieve WebGL context");
   }
 
   // Initialize render method
-  const renderGLLineGraph = getWebGLLineGraphRenderMethod(
+  const renderWebGLPath = getWebGLLineGraphRenderMethod(
     canvasElement,
     gl,
     points
@@ -39,13 +43,13 @@ export const drawGraphWebGL = (args: {
   resizeGlCanvas(gl, canvasElement);
 
   // Call WebGL render method
-  renderGLLineGraph();
+  renderWebGLPath();
 
   // Define debounced resize method (resizing WebGl canvas is slow ~20ms)
   const debouncedCanvasResize = debounce(
     (scale?: [number, number], translation?: [number, number]) => {
       resizeGlCanvas(gl, canvasElement);
-      renderGLLineGraph(scale, translation);
+      renderWebGLPath(scale, translation);
     },
     150
   );
@@ -53,7 +57,7 @@ export const drawGraphWebGL = (args: {
   // Return graph handlers (resize and rescale)
   return {
     resize: () => {
-      renderGLLineGraph();
+      renderWebGLPath();
       debouncedCanvasResize();
     },
     rescale: (
@@ -83,11 +87,11 @@ export const drawGraphWebGL = (args: {
       const translation: [number, number] = [xTranslation, yTranslation];
 
       // Redraw the graph with new scale and translation
-      renderGLLineGraph(scale, translation);
+      renderWebGLPath(scale, translation);
 
       return {
         resize: () => {
-          renderGLLineGraph(scale, translation);
+          renderWebGLPath(scale, translation);
           debouncedCanvasResize(scale, translation);
         }
       };

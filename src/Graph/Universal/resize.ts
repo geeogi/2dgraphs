@@ -1,5 +1,6 @@
 /**
  * Util for attaching resize listener to the Window
+ * Will cleanup existing resize listener
  * @param onResize
  */
 let cleanup: () => void;

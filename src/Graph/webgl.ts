@@ -1,44 +1,36 @@
-import {
-  GraphHandlers,
-  GraphInitializeMethod,
-  GraphRescaleMethod
-} from "../types";
+import { GraphHandlers, GraphRescaleMethod } from "../types";
 import { addInteractivityHandlers } from "./Universal/eventUtils";
 import { getGraphConfig } from "./Universal/getGraphConfig";
 import { positionActiveLegend } from "./Universal/positionActiveLegend";
 import { positionLabels } from "./Universal/positionLabels";
 import { addResizeHandler } from "./Universal/resize";
+import { drawGraphWebGL } from "./WebGL/index";
 
 /**
- * Initializes the drawing method (can be WebGl or 2DCanvas)
- * Positions the graph labels
- * Attaches event listeners (resize and interaction)
- * Returns redraw method which can used to redraw the graph
+ * Initialize the WebGL graph
+ * Returns a method that can be used to redraw the graph
  * @param canvasElement
- * @param initGraphMethod
- * @param initNoOfDataPoints
  * @param values
  */
 export const initializeWebGLGraph = (
   canvasElement: HTMLCanvasElement,
-  initGraphMethod: GraphInitializeMethod,
-  values: { dateTime: number; price: number }[]
+  initValues: { dateTime: number; price: number }[]
 ) => {
   /**
-   * Initializes or rescales the graph
+   * Draws the graph
+   * Will initialize the WebGL path if no rescaleGraph method is available
+   * Will rescale the existing WebGL path if a rescaleGraph method is available
    * Positions the graph labels
-   * Attaches event listeners (resize and interaction)
-   * @param initGraph
+   * Attaches event listeners (window resize and interaction)
+   * @param values
    * @param rescaleGraph
-   * @param newNoOfDataPoints
    */
   const drawGraph = (args: {
-    initGraph?: GraphInitializeMethod;
-    initValues?: { dateTime: number; price: number }[];
+    values?: { dateTime: number; price: number }[];
     rescaleGraph?: GraphRescaleMethod;
   }) => {
     // Extract render arguments
-    const { initGraph, initValues, rescaleGraph } = args;
+    const { values, rescaleGraph } = args;
 
     // Get graph configuration
     const {
@@ -52,7 +44,7 @@ export const initializeWebGLGraph = (
       maxYValue,
       minXValue,
       maxXValue
-    } = getGraphConfig({ initValues });
+    } = getGraphConfig({ values });
 
     // Define method to be called on graph interaction
     const onInteraction = (args: {
@@ -76,14 +68,12 @@ export const initializeWebGLGraph = (
     // Reset interaction state
     onInteraction({});
 
-    // Draw or rescale the path
+    // Draw or rescale the primary path
     const graphHandlers: GraphHandlers = rescaleGraph
       ? rescaleGraph(minYValue, maxYValue, minXValue, maxXValue)
-      : initGraph({
+      : drawGraphWebGL({
           canvasElement,
           points,
-          xGridLines,
-          yGridLines,
           minYValue,
           maxYValue,
           minXValue,
@@ -109,33 +99,18 @@ export const initializeWebGLGraph = (
     addInteractivityHandlers(onInteraction, canvasElement);
 
     // Return graph handlers
-    return { graphHandlers, points };
+    return { graphHandlers };
   };
 
   // Draw the graph and fetch the graph handlers
-  const { graphHandlers } = drawGraph({
-    initGraph: initGraphMethod,
-    initValues: values
-  });
+  const { graphHandlers } = drawGraph({ values: initValues });
   const { rescale } = graphHandlers;
 
-  // Define a method which can be used to reinitialize the graph
-  const onReinitialize = (noOfPoints: number) => {
-    const newValues = values.slice(values.length - noOfPoints, values.length);
-    drawGraph({ initGraph: initGraphMethod, initValues: newValues });
+  // Return a method to redraw the graph with a given number of points
+  return (noOfPoints: number) => {
+    const start = initValues.length - noOfPoints;
+    const end = initValues.length;
+    const newValues = initValues.slice(start, end);
+    drawGraph({ rescaleGraph: rescale, values: newValues });
   };
-
-  // Define a rescale method which can be used to redraw the graph
-  // (Note: only the WebGL graph can be rescaled without re-initializing)
-  const onRescale = rescale
-    ? (noOfPoints: number) => {
-        const newValues = values.slice(
-          values.length - noOfPoints,
-          values.length
-        );
-        drawGraph({ rescaleGraph: rescale, initValues: newValues });
-      }
-    : onReinitialize;
-
-  return { onRescale };
 };

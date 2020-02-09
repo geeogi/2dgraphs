@@ -1,4 +1,3 @@
-import { initializeWebGLGraph } from './Graph/webgl';
 import {
   CANVAS_2D_CANVAS_ID,
   CANVAS_2D_RENDER_BUTTON,
@@ -8,10 +7,8 @@ import {
   WEB_GL_RENDER_BUTTON
 } from "./Config/constants";
 import { VALUES } from "./Data/data";
-import { drawGraph2DCanvas } from "./Graph/2DCanvas/index";
-import { drawGraphWebGL } from "./Graph/WebGL/index";
-import { GraphInitializeMethod } from "./types";
-import { initialize2DCanvasGraph } from './Graph/2dcanvas';
+import { initialize2DCanvasGraph } from "./Graph/2dcanvas";
+import { initializeWebGLGraph } from "./Graph/webgl";
 
 /**
  *
@@ -23,7 +20,7 @@ import { initialize2DCanvasGraph } from './Graph/2dcanvas';
 // Types
 type GraphRedrawMethod = {
   canvasId: string;
-  onRescale: (noOfPoints: number) => void;
+  rescaleByNumberOfPoints: (noOfPoints: number) => void;
 };
 
 // State
@@ -37,13 +34,13 @@ const redrawMethods: GraphRedrawMethod[] = [];
  * @param canvasId
  */
 export const showCanvasById = (canvasId: string) => {
-  // DOM: Hide current canvas if the canvasId has changed
+  // Hide the current canvas
   if (currentCanvasId && canvasId !== currentCanvasId) {
     const currentCanvas = document.getElementById(currentCanvasId);
     currentCanvas.setAttribute("style", "display: none;");
   }
 
-  // DOM: Fetch and show canvas element
+  // Fetch and show canvas element
   const canvas: HTMLCanvasElement = document.getElementById(canvasId) as any;
   canvas.setAttribute("style", "display: block;");
 
@@ -54,32 +51,6 @@ export const showCanvasById = (canvasId: string) => {
 };
 
 /**
- * Calls the graph initialize method
- * Updates canvas visibility
- * Updates render variable cache
- * @param canvasId
- * @param drawingMethod
- * @param noOfDataPoints
- */
-export const setupGraph = (
-  canvasId: string,
-  drawingMethod: GraphInitializeMethod,
-  noOfDataPoints: number = currentNoOfDataPoints,
-  initializeGraph: any
-) => {
-  const canvas: HTMLCanvasElement = document.getElementById(canvasId) as any;
-
-  // Initialize the graph
-  const { onRescale } = initializeGraph(canvas, drawingMethod, VALUES);
-
-  // Update state
-  currentNoOfDataPoints = noOfDataPoints;
-  redrawMethods.push({ canvasId, onRescale });
-
-  return onRescale;
-};
-
-/**
  *
  * Attach event listeners to index.html and initialize the graph on window load
  *
@@ -87,43 +58,48 @@ export const setupGraph = (
 window.onload = () => {
   // Initialize the WebGL graph on page load
   showCanvasById(WEB_GL_CANVAS_ID);
-  setupGraph(WEB_GL_CANVAS_ID, drawGraphWebGL, VALUES.length, initializeWebGLGraph);
+  const canvas = document.getElementById(WEB_GL_CANVAS_ID) as HTMLCanvasElement;
+  const rescaleByNumberOfPoints = initializeWebGLGraph(canvas, VALUES);
 
-  // Attach button listener
+  // Update state
+  currentNoOfDataPoints = VALUES.length;
+  redrawMethods.push({ canvasId: WEB_GL_CANVAS_ID, rescaleByNumberOfPoints });
+
+  // Attach button listener (2D Canvas)
   document.getElementById(CANVAS_2D_RENDER_BUTTON).onclick = () => {
     const id = CANVAS_2D_CANVAS_ID;
     const redraw = redrawMethods.find(({ canvasId }) => canvasId === id);
     showCanvasById(id);
     if (redraw) {
-      redraw.onRescale(currentNoOfDataPoints);
+      redraw.rescaleByNumberOfPoints(currentNoOfDataPoints);
     } else {
-      setupGraph(id, drawGraph2DCanvas, undefined, initialize2DCanvasGraph)(currentNoOfDataPoints);
+      const canvas: HTMLCanvasElement = document.getElementById(id) as any;
+      const rescaleByNumberOfPoints = initialize2DCanvasGraph(canvas, VALUES);
+      rescaleByNumberOfPoints(currentNoOfDataPoints);
+
+      // Update state
+      currentNoOfDataPoints = currentNoOfDataPoints;
+      redrawMethods.push({ canvasId: id, rescaleByNumberOfPoints });
     }
   };
 
-  // Attach button listener
+  // Attach button listener (WebGL)
   document.getElementById(WEB_GL_RENDER_BUTTON).onclick = () => {
     const id = WEB_GL_CANVAS_ID;
     const redraw = redrawMethods.find(({ canvasId }) => canvasId === id);
     showCanvasById(id);
-    if (redraw) {
-      redraw.onRescale(currentNoOfDataPoints);
-    } else {
-      setupGraph(id, drawGraph2DCanvas, undefined, initialize2DCanvasGraph);
-    }
+    redraw.rescaleByNumberOfPoints(currentNoOfDataPoints);
   };
 
   // Attach range input listener
   document.getElementById(DATA_POINTS_SLIDER).oninput = e => {
     const newNoOfDataPoints = parseInt((e.target as HTMLInputElement).value);
-
-    // Rescale graph
     const redraw = redrawMethods.find(
       ({ canvasId }) => canvasId === currentCanvasId
     );
-    redraw.onRescale(newNoOfDataPoints);
+    redraw.rescaleByNumberOfPoints(newNoOfDataPoints);
 
-    // Update the cache
+    // Update the state
     currentNoOfDataPoints = newNoOfDataPoints;
 
     // Update data points label

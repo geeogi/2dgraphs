@@ -52,3 +52,7 @@ export const WEB_GL_RENDER_BUTTON = "render-webgl-button";
 
 export const DATA_POINTS_SLIDER = "data-points-slider";
 export const DATA_POINTS_PREVIEW = "data-points-preview";
+
+export const ACTIVE_LEGEND = "active-legend";
+export const ACTIVE_CIRCLE = "active-circle";
+export const ACTIVE_LINE = "active-line";

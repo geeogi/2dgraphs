@@ -1,5 +1,5 @@
-import { GraphPoints } from "../../types";
 import { GRAPH_MARGIN_X, GRAPH_MARGIN_Y } from "../../Config/constants";
+import { GraphPoints } from "../../types";
 import { getDateLabels, getPriceLabels } from "./labelUtils";
 import { getScaleMethod } from "./numberUtils";
 
@@ -10,20 +10,18 @@ import { getScaleMethod } from "./numberUtils";
  * @returns { priceLabels, dateLabels, xGridLines, yGridLines, points, margin }
  */
 export const getGraphConfig = (args: {
-  initValues?: { dateTime: number; price: number }[];
-  initPoints?: GraphPoints;
+  values?: { dateTime: number; price: number }[];
 }) => {
   // Determine the base for the config
-  const { initPoints, initValues } = args;
-  const base = initPoints || initValues;
+  const { values } = args;
 
   // Calculate min, max and average price
-  const minPrice = Math.min(...base.map(value => value.price));
-  const maxPrice = Math.max(...base.map(value => value.price));
+  const minPrice = Math.min(...values.map(value => value.price));
+  const maxPrice = Math.max(...values.map(value => value.price));
 
   // Calculate min, max date
-  const earliestDate = base[0].dateTime;
-  const latestDate = base[base.length - 1].dateTime;
+  const earliestDate = values[0].dateTime;
+  const latestDate = values[values.length - 1].dateTime;
 
   // Define margin
   const margin: [number, number] = [GRAPH_MARGIN_X, GRAPH_MARGIN_Y];
@@ -48,14 +46,12 @@ export const getGraphConfig = (args: {
   const yGridLines = priceLabels.map(label => scalePriceY(label));
 
   // Calculate point coordinates [-1,1] if these weren't provided
-  const points: GraphPoints =
-    initPoints ||
-    initValues.map(value => ({
-      x: scaleUnixX(value.dateTime),
-      y: scalePriceY(value.price),
-      price: value.price,
-      dateTime: value.dateTime
-    }));
+  const points: GraphPoints = values.map(value => ({
+    x: scaleUnixX(value.dateTime),
+    y: scalePriceY(value.price),
+    price: value.price,
+    dateTime: value.dateTime
+  }));
 
   return {
     priceLabels,
