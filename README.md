@@ -3,7 +3,7 @@
 
 ### TL;DR
 
-The initial load of the 2D Canvas graph (~15ms) is significantly faster than the initial load of the WebGL graph (~40ms) [and both are faster than the best performing JS charting libraries according to a recent benchmark]. The WebGL graph is much faster when zooming and panning.
+The initial load of the 2D Canvas graph (~15ms) is significantly faster than the initial load of the WebGL graph (~40ms) [and both are faster than the best performing JS charting libraries according to a [recent benchmark](https://github.com/leeoniya/uPlot#performance)]. The WebGL graph is much faster when zooming and panning.
 
 ### Introduction:
 
