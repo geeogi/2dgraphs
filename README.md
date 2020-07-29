@@ -28,7 +28,7 @@ The aim of this repo is to compare the relative performance of two browser rende
 ### Performance benchmark (MacBook Pro 2017 2.3 GHz Intel Core i5):
 
 |Action|2D snippet|WebGL snippet|2D performance|WebGL performance|
-|--- |--- |--- |--- |--- |--- |
+|--- |--- |--- |--- |--- |
 |Fetching the context|getContext(“2d”);|getContext(“webgl”);|~0.01ms|~7.8ms|
 |Resizing the canvas|canvas.width=400;|canvas.width=400;|~0.02ms|~1.4ms|
 |Initiating buffers|N/A|createBuffer(...); bindBuffer(...);|N/A|~0.03ms|
