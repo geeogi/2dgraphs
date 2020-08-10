@@ -270,26 +270,16 @@
         </div>
       </div>
       <div class="TextColumn">
-        <h3>TL;DR</h3>
-        <p>The initial load of the <em>2D Canvas</em> graph (~15ms) is significantly faster than the initial load of the <em>WebGL</em> graph (~40ms) [and both are faster than the best performing JS charting libraries according to a recent <a href="https://github.com/leeoniya/uPlot#performance">benchmark</a>]. The <em>WebGL</em> graph is much faster when zooming and panning.</p>
         <h3>Introduction:</h3>
         <p>
-          The aim of this page is to compare the relative performance of two browser rendering technologies <em>2D Canvas</em> and <em><em>WebGL</em></em> for graphing 1000+ points. The primary line and the shaded region of the graph have been implemented using each API. You can toggle the render technology by using the buttons and you can re-render the graph by reducing/increasing the number of data points. The rest of the graph (data parsing, labels and grid lines) is handled by a separate module to achieve a controlled environment for comparing the two render technologies.
+          The aim of this page is to compare the relative performance of two browser rendering technologies 2D Canvas and WebGL for graphing 1000+ points. The primary line and the shaded region of the graph have been implemented using each API. You can toggle the render technology by using the buttons and you can re-render the graph by reducing/increasing the number of data points. The rest of the graph (data parsing, labels and grid lines) is handled by a separate module to achieve a controlled environment for comparing the two render technologies.
         </p>
         <h3>Key findings:</h3>
-        <p>
-          Both technologies produced fine graphs but their performance differs. The initial load of the
-          <em>2D Canvas</em> graph (~15ms) is significantly faster than the initial load of the <em>WebGL</em> graph (~40ms). However, once the <em>WebGL</em> graph is loaded the drawing command executes extremely fast (~0.01ms) in comparison to the <em>2D Canvas</em> graph (up to 1.2ms) and so the <em>WebGL</em> graph is quicker to re-render when making zoom/pan interactions.
-        </p>
-        <p>The slow loading speed of the <em>WebGL</em> graph is due to the fact that fetching the <em>WebGL</em> context is slow in all major browsers (~10ms). Fetching the attribute and uniform locations for the compiled drawing program (~3ms each) and sizing the canvas (~2ms) also takes a significant amount of time. The <em>WebGL</em> graph benefits from performing matrix transformations (e.g. zoom) on the GPU, whereas the <em>2D Canvas</em> is bound to performing these on the CPU and so performance greatly decreases as the number of data points increases.</p>
-        <h3>Performance considerations:</h3>
-        <p>Compiling the <em>WebGL</em> drawing program and fetching the attribute and uniform locations (~3ms each) is slow and should be completed as soon as possible on application start. These can be cached and reused throughout the lifetime of the application.</p>
-        <p>Resizing the <em>WebGL</em> canvas is slow and should be done as infrequently as possible. The <em>WebGL</em> resize handler on this page scales the canvas element (~0.01ms) immediately and then resizes the <em>WebGL</em> canvas (~1.4ms) in a debounced action.</p>
-        <p><em>WebGL</em> is extremely fast when drawing the same attributes repeatedly with matrix vectors applied (e.g. scale, skew, rotation, transformation). The pan-able and zoom-able features of the <em>WebGL</em> graph are achieved through matrix transformation of a single set of attributes for the best performance.</p>
-        <p>
-          In theory a 2D graph could be loaded using the
-          <em>2D Canvas</em> context and then replaced with a <em>WebGL</em> context as soon as possible. This implementation could benefit from the best performance of each technology i.e. fast load times with <em>2D canvas</em> and quick interaction times with <em>WebGL</em> (note: not tried this yet, could be a bad idea).
-        </p>
+        <p>The initial load of the 2D Canvas graph (~15ms) is significantly faster than the initial load of the WebGL graph (~40ms). However, once the WebGL graph is loaded the drawing command executes extremely fast (~0.01ms) in comparison to the 2D Canvas graph (up to 1.2ms) and so the WebGL graph is quicker to re-render when making zoom/pan interactions.</p>
+        <p>The slow loading speed of the WebGL graph is due to the fact that fetching the WebGL context is slow in all major browsers (~10ms). Fetching the attribute and uniform locations for the compiled drawing program (~3ms each) and sizing the canvas (~2ms) also takes a significant amount of time. The WebGL graph benefits from performing matrix transformations (e.g. zoom) on the GPU, whereas the 2D Canvas is bound to performing these on the CPU and so performance greatly decreases as the number of data points increases.</p>
+        <h3>WebGL performance considerations:</h3>
+        <p>Compiling the WebGL drawing program and fetching the attribute and uniform locations (~3ms each) is slow and should be completed as soon as possible on application start. These can be cached and reused throughout the lifetime of the application. Resizing the WebGL canvas is slow and should be done as infrequently as possible. The WebGL resize handler on this page scales the canvas element (~0.01ms) immediately and then resizes the WebGL canvas (~1.4ms) in a debounced action.</p>
+        <p>WebGL is extremely fast when drawing the same attributes repeatedly with matrix vectors applied (e.g. scale, skew, rotation, transformation). The pan-able and zoom-able features of the WebGL graph are achieved through matrix transformation of a single set of attributes for the best performance. In theory a 2D graph could be loaded using the 2D Canvas context and then replaced with a WebGL context as soon as possible. This implementation could benefit from the best performance of each technology i.e. fast load times with 2D canvas and quick interaction times with WebGL (note: not tried this yet, could be a bad idea).</p>
         <h3>Performance benchmark (MacBook Pro 2017 2.3 GHz Intel Core i5):</h3>
         <div class="Table">
           <table>
